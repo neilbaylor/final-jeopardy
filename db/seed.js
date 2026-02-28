@@ -11,7 +11,7 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-const SEASON_URL = 'https://j-archive.com/showseason.php?season=41';
+const SEASONS = [38, 39, 40, 41];
 
 function fetchPage(url) {
   const html = execSync(
@@ -21,8 +21,8 @@ function fetchPage(url) {
   return html.toString();
 }
 
-async function getEpisodeLinks() {
-  const html = fetchPage(SEASON_URL);
+async function getEpisodeLinks(season) {
+  const html = fetchPage(`https://j-archive.com/showseason.php?season=${season}`);
   const $ = cheerio.load(html);
   const links = [];
   $('a[href*="showgame.php"]').each((_, el) => {
@@ -52,8 +52,9 @@ async function extractFinalJeopardy(url) {
 
 async function main() {
   const db = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
+    ...(process.env.DB_SOCKET
+      ? { socketPath: process.env.DB_SOCKET }
+      : { host: process.env.DB_HOST || 'localhost', port: process.env.DB_PORT || 3306 }),
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'final_jeopardy',
@@ -63,31 +64,33 @@ async function main() {
   await db.execute('DELETE FROM questions');
   console.log('Cleared existing questions.');
 
-  const links = await getEpisodeLinks();
-  console.log(`Found ${links.length} episode links.`);
-
   let inserted = 0;
   let skipped = 0;
 
-  for (const link of links) {
-    try {
-      const data = await extractFinalJeopardy(link);
-      if (!data) {
-        console.log(`  SKIP (no data): ${link}`);
+  for (const season of SEASONS) {
+    const links = await getEpisodeLinks(season);
+    console.log(`\nSeason ${season}: found ${links.length} episode links.`);
+
+    for (const link of links) {
+      try {
+        const data = await extractFinalJeopardy(link);
+        if (!data) {
+          console.log(`  SKIP (no data): ${link}`);
+          skipped++;
+          continue;
+        }
+        await db.execute(
+          'INSERT INTO questions (question, answer, category) VALUES (?, ?, ?)',
+          [data.question, data.answer, data.category]
+        );
+        console.log(`  OK [${data.category}] ${data.question.substring(0, 60)}...`);
+        inserted++;
+        // polite delay
+        await new Promise(r => setTimeout(r, 500));
+      } catch (err) {
+        console.error(`  ERROR ${link}: ${err.message}`);
         skipped++;
-        continue;
       }
-      await db.execute(
-        'INSERT INTO questions (question, answer, category) VALUES (?, ?, ?)',
-        [data.question, data.answer, data.category]
-      );
-      console.log(`  OK [${data.category}] ${data.question.substring(0, 60)}...`);
-      inserted++;
-      // polite delay
-      await new Promise(r => setTimeout(r, 500));
-    } catch (err) {
-      console.error(`  ERROR ${link}: ${err.message}`);
-      skipped++;
     }
   }
 
