@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS questions (
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
   category VARCHAR(100) DEFAULT 'General',
-  difficulty ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -63,15 +62,4 @@ CREATE TABLE IF NOT EXISTS game_questions (
   FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 );
 
--- Sample questions
-INSERT IGNORE INTO questions (question, answer, category, difficulty) VALUES
-  ('What is the capital of France?', 'Paris', 'Geography', 'easy'),
-  ('Who wrote "To Kill a Mockingbird"?', 'Harper Lee', 'Literature', 'medium'),
-  ('What is the chemical symbol for gold?', 'Au', 'Science', 'easy'),
-  ('In what year did World War II end?', '1945', 'History', 'easy'),
-  ('What is the largest planet in our solar system?', 'Jupiter', 'Science', 'easy'),
-  ('What is the speed of light (approximately)?', '299,792,458 meters per second', 'Science', 'hard'),
-  ('Who painted the Mona Lisa?', 'Leonardo da Vinci', 'Art', 'easy'),
-  ('What is the square root of 144?', '12', 'Math', 'easy'),
-  ('Which country has the most natural lakes?', 'Canada', 'Geography', 'hard'),
-  ('What year did the Berlin Wall fall?', '1989', 'History', 'medium');
+-- Questions are seeded from j-archive.com via db/seed.js
