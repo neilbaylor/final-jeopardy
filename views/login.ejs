@@ -2,26 +2,124 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FJ Friends" />
+  <meta name="theme-color" content="#0d1a3e" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/images/logo.jpeg" />
   <title>Final Jeopardy! With Friends</title>
-  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d1a3e;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    .landing-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      gap: 2.5rem;
+    }
+
+    .logo {
+      width: min(280px, 72vw);
+      border-radius: 20px;
+      opacity: 0;
+      animation: fadeIn 0.9s ease forwards;
+    }
+
+    .btn-area {
+      opacity: 0;
+      animation: fadeIn 0.7s ease forwards;
+      animation-delay: 1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .error {
+      color: #ff6b6b;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .btn:active { transform: scale(0.96); opacity: 0.85; }
+
+    .btn-google {
+      background: #ffffff;
+      color: #333;
+      min-width: 220px;
+    }
+
+    .btn-google img { width: 20px; height: 20px; }
+
+    .btn-play {
+      background: #FFD700;
+      color: #111;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 1rem 3rem;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+  </style>
 </head>
-<body class="landing">
+<body>
   <div class="landing-container">
     <img src="/images/logo.jpeg" alt="Final Jeopardy! With Friends" class="logo" />
 
-    <% if (error) { %>
-      <p class="error">Sign-in failed. Please try again.</p>
-    <% } %>
+    <div class="btn-area">
+      <% if (error) { %>
+        <p class="error">Sign-in failed. Please try again.</p>
+      <% } %>
 
-    <% if (user) { %>
-      <a href="/dashboard" class="btn btn-play">Play</a>
-    <% } else { %>
-      <a href="/auth/google" class="btn btn-google">
-        <img src="/images/google-icon.svg" alt="Google" />
-        Sign in with Google
-      </a>
-    <% } %>
+      <% if (user) { %>
+        <a href="/dashboard" class="btn btn-play">Play</a>
+      <% } else { %>
+        <a href="/auth/google" class="btn btn-google">
+          <img src="/images/google-icon.svg" alt="Google" />
+          Sign in with Google
+        </a>
+      <% } %>
+    </div>
   </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
 </body>
 </html>
