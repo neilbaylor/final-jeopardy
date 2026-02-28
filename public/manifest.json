@@ -4,8 +4,8 @@
   "description": "Multiplayer Final Jeopardy with friends",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d1a3e",
-  "theme_color": "#0d1a3e",
+  "background_color": "#07102e",
+  "theme_color": "#07102e",
   "orientation": "portrait",
   "icons": [
     {
