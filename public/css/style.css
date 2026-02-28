@@ -1,0 +1,121 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue: #060CE9;
+  --gold: #FFD700;
+  --dark: #0a0a1a;
+  --white: #ffffff;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+}
+
+/* Landing */
+.landing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.logo {
+  width: 200px;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 3rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.tagline {
+  color: #aaa;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.error {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.btn:hover { opacity: 0.85; }
+
+.btn-google {
+  background: var(--white);
+  color: #333;
+}
+
+.btn-google img {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-sm {
+  background: var(--blue);
+  color: var(--white);
+  padding: 0.4rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Dashboard */
+.dashboard header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: #111;
+  border-bottom: 2px solid var(--gold);
+}
+
+.logo-sm { height: 40px; }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+nav { display: flex; align-items: center; }
+
+.dashboard main {
+  padding: 3rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dashboard main h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
