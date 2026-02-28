@@ -75,6 +75,14 @@ h1 {
   height: 20px;
 }
 
+.btn-play {
+  background: var(--gold);
+  color: #111;
+  font-size: 1.25rem;
+  padding: 0.85rem 2.5rem;
+  letter-spacing: 1px;
+}
+
 .btn-sm {
   background: var(--blue);
   color: var(--white);
