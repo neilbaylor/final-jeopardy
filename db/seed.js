@@ -5,7 +5,9 @@
  * Usage: node db/seed.js
  */
 
-const { execSync } = require('child_process');
+const https = require('https');
+const http = require('http');
+const { URL } = require('url');
 const cheerio = require('cheerio');
 const mysql = require('mysql2/promise');
 const path = require('path');
@@ -13,16 +15,25 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const SEASONS = [38, 39, 40, 41];
 
-function fetchPage(url) {
-  const html = execSync(
-    `curl -s -L --max-redirs 5 -A "Mozilla/5.0 (compatible; seed-script/1.0)" "${url}"`,
-    { timeout: 20000, maxBuffer: 10 * 1024 * 1024 }
-  );
-  return html.toString();
+function fetchPage(url, redirectCount = 0) {
+  return new Promise((resolve, reject) => {
+    if (redirectCount > 5) return reject(new Error('Too many redirects'));
+    const parsed = new URL(url);
+    const client = parsed.protocol === 'https:' ? https : http;
+    client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; seed-script/1.0)' } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return fetchPage(new URL(res.headers.location, url).href, redirectCount + 1).then(resolve, reject);
+      }
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => resolve(Buffer.concat(chunks).toString()));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
 }
 
 async function getEpisodeLinks(season) {
-  const html = fetchPage(`https://j-archive.com/showseason.php?season=${season}`);
+  const html = await fetchPage(`https://j-archive.com/showseason.php?season=${season}`);
   const $ = cheerio.load(html);
   const links = [];
   $('a[href*="showgame.php"]').each((_, el) => {
@@ -34,7 +45,7 @@ async function getEpisodeLinks(season) {
 }
 
 async function extractFinalJeopardy(url) {
-  const html = fetchPage(url);
+  const html = await fetchPage(url);
   const $ = cheerio.load(html);
 
   const finalRound = $('.final_round');
@@ -61,16 +72,25 @@ async function main() {
   });
 
   console.log('Connected to database.');
+
+  // Fetch all episode links first — only wipe the table if scraping is actually working
+  const linksBySeason = [];
+  for (const season of SEASONS) {
+    const links = await getEpisodeLinks(season);
+    console.log(`Season ${season}: found ${links.length} episode links.`);
+    linksBySeason.push({ season, links });
+  }
+  const totalLinks = linksBySeason.reduce((n, s) => n + s.links.length, 0);
+  if (totalLinks === 0) throw new Error('No episode links found — aborting to preserve existing data');
+
   await db.execute('DELETE FROM questions');
   console.log('Cleared existing questions.');
 
   let inserted = 0;
   let skipped = 0;
 
-  for (const season of SEASONS) {
-    const links = await getEpisodeLinks(season);
-    console.log(`\nSeason ${season}: found ${links.length} episode links.`);
-
+  for (const { season, links } of linksBySeason) {
+    console.log(`\nProcessing Season ${season}...`);
     for (const link of links) {
       try {
         const data = await extractFinalJeopardy(link);
