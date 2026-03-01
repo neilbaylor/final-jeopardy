@@ -13,7 +13,7 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-const SEASONS = [38, 39, 40, 41];
+const SEASONS = [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41];
 
 function fetchPage(url, redirectCount = 0) {
   return new Promise((resolve, reject) => {
@@ -72,6 +72,14 @@ async function main() {
   });
 
   console.log('Connected to database.');
+
+  // Skip seeding entirely if the table already has data
+  const [[{ cnt }]] = await db.execute('SELECT COUNT(*) AS cnt FROM questions');
+  if (cnt > 0) {
+    console.log(`DB already has ${cnt} questions — skipping seed.`);
+    await db.end();
+    return;
+  }
 
   // Fetch all episode links first — only wipe the table if scraping is actually working
   const linksBySeason = [];
