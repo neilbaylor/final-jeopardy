@@ -26,4 +26,20 @@ router.get('/api/me', async (req, res) => {
   }
 });
 
+// API: fetch all users except the requesting user
+router.get('/api/users', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  try {
+    const [rows] = await db.execute(
+      'SELECT id, display_name, avatar_url FROM users WHERE id != ? ORDER BY display_name ASC',
+      [userId]
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 module.exports = router;

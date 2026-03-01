@@ -192,21 +192,89 @@
     body.panel-open #new-game-panel {
       transform: translateX(0);
     }
+    /* Panel header */
+    #panel-header {
+      display: flex;
+      align-items: center;
+      background: #07102e;
+      padding: 8px 16px 8px 4px;
+      flex-shrink: 0;
+    }
+    #panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.01em;
+    }
     #close-panel {
       background: none;
       border: none;
       cursor: pointer;
-      padding: 16px;
-      align-self: flex-start;
+      padding: 10px 12px 10px 16px;
       -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
     }
     #close-panel svg {
       width: 28px;
       height: 28px;
-      stroke: #07102e;
+      stroke: #fff;
       stroke-width: 2.5;
       stroke-linecap: round;
       stroke-linejoin: round;
+      display: block;
+    }
+
+    /* Spinner inside panel */
+    #panel-spinner {
+      display: flex;
+      justify-content: center;
+      padding-top: 50px;
+    }
+    #panel-spinner.hidden { display: none; }
+    .panel-spin {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(7,16,46,0.15);
+      border-top-color: #07102e;
+      border-radius: 50%;
+      animation: panelSpin 0.7s linear infinite;
+    }
+    @keyframes panelSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Users list */
+    #users-list {
+      overflow-y: auto;
+      flex: 1;
+      padding: 12px 16px;
+    }
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .user-row:last-child { border-bottom: none; }
+    .user-row img, .user-row .user-avatar-placeholder {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .user-avatar-placeholder {
+      background: #e8eaf0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .user-name {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #111;
     }
   </style>
 </head>
@@ -228,9 +296,14 @@
   </div>
 
   <div id="new-game-panel">
-    <button id="close-panel" aria-label="Back">
-      <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
+    <div id="panel-header">
+      <button id="close-panel" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span id="panel-title">Select Friends For a Game</span>
+    </div>
+    <div id="panel-spinner"><div class="panel-spin"></div></div>
+    <div id="users-list"></div>
   </div>
 
   <script>
@@ -258,10 +331,36 @@
 
     document.getElementById('new-game').addEventListener('click', () => {
       document.body.classList.add('panel-open');
+      loadUsers();
     });
     document.getElementById('close-panel').addEventListener('click', () => {
       document.body.classList.remove('panel-open');
     });
+
+    function loadUsers() {
+      const spinner = document.getElementById('panel-spinner');
+      const list = document.getElementById('users-list');
+      spinner.classList.remove('hidden');
+      list.innerHTML = '';
+
+      fetch(`/api/users?userId=${encodeURIComponent(userId)}`)
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(users => {
+          spinner.classList.add('hidden');
+          list.innerHTML = users.map(u => `
+            <div class="user-row">
+              ${u.avatar_url
+                ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
+                : `<div class="user-avatar-placeholder">👤</div>`}
+              <span class="user-name">${u.display_name}</span>
+            </div>
+          `).join('');
+        })
+        .catch(() => {
+          spinner.classList.add('hidden');
+          list.innerHTML = '<p style="padding:16px;color:#888;">Could not load users.</p>';
+        });
+    }
   </script>
 </body>
 </html>
