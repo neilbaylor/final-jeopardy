@@ -368,13 +368,15 @@
       spinner.classList.remove('hidden');
       list.innerHTML = '';
 
-      const delay = new Promise(res => setTimeout(res, 400));
       const now = Date.now();
-      const fetchUsers = (usersCache && now - usersCacheAt < 60_000)
+      const cached = usersCache && now - usersCacheAt < 60_000;
+      const delay = cached ? Promise.resolve() : new Promise(res => setTimeout(res, 400));
+      const fetchUsers = cached
         ? Promise.resolve(usersCache)
         : fetch(`/api/users?userId=${encodeURIComponent(userId)}`)
             .then(r => r.ok ? r.json() : Promise.reject())
             .then(data => { usersCache = data; usersCacheAt = Date.now(); return data; });
+      if (cached) spinner.classList.add('hidden');
 
       Promise.all([fetchUsers, delay])
         .then(([users]) => {
