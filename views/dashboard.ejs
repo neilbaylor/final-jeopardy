@@ -426,10 +426,10 @@
     let usersCache = null;
     let usersCacheAt = 0;
 
-    function loadUsers() {
+    function loadUsers(silent = false) {
       const spinner = document.getElementById('panel-spinner');
       const list = document.getElementById('users-list');
-      spinner.classList.remove('hidden');
+      if (!silent) spinner.classList.remove('hidden');
       list.innerHTML = '';
 
       const now = Date.now();
@@ -440,11 +440,11 @@
         : fetch(`/api/users?userId=${encodeURIComponent(userId)}`)
             .then(r => r.ok ? r.json() : Promise.reject())
             .then(data => { usersCache = data; usersCacheAt = Date.now(); return data; });
-      if (cached) spinner.classList.add('hidden');
+      if (cached && !silent) spinner.classList.add('hidden');
 
       return Promise.all([fetchUsers, delay])
         .then(([users]) => {
-          spinner.classList.add('hidden');
+          if (!silent) spinner.classList.add('hidden');
           list.innerHTML = users.map(u => `
             <div class="user-row" onclick="this.querySelector('input').click()">
               ${u.avatar_url
@@ -456,7 +456,7 @@
           `).join('');
         })
         .catch(() => {
-          spinner.classList.add('hidden');
+          if (!silent) spinner.classList.add('hidden');
           list.innerHTML = '<p style="padding:16px;color:#888;">Could not load users.</p>';
         });
     }
@@ -500,7 +500,7 @@
           ptrSpinner.style.transform = '';
           ptrSpinner.classList.add('ptr-spinning');
           usersCache = null;
-          loadUsers().finally(() => {
+          loadUsers(true).finally(() => {
             ptr.style.height = '0';
             ptrSpinner.classList.remove('ptr-spinning');
           });
