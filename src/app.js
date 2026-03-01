@@ -117,7 +117,7 @@ async function initDB() {
 async function seedIfEmpty() {
   try {
     const [[{ count }]] = await db.query('SELECT COUNT(*) as count FROM questions');
-    if (count > 0) {
+    if (count > 0 && !process.env.FORCE_RESEED) {
       console.log(`Questions already seeded (${count} rows). Skipping.`);
       return;
     }
