@@ -233,15 +233,17 @@
             document.getElementById('welcome-name').textContent = firstName ? `Welcome, ${firstName}!` : 'Welcome!';
           }
           document.getElementById('welcome-overlay').style.opacity = '1';
-          setTimeout(() => location.replace('/dashboard'), 500);
+          setTimeout(() => location.replace('/dashboard'), 1000);
         })
         .catch(() => location.replace('/dashboard'));
     }
 
-    // Trigger logo fade-in after a short delay so the browser has painted first
-    setTimeout(() => {
-      document.querySelector('.logo-wrap').style.opacity = '1';
-    }, 100);
+    // Trigger logo fade-in only when not showing the welcome overlay
+    if (!uid) {
+      setTimeout(() => {
+        document.querySelector('.logo-wrap').style.opacity = '1';
+      }, 100);
+    }
 
     // Verify stored userId against API before showing Play button
     const storedId = localStorage.getItem('userId');
