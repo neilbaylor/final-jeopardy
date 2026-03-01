@@ -234,7 +234,7 @@
             document.getElementById('welcome-name').textContent = firstName ? `Welcome, ${firstName}!` : 'Welcome!';
           }
           document.getElementById('welcome-overlay').style.opacity = '1';
-          setTimeout(() => location.replace('/dashboard'), 1000);
+          setTimeout(() => location.replace('/dashboard'), 1200);
         })
         .catch(() => location.replace('/dashboard'));
     }
