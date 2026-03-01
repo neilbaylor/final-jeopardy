@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 const passport = require('./config/passport');
 const db = require('./config/database');
 
@@ -22,12 +23,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Session
+const sessionStore = new MySQLStore({
+  expiration: 1000 * 60 * 60 * 24 * 30, // 30 days
+  createDatabaseTable: true,
+}, db);
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'fallback-secret',
     resave: false,
     saveUninitialized: false,
     rolling: true,
+    store: sessionStore,
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 }, // 30 days, refreshed on each request
   })
 );
