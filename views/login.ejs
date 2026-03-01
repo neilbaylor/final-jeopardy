@@ -126,9 +126,7 @@
     const uid = params.get('uid');
     if (uid) {
       localStorage.setItem('userId', uid);
-      params.delete('uid');
-      const qs = params.toString();
-      history.replaceState(null, '', qs ? '?' + qs : '/');
+      location.replace('/dashboard');
     }
 
     // Show Play button if already signed in
