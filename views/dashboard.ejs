@@ -203,10 +203,30 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.25);
     }
     #panel-title {
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 700;
       color: #fff;
       letter-spacing: 0.01em;
+      flex: 1;
+    }
+    #create-btn {
+      background: rgba(255,213,0,0.88);
+      border: none;
+      border-radius: 999px;
+      padding: 0 16px;
+      height: 34px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #07102e;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #create-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
     }
     #close-panel {
       background: none;
@@ -261,7 +281,7 @@
       -webkit-tap-highlight-color: transparent;
     }
     .user-row:last-child { border-bottom: none; }
-    .user-row:has(input:checked) { background: #e8f0fe; }
+    .user-row:has(input:checked) { background: #f0f5ff; }
     .user-row input[type="checkbox"] {
       appearance: none;
       -webkit-appearance: none;
@@ -326,6 +346,7 @@
         <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <span id="panel-title">Select Friends For a Game</span>
+      <button id="create-btn" disabled>Create</button>
     </div>
     <div id="panel-spinner"><div class="panel-spin"></div></div>
     <div id="users-list"></div>
@@ -360,7 +381,13 @@
     });
     document.getElementById('close-panel').addEventListener('click', () => {
       document.body.classList.remove('panel-open');
+      document.getElementById('create-btn').disabled = true;
     });
+
+    function updateCreateBtn() {
+      const anyChecked = document.querySelector('#users-list input:checked');
+      document.getElementById('create-btn').disabled = !anyChecked;
+    }
 
     let usersCache = null;
     let usersCacheAt = 0;
@@ -390,7 +417,7 @@
                 ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
                 : `<div class="user-avatar-placeholder">👤</div>`}
               <span class="user-name">${u.display_name}</span>
-              <input type="checkbox" onclick="event.stopPropagation()" />
+              <input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" />
             </div>
           `).join('');
         })
