@@ -62,4 +62,18 @@ CREATE TABLE IF NOT EXISTS game_questions (
   FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 );
 
+-- Player answers to game questions (one per user per game_question)
+CREATE TABLE IF NOT EXISTS game_answers (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  game_question_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NOT NULL,
+  wager INT UNSIGNED NOT NULL DEFAULT 0,
+  answer TEXT,
+  is_correct BOOLEAN DEFAULT NULL,
+  answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_game_answer (game_question_id, user_id),
+  FOREIGN KEY (game_question_id) REFERENCES game_questions(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Questions are seeded from j-archive.com via db/seed.js
