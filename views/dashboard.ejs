@@ -343,9 +343,12 @@
       spinner.classList.remove('hidden');
       list.innerHTML = '';
 
-      fetch(`/api/users?userId=${encodeURIComponent(userId)}`)
-        .then(r => r.ok ? r.json() : Promise.reject())
-        .then(users => {
+      const delay = new Promise(res => setTimeout(res, 400));
+      const fetchUsers = fetch(`/api/users?userId=${encodeURIComponent(userId)}`)
+        .then(r => r.ok ? r.json() : Promise.reject());
+
+      Promise.all([fetchUsers, delay])
+        .then(([users]) => {
           spinner.classList.add('hidden');
           list.innerHTML = users.map(u => `
             <div class="user-row">
