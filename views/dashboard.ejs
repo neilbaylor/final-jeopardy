@@ -69,7 +69,39 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      position: relative;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
+
+    #user-popover {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+      min-width: 120px;
+      z-index: 100;
+      display: none;
+      overflow: hidden;
+    }
+    #user-popover.open { display: block; }
+    #logout-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      text-align: left;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #c0392b;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #logout-btn:active { background: #fdf0ef; }
 
     .topbar-greeting {
       font-size: 0.9rem;
@@ -361,9 +393,12 @@
 <body>
   <div id="dashboard-root">
     <div class="topbar">
-      <div class="topbar-user">
+      <div class="topbar-user" id="topbar-user">
         <div id="avatar-wrap"><div class="spinner"></div></div>
         <span id="topbar-greeting" class="topbar-greeting" style="display:none"></span>
+        <div id="user-popover">
+          <button id="logout-btn">Log out</button>
+        </div>
       </div>
     </div>
 
@@ -410,6 +445,18 @@
         })
         .catch(() => location.replace('/'));
     }
+
+    document.getElementById('topbar-user').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('user-popover').classList.toggle('open');
+    });
+    document.addEventListener('click', () => {
+      document.getElementById('user-popover').classList.remove('open');
+    });
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('userId');
+      location.replace('/');
+    });
 
     document.getElementById('new-game').addEventListener('click', () => {
       document.body.classList.add('panel-open');
