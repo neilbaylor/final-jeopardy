@@ -260,21 +260,23 @@
       }
     }
 
-    // Play button: slide login page down using CSS View Transitions (MPA)
+    // Play button: slide login page down using CSS View Transitions (MPA).
+    // Key: always preventDefault so we control navigation order —
+    // inject the @view-transition opt-in first, THEN navigate.
     const btnPlay = document.getElementById('btn-play');
     if (btnPlay) {
       btnPlay.addEventListener('click', function(e) {
+        e.preventDefault();
         const url = this.href;
-        // PageSwapEvent is present in browsers that support MPA View Transitions
-        if (typeof PageSwapEvent !== 'undefined') {
-          // Dynamically opt-in to cross-document transition for this navigation only
+        // PageSwapEvent + PageRevealEvent indicate full MPA View Transitions support
+        if (typeof PageSwapEvent !== 'undefined' && typeof PageRevealEvent !== 'undefined') {
           const vt = document.createElement('style');
           vt.textContent = '@view-transition { navigation: auto; }';
           document.head.appendChild(vt);
-          return; // Let the default navigation proceed
+          location.href = url; // navigate AFTER style is in DOM
+          return;
         }
         // Fallback: CSS animation then navigate
-        e.preventDefault();
         document.body.classList.add('slide-out');
         setTimeout(() => { location.href = url; }, 430);
       });
