@@ -23,7 +23,7 @@ passport.use(
             'UPDATE users SET display_name = ?, avatar_url = ? WHERE google_id = ?',
             [profile.displayName, profile.photos?.[0]?.value || null, profile.id]
           );
-          return done(null, rows[0]);
+          return done(null, { ...rows[0], isNew: false });
         }
 
         // Create new user
@@ -38,7 +38,7 @@ passport.use(
         );
 
         const [newUser] = await db.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
-        return done(null, newUser[0]);
+        return done(null, { ...newUser[0], isNew: true });
       } catch (err) {
         return done(err, null);
       }

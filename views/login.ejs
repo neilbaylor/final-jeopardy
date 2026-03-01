@@ -219,6 +219,7 @@
     // After OAuth redirect: store userId in localStorage, show welcome, then navigate
     const params = new URLSearchParams(location.search);
     const uid = params.get('uid');
+    const isNew = params.get('new') === '1';
     if (uid) {
       document.querySelector('.btn-area').style.visibility = 'hidden';
       localStorage.setItem('userId', uid);
@@ -228,10 +229,11 @@
         .then(user => {
           if (user) {
             const firstName = user.display_name ? user.display_name.trim().split(' ')[0] : '';
+            const greeting = isNew ? 'Welcome' : 'Welcome back';
             document.getElementById('welcome-avatar').innerHTML = user.avatar_url
               ? `<img src="${user.avatar_url}" alt="${user.display_name}" />`
               : `<div class="welcome-avatar-ph">👤</div>`;
-            document.getElementById('welcome-name').textContent = firstName ? `Welcome, ${firstName}!` : 'Welcome!';
+            document.getElementById('welcome-name').textContent = firstName ? `${greeting}, ${firstName}!` : `${greeting}!`;
           }
           document.getElementById('welcome-overlay').style.opacity = '1';
           setTimeout(() => location.replace('/dashboard'), 1200);

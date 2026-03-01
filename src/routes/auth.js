@@ -11,9 +11,10 @@ router.get(
   passport.authenticate('google', { failureRedirect: '/?error=auth_failed' }),
   (req, res) => {
     const userId = req.user.id;
+    const isNew = req.user.isNew;
     req.logout((err) => {
       req.session.destroy(() => {
-        res.redirect(`/?uid=${userId}`);
+        res.redirect(`/?uid=${userId}${isNew ? '&new=1' : ''}`);
       });
     });
   }
