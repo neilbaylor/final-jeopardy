@@ -73,9 +73,9 @@ async function main() {
 
   console.log('Connected to database.');
 
-  // Skip seeding entirely if the table already has data
+  // Skip seeding entirely if the table already has data (unless forced)
   const [[{ cnt }]] = await db.execute('SELECT COUNT(*) AS cnt FROM questions');
-  if (cnt > 0) {
+  if (cnt > 0 && !process.env.FORCE_RESEED) {
     console.log(`DB already has ${cnt} questions — skipping seed.`);
     await db.end();
     return;
