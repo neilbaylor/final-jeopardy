@@ -179,7 +179,10 @@
     const uid = params.get('uid');
     if (uid) {
       localStorage.setItem('userId', uid);
-      location.replace('/dashboard');
+      history.replaceState(null, '', '/');
+      // Wait for the page to actually paint so the view transition captures a
+      // rendered login page (dark background + logo) rather than a blank snapshot
+      requestAnimationFrame(() => requestAnimationFrame(() => location.replace('/dashboard')));
     }
 
     // Trigger logo fade-in after a short delay so the browser has painted first
