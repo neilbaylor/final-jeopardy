@@ -29,7 +29,7 @@
     .logo-wrap {
       margin-top: 10vh;
       opacity: 0;
-      animation: fadeIn 0.15s ease forwards;
+      transition: opacity 0.3s ease;
     }
 
     .logo {
@@ -176,10 +176,27 @@
       location.replace('/dashboard');
     }
 
-    // Show Play button if already signed in
-    if (localStorage.getItem('userId')) {
-      document.getElementById('btn-google').style.display = 'none';
-      document.getElementById('btn-play').style.display = '';
+    // Trigger logo fade-in after a short delay so the browser has painted first
+    setTimeout(() => {
+      document.querySelector('.logo-wrap').style.opacity = '1';
+    }, 30);
+
+    // Verify stored userId against API before showing Play button
+    const storedId = localStorage.getItem('userId');
+    if (storedId) {
+      fetch('/api/me?userId=' + encodeURIComponent(storedId))
+        .then(r => {
+          if (r.ok) {
+            document.getElementById('btn-google').style.display = 'none';
+            document.getElementById('btn-play').style.display = '';
+          } else {
+            localStorage.removeItem('userId');
+          }
+        })
+        .catch(() => {
+          document.getElementById('btn-google').style.display = 'none';
+          document.getElementById('btn-play').style.display = '';
+        });
     }
 
     // Add to Home Screen prompt
