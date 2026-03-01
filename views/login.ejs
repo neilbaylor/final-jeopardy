@@ -145,6 +145,24 @@
       padding: 0.5rem;
       font-size: 1.1rem;
     }
+
+    /* --- Play button view transition --- */
+    @keyframes slide-down {
+      from { transform: translateY(0); }
+      to   { transform: translateY(100dvh); }
+    }
+    /* MPA View Transitions: login slides down, dashboard appears behind */
+    ::view-transition-old(root) {
+      animation: slide-down 0.42s cubic-bezier(0.4, 0, 1, 1) both;
+    }
+    ::view-transition-new(root) {
+      animation: none;
+    }
+    /* Fallback for browsers without MPA View Transitions */
+    body.slide-out {
+      animation: slide-down 0.42s ease-in forwards;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -240,6 +258,26 @@
           });
         });
       }
+    }
+
+    // Play button: slide login page down using CSS View Transitions (MPA)
+    const btnPlay = document.getElementById('btn-play');
+    if (btnPlay) {
+      btnPlay.addEventListener('click', function(e) {
+        const url = this.href;
+        // PageSwapEvent is present in browsers that support MPA View Transitions
+        if (typeof PageSwapEvent !== 'undefined') {
+          // Dynamically opt-in to cross-document transition for this navigation only
+          const vt = document.createElement('style');
+          vt.textContent = '@view-transition { navigation: auto; }';
+          document.head.appendChild(vt);
+          return; // Let the default navigation proceed
+        }
+        // Fallback: CSS animation then navigate
+        e.preventDefault();
+        document.body.classList.add('slide-out');
+        setTimeout(() => { location.href = url; }, 430);
+      });
     }
   </script>
 </body>

@@ -133,6 +133,11 @@
     }
 
     .fab { animation-delay: 0.18s; }
+
+    /* Accept incoming view transitions from login — dashboard sits static behind */
+    @view-transition { navigation: auto; }
+    ::view-transition-old(root) { animation: none; }
+    ::view-transition-new(root) { animation: none; }
   </style>
 </head>
 <body>
