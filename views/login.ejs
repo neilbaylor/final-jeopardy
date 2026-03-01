@@ -270,7 +270,7 @@
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     const dismissed = sessionStorage.getItem('installDismissed');
 
-    if (!isStandalone && !dismissed) {
+    if (!isStandalone && !dismissed && !uid) {
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
       let deferredPrompt = null;
 

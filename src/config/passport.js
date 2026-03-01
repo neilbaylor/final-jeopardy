@@ -3,7 +3,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('./database');
 require('dotenv').config();
 
-passport.use(
+if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+  console.warn('WARNING: GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set — Google OAuth will be unavailable.');
+} else passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
