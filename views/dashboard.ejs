@@ -150,6 +150,7 @@
 
     ::view-transition-old(root) {
       animation: slide-down 0.3s ease-in both;
+      z-index: 1; /* Must be above ::view-transition-new so the slide is visible */
     }
     ::view-transition-new(root) {
       animation: none;
