@@ -29,7 +29,7 @@
     .logo-wrap {
       margin-top: 10vh;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.7s ease;
     }
 
     .logo {
@@ -48,8 +48,8 @@
       align-items: center;
       gap: 0.75rem;
       opacity: 0;
-      animation: fadeIn 0.15s ease forwards;
-      animation-delay: 0.45s;
+      animation: fadeIn 0.4s ease forwards;
+      animation-delay: 0.9s;
     }
 
     @keyframes fadeIn {
@@ -179,7 +179,7 @@
     // Trigger logo fade-in after a short delay so the browser has painted first
     setTimeout(() => {
       document.querySelector('.logo-wrap').style.opacity = '1';
-    }, 30);
+    }, 100);
 
     // Verify stored userId against API before showing Play button
     const storedId = localStorage.getItem('userId');
