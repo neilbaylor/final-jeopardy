@@ -220,6 +220,7 @@
     const params = new URLSearchParams(location.search);
     const uid = params.get('uid');
     if (uid) {
+      document.querySelector('.btn-area').style.visibility = 'hidden';
       localStorage.setItem('userId', uid);
       history.replaceState(null, '', '/');
       fetch('/api/me?userId=' + encodeURIComponent(uid))
