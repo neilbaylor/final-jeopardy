@@ -34,6 +34,7 @@
       padding-right: 14px;
       min-height: calc(env(safe-area-inset-top, 0px) + 56px);
       flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
     }
 
     .avatar {
@@ -170,7 +171,7 @@
           const firstName = user.display_name ? user.display_name.trim().split(' ')[0] : '';
           if (firstName) {
             const greeting = document.getElementById('topbar-greeting');
-            greeting.textContent = `Hi ${firstName}`;
+            greeting.textContent = `Hi, ${firstName}!`;
             greeting.style.display = '';
           }
         })
