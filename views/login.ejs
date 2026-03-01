@@ -16,8 +16,9 @@
 
     body {
       background: #07102e;
-      min-height: 100vh;
-      min-height: 100dvh;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -97,6 +98,52 @@
       border-radius: 14px;
       text-transform: uppercase;
     }
+
+    .install-hint {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding: 0.85rem 1.5rem max(env(safe-area-inset-bottom, 0px), 0.85rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.85);
+      animation: slideUp 0.3s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+
+    .install-hint span { flex: 1; line-height: 1.4; }
+
+    .install-hint button {
+      background: #FFD700;
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .install-hint .dismiss {
+      background: none;
+      color: rgba(255,255,255,0.5);
+      padding: 0.5rem;
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 <body>
@@ -133,6 +180,48 @@
     if (localStorage.getItem('userId')) {
       document.getElementById('btn-google').style.display = 'none';
       document.getElementById('btn-play').style.display = '';
+    }
+
+    // Add to Home Screen prompt
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const dismissed = sessionStorage.getItem('installDismissed');
+
+    if (!isStandalone && !dismissed) {
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      let deferredPrompt = null;
+
+      function showHint(label, onClick) {
+        const hint = document.createElement('div');
+        hint.className = 'install-hint';
+        hint.innerHTML = `
+          <span>${label}</span>
+          <button id="install-btn">${isIOS ? 'How?' : 'Install'}</button>
+          <button class="dismiss" aria-label="Dismiss">✕</button>
+        `;
+        document.body.appendChild(hint);
+        hint.querySelector('#install-btn').addEventListener('click', onClick);
+        hint.querySelector('.dismiss').addEventListener('click', () => {
+          sessionStorage.setItem('installDismissed', '1');
+          hint.remove();
+        });
+      }
+
+      if (isIOS) {
+        showHint('Add this app to your Home Screen for the best experience.', () => {
+          alert('Tap the Share button (□↑) in Safari, then choose "Add to Home Screen".');
+        });
+      } else {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          showHint('Add Final Jeopardy! to your Home Screen.', async () => {
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            document.querySelector('.install-hint')?.remove();
+          });
+        });
+      }
     }
   </script>
 </body>
