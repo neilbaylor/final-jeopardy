@@ -200,7 +200,8 @@
       padding: 6px 14px 6px 4px;
       min-height: 48px;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      clip-path: inset(0 -20px -20px -20px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.22);
     }
     #panel-title {
       font-size: 0.9rem;
@@ -221,12 +222,13 @@
       color: #07102e;
       cursor: pointer;
       flex-shrink: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.3s ease;
       -webkit-tap-highlight-color: transparent;
     }
     #create-btn:disabled {
       opacity: 0.35;
       cursor: default;
+      transform: scale(0.9);
     }
     #close-panel {
       background: none;
