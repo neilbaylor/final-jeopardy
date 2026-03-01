@@ -27,8 +27,12 @@
       background: #07102e;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      padding: calc(env(safe-area-inset-top, 0px) + 10px) calc(env(safe-area-inset-right, 0px) + 14px) 10px 14px;
+      justify-content: flex-start;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+      padding-bottom: 10px;
+      padding-left: calc(env(safe-area-inset-left, 0px) + 14px);
+      padding-right: 14px;
+      min-height: calc(env(safe-area-inset-top, 0px) + 56px);
       flex-shrink: 0;
     }
 
@@ -61,18 +65,23 @@
       position: fixed;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
       right: calc(env(safe-area-inset-right, 0px) + 20px);
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
+      height: 48px;
+      border-radius: 999px;
       background: rgba(255, 213, 0, 0.88);
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
+      padding: 0 18px 0 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.18);
       transition: transform 0.15s ease, opacity 0.15s ease;
       -webkit-tap-highlight-color: transparent;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #07102e;
     }
 
     .fab:active {
@@ -110,6 +119,7 @@
 
   <button class="fab" id="new-game" aria-label="New game">
     <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New Game
   </button>
 
   <script>
