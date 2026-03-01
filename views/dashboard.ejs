@@ -255,8 +255,30 @@
       gap: 14px;
       padding: 12px 0;
       border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
     .user-row:last-child { border-bottom: none; }
+    .user-row input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: border-color 0.15s, background 0.15s;
+      cursor: pointer;
+    }
+    .user-row input[type="checkbox"]:checked {
+      border-color: #07102e;
+      background: #07102e;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23fff' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 12px 10px;
+    }
     .user-row img, .user-row .user-avatar-placeholder {
       width: 44px;
       height: 44px;
@@ -351,11 +373,12 @@
         .then(([users]) => {
           spinner.classList.add('hidden');
           list.innerHTML = users.map(u => `
-            <div class="user-row">
+            <div class="user-row" onclick="this.querySelector('input').click()">
               ${u.avatar_url
                 ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
                 : `<div class="user-avatar-placeholder">👤</div>`}
               <span class="user-name">${u.display_name}</span>
+              <input type="checkbox" onclick="event.stopPropagation()" />
             </div>
           `).join('');
         })
