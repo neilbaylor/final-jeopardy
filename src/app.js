@@ -107,10 +107,30 @@ async function initDB() {
   console.log('Database tables ready');
 }
 
+async function seedIfEmpty() {
+  try {
+    const [[{ count }]] = await db.query('SELECT COUNT(*) as count FROM questions');
+    if (count > 0) {
+      console.log(`Questions already seeded (${count} rows). Skipping.`);
+      return;
+    }
+    console.log('Questions table is empty — seeding in background...');
+    const { execFile } = require('child_process');
+    const path = require('path');
+    const child = execFile('node', [path.join(__dirname, '../db/seed.js')], { env: process.env });
+    child.stdout.on('data', (d) => process.stdout.write(d));
+    child.stderr.on('data', (d) => process.stderr.write(d));
+    child.on('exit', (code) => console.log(`Seed exited with code ${code}`));
+  } catch (err) {
+    console.error('Seed check failed:', err.message);
+  }
+}
+
 // Start server (init DB schema, then listen)
 initDB()
   .then(() => {
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+    seedIfEmpty();
   })
   .catch((err) => {
     console.error('Database init failed:', err.message);
