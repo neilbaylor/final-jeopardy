@@ -9,6 +9,12 @@
   <meta name="theme-color" content="#07102e" />
   <link rel="manifest" href="/manifest.json" />
   <title>Final Jeopardy! With Friends</title>
+  <script>
+    // Must run before first paint so the class is set before CSS is applied.
+    window.addEventListener('pagereveal', e => {
+      if (e.viewTransition) document.documentElement.classList.add('vt-entry');
+    });
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -139,6 +145,14 @@
     @view-transition { navigation: auto; }
     ::view-transition-old(root) { animation: none; }
     ::view-transition-new(root) { animation: none; }
+
+    /* When arriving via a view transition, skip the topbar/fab fade-in so the
+       transition screenshot captures them at full opacity (no flicker). */
+    :root.vt-entry .topbar,
+    :root.vt-entry .fab {
+      animation: none;
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
