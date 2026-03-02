@@ -9,13 +9,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/images/home-screen.png",
+      "src": "/images/home-screen-ios.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/home-screen.png",
+      "src": "/images/home-screen-ios.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "maskable"
