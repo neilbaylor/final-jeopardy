@@ -500,6 +500,13 @@
     <div id="users-list"></div>
   </div>
 
+  <div id="error-modal-backdrop">
+    <div id="error-modal">
+      <p id="error-modal-msg"></p>
+      <button id="error-modal-ok">OK</button>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
     const userId = localStorage.getItem('userId');
@@ -698,12 +705,5 @@
       });
     })();
   </script>
-
-  <div id="error-modal-backdrop">
-    <div id="error-modal">
-      <p id="error-modal-msg"></p>
-      <button id="error-modal-ok">OK</button>
-    </div>
-  </div>
 </body>
 </html>
