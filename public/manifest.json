@@ -1,7 +1,7 @@
 {
   "name": "Final Jeopardy with Friends",
-  "short_name": "FJ Friends",
-  "description": "Multiplayer Final Jeopardy with friends",
+  "short_name": "Final Jeopardy",
+  "description": "Final Jeopardy with friends",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#07102e",
