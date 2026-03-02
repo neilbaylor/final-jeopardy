@@ -382,6 +382,79 @@
       border-top-color: #000;
     }
 
+    /* Game cards */
+    #games-list {
+      padding-bottom: 88px; /* clear FAB */
+    }
+    .game-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .game-card:last-child { border-bottom: none; }
+    .game-avatars {
+      display: flex;
+      flex-shrink: 0;
+    }
+    .game-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      flex-shrink: 0;
+    }
+    .game-avatar + .game-avatar { margin-left: -10px; }
+    .game-avatar-placeholder {
+      background: #e8eaf0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #555;
+    }
+    .game-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .game-player-names {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #111;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .game-status-text {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .game-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #07102e;
+      color: #ffd500;
+      padding: 3px 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .no-games {
+      text-align: center;
+      color: #999;
+      padding: 48px 20px;
+      font-size: 0.95rem;
+    }
+
     /* Spinner inside panel */
     #panel-spinner {
       display: flex;
@@ -417,9 +490,9 @@
     }
     #ptr-spinner,
     #games-ptr-spinner {
-      width: 28px;
-      height: 28px;
-      border: 3px solid rgba(7,16,46,0.15);
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(7,16,46,0.15);
       border-top-color: #07102e;
       border-radius: 50%;
       flex-shrink: 0;
@@ -516,6 +589,7 @@
     <div class="content" id="content">
       <div id="games-ptr-indicator"><div id="games-ptr-spinner"></div></div>
       <div id="games-spinner"><div class="panel-spin"></div></div>
+      <div id="games-list"></div>
     </div>
 
     <button class="fab" id="new-game" aria-label="New game">
@@ -643,6 +717,7 @@
         });
 
         if (res.ok) {
+          await loadGames(true);
           document.body.classList.remove('panel-open');
           btn.style.width = '';
           btn.classList.remove('loading');
@@ -658,6 +733,41 @@
       }
     });
 
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderGames(games) {
+      const list = document.getElementById('games-list');
+      if (!games.length) {
+        list.innerHTML = '<p class="no-games">No games yet. Tap + to start one!</p>';
+        return;
+      }
+      list.innerHTML = games.map(g => {
+        const hasAnswered = g.current_question
+          ? g.my_answers.some(a => a.game_question_id === g.current_question.game_question_id)
+          : false;
+        const needsAnswer = g.current_question && !hasAnswered;
+        const avatars = g.players.map(p =>
+          p.avatar_url
+            ? `<img class="game-avatar" src="${escHtml(p.avatar_url)}" alt="${escHtml(p.display_name)}" />`
+            : `<div class="game-avatar game-avatar-placeholder">${escHtml(p.display_name[0].toUpperCase())}</div>`
+        ).join('');
+        const names = escHtml(g.players.map(p => p.display_name).join(', '));
+        const statusText = g.current_question
+          ? (hasAnswered ? 'Waiting for opponent' : escHtml(g.current_question.category))
+          : 'Starting\u2026';
+        return `<div class="game-card" data-game-id="${g.id}">
+          <div class="game-avatars">${avatars}</div>
+          <div class="game-body">
+            <div class="game-player-names">${names}</div>
+            <div class="game-status-text">${statusText}</div>
+          </div>
+          ${needsAnswer ? '<div class="game-badge">Answer</div>' : ''}
+        </div>`;
+      }).join('');
+    }
+
     function loadGames(silent = false) {
       const fab = document.getElementById('new-game');
       const spinner = document.getElementById('games-spinner');
@@ -666,7 +776,8 @@
         .then(r => r.ok ? r.json() : Promise.reject());
 
       return Promise.all([fetch$, delay])
-        .then(() => {
+        .then(([games]) => {
+          renderGames(games);
           if (!silent) {
             spinner.classList.add('hidden');
             fab.style.opacity = '1';
@@ -740,7 +851,7 @@
         const dy = e.touches[0].clientY - startY;
         if (dy <= 0) { pulling = false; return; }
         e.preventDefault();
-        const capped = Math.min(dy * 0.45, 56);
+        const capped = Math.min(dy * 0.45, 68);
         ptr.style.height = capped + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${dy * 2}deg)`;
@@ -752,7 +863,7 @@
         pulling = false;
         ptr.classList.add('ptr-snap');
         if (triggered) {
-          ptr.style.height = '48px';
+          ptr.style.height = '64px';
           ptrSpinner.style.opacity = '1';
           ptrSpinner.style.transform = '';
           requestAnimationFrame(() => {
@@ -791,7 +902,7 @@
         const dy = e.touches[0].clientY - startY;
         if (dy <= 0) { pulling = false; return; }
         e.preventDefault();
-        const capped = Math.min(dy * 0.45, 56);
+        const capped = Math.min(dy * 0.45, 68);
         ptr.style.height = capped + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${dy * 2}deg)`;
@@ -803,7 +914,7 @@
         pulling = false;
         ptr.classList.add('ptr-snap');
         if (triggered) {
-          ptr.style.height = '48px';
+          ptr.style.height = '64px';
           ptrSpinner.style.opacity = '1';
           ptrSpinner.style.transform = '';
           requestAnimationFrame(() => {
