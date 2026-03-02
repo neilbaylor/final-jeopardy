@@ -2,7 +2,7 @@
 /**
  * Scrapes Final Jeopardy questions from j-archive.com Season 41
  * and seeds the questions table.
- * Usage: node db/seed.js
+ * Usage: node src/seed.js
  */
 
 const https = require('https');

@@ -124,7 +124,7 @@ async function seedIfEmpty() {
     console.log('Questions table is empty — seeding in background...');
     const { execFile } = require('child_process');
     const path = require('path');
-    const child = execFile('node', [path.join(__dirname, '../db/seed.js')], { env: process.env });
+    const child = execFile('node', [path.join(__dirname, 'seed.js')], { env: process.env });
     child.stdout.on('data', (d) => process.stdout.write(d));
     child.stderr.on('data', (d) => process.stderr.write(d));
     child.on('exit', (code) => console.log(`Seed exited with code ${code}`));
