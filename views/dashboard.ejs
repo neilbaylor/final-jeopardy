@@ -209,7 +209,7 @@
       display: block;
       position: fixed;
       inset: 0;
-      transform: translateY(-5%);
+      transform: translateY(-10%);
       opacity: 0.96;
     }
     #new-game-panel {
@@ -233,7 +233,7 @@
       display: flex;
       align-items: center;
       background: #07102e;
-      padding: 6px 14px 6px 4px;
+      padding: 6px 6px 6px 0px;
       min-height: 48px;
       flex-shrink: 0;
       clip-path: inset(0 -20px -20px -20px);
@@ -391,16 +391,7 @@
       text-overflow: ellipsis;
     }
 
-    .topbar-header-img {
-      height: 128px;
-      width: auto;
-      object-fit: contain;
-      border-radius: 4px;
-      flex-shrink: 0;
-      display: block;
-      margin: 0 auto;
-    }
-  </style>
+</style>
 </head>
 <body>
   <div id="dashboard-root">
@@ -408,7 +399,6 @@
       <div class="topbar-user" id="topbar-user">
         <div id="avatar-wrap"><div class="spinner"></div></div>
         <span id="topbar-greeting" class="topbar-greeting" style="display:none"></span>
-        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAkADYDASIAAhEBAxEB/8QAHAABAAICAwEAAAAAAAAAAAAAAAcIBQYBAgME/8QAKhAAAgICAgICAQQBBQAAAAAAAQIDBAURABIGIRMxQQcUIlEyFSRCYfD/xAAZAQEAAwEBAAAAAAAAAAAAAAAAAgMEAQX/xAAuEQABBAADBgILAAAAAAAAAAABAAIDEQRBURIhMWGhwQWBExQVImJxgpGx0fD/2gAMAwEAAhEDEQA/AKqc+rHULWRsiClBNPJ62Io2cqCQuyFBOtkD6/I5mfA/Gn8oz8dIs0dZehnlXX8A8iQpv86aWWJCQGKhi3VupHLD+NeOeOU/J7uLWlFk56VeSwK9pYXUhH27IGXrEezPpYtIQdkAqOubEyysFQsLnHTLmtOHijd78rqA6qvVTw3I287FiIJqDXpQxjj/AHC7JDdVUj7Rmb11cKyj+ThEBYbLkf0kylXHVbCTzSNKW7E4210Oj9oFjaQa/Pyxxe/8PkXbCzXkOW8hhyBqYTDw/BD+3SYw2YJDEXlZWDsf8SFCnqN6+zzGnIeWSWUi6zp8sxqp2s1nTuiiVn2fXUopA9/ZP9DmJ/tHdbK1qiOHa8r4KQ9WJsHd86/vuql0vFMtkKMVrGV/9QEo/jFSP7iUHetPGm2jO967he2iV7D3zA8vLk7M2R8fiXN4Qysy6kaCaLur/KqKegKtG/YqVKnY12BGuRR5d4nhchjc3V+W5Rs1axySGyySkVwytMyRk67ssICurK8hUmV9MWNzJsY19SwnZ1BsAc/1QPYWQSMuNw2tNd/nl+FXHjnveqTULtinbT47FeRopE2D1ZTojY9H2Pxxz0FlIINFbt+j15KmcvxEN8lmCuEYfSCK9VsSOx/4qscEjFvwFJOgCRNmUL4fzK/vDzvlrL2LNO5EQkcsMkXQxyn8KhJ9AbJ0fe/dX8bdsYzI1b9JxHaqypPC5UN1dSGU6IIPsD0RrklwfqveyVzDQ5UkVoAY5vmsP8IJUxiTsiNMNKdt2MrN/LXXehbDLIwkR0CQQCdeak9kM0YjlurB3Z69FKz5G3PImRNrEVZrKJMneWSVgwUjfVQoGwzDR97O+dad6+a6lvI8TJIezA2abbRm7ej70VAfrr60B6++Rjk/I/Fr1o2I6mLpTaX+dS9cjJIH2f8Ab6J/97++czZzCJBVQ56KxERsxJkrq/Fv7DE0x/Z+ifo8tLcU6iMS0X8PDopiHw0W30JP1HupJu5bMVshWfGy0JZ5FmUGtYk7Sv8AG6oT2BACli3v7IHv1zDVo3TwfzPOZBpKsdqkuIqJZZS6hE+LTMPQ27KNnQ+yfXvmt4ry/wAVxSzNXo4p5V24m/f3fnfqCQA5reidADehsjfretan/VfyM+MSYWrfswQTRPWlQCExNA6srRhTGXHo/fyH/oD1o6bERhzXva8buAo6ny4ZI2LBxPD4Wlpo52tX81ykec8yz2WgXrFfv2LSLsnSvIzAewP7/occwvHMxNm1UTZsJxxxzi4nHHHCJxxxwiccccIv/9k=" class="topbar-header-img" alt="" />
         <div id="user-popover">
           <button id="logout-btn">Log out</button>
         </div>
