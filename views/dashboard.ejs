@@ -299,15 +299,44 @@
     }
     #create-btn.loading .btn-text { display: none; }
     #create-btn.loading .btn-spinner { display: block; }
-    #game-error {
+    #error-modal-backdrop {
       display: none;
-      background: #fff0f0;
-      color: #c00;
-      font-size: 0.82rem;
-      font-weight: 600;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #error-modal-backdrop.open { display: flex; }
+    #error-modal {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 24px 20px;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.22);
       text-align: center;
-      padding: 8px 16px;
-      flex-shrink: 0;
+    }
+    #error-modal p {
+      font-size: 0.95rem;
+      color: #111;
+      line-height: 1.45;
+      margin-bottom: 20px;
+    }
+    #error-modal-ok {
+      background: #07102e;
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0 28px;
+      height: 38px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
     #close-panel {
       background: none;
@@ -466,7 +495,6 @@
       <span id="panel-title">Select Friends For a Game</span>
       <button id="create-btn" disabled><span class="btn-text">Create</span><div class="btn-spinner"></div></button>
     </div>
-    <div id="game-error"></div>
     <div id="panel-spinner"><div class="panel-spin"></div></div>
     <div id="ptr-indicator"><div id="ptr-spinner"></div></div>
     <div id="users-list"></div>
@@ -517,7 +545,14 @@
     document.getElementById('close-panel').addEventListener('click', () => {
       document.body.classList.remove('panel-open');
       document.getElementById('create-btn').disabled = true;
-      document.getElementById('game-error').style.display = 'none';
+    });
+
+    function showErrorModal(msg) {
+      document.getElementById('error-modal-msg').textContent = msg;
+      document.getElementById('error-modal-backdrop').classList.add('open');
+    }
+    document.getElementById('error-modal-ok').addEventListener('click', () => {
+      document.getElementById('error-modal-backdrop').classList.remove('open');
     });
 
     function updateCreateBtn() {
@@ -532,7 +567,16 @@
       const friendIds = checked.map(cb => Number(cb.closest('.user-row').dataset.userId));
       const btn = document.getElementById('create-btn');
       const rows = [...document.querySelectorAll('#users-list .user-row')];
-      const errorEl = document.getElementById('game-error');
+
+      function reEnableRows() {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        rows.forEach(row => {
+          row.style.pointerEvents = '';
+          row.style.opacity = '';
+          row.querySelector('input').disabled = false;
+        });
+      }
 
       // Disable UI and show spinner in button
       btn.disabled = true;
@@ -542,7 +586,6 @@
         row.style.opacity = '0.45';
         row.querySelector('input').disabled = true;
       });
-      errorEl.style.display = 'none';
 
       try {
         const res = await fetch('/api/games', {
@@ -557,26 +600,12 @@
           btn.disabled = true;
         } else {
           const data = await res.json();
-          errorEl.textContent = data.error || 'Failed to create game';
-          errorEl.style.display = 'block';
-          btn.classList.remove('loading');
-          btn.disabled = false;
-          rows.forEach(row => {
-            row.style.pointerEvents = '';
-            row.style.opacity = '';
-            row.querySelector('input').disabled = false;
-          });
+          reEnableRows();
+          showErrorModal(res.status === 409 ? data.error : 'Sorry, something went wrong');
         }
       } catch (e) {
-        errorEl.textContent = 'Network error. Please try again.';
-        errorEl.style.display = 'block';
-        btn.classList.remove('loading');
-        btn.disabled = false;
-        rows.forEach(row => {
-          row.style.pointerEvents = '';
-          row.style.opacity = '';
-          row.querySelector('input').disabled = false;
-        });
+        reEnableRows();
+        showErrorModal('Sorry, something went wrong');
       }
     });
 
@@ -669,5 +698,12 @@
       });
     })();
   </script>
+
+  <div id="error-modal-backdrop">
+    <div id="error-modal">
+      <p id="error-modal-msg"></p>
+      <button id="error-modal-ok">OK</button>
+    </div>
+  </div>
 </body>
 </html>
