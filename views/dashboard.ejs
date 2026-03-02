@@ -305,7 +305,7 @@
     #create-btn.loading .btn-text { display: none; }
     #create-btn.loading .btn-spinner { display: block; }
     #error-modal-backdrop {
-      display: none;
+      display: flex;
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.45);
@@ -313,8 +313,14 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
     }
-    #error-modal-backdrop.open { display: flex; }
+    #error-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
     #error-modal {
       background: #fff;
       border-radius: 16px;
