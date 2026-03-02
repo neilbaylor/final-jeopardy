@@ -577,6 +577,7 @@
       const rows = [...document.querySelectorAll('#users-list .user-row')];
 
       function reEnableRows() {
+        btn.style.width = '';
         btn.classList.remove('loading');
         btn.disabled = false;
         rows.forEach(row => {
@@ -586,7 +587,8 @@
         });
       }
 
-      // Disable UI and show spinner in button
+      // Disable UI and show spinner in button (lock width first so it doesn't shrink)
+      btn.style.width = btn.offsetWidth + 'px';
       btn.disabled = true;
       btn.classList.add('loading');
       rows.forEach(row => {
@@ -604,6 +606,7 @@
 
         if (res.ok) {
           document.body.classList.remove('panel-open');
+          btn.style.width = '';
           btn.classList.remove('loading');
           btn.disabled = true;
         } else {
