@@ -162,7 +162,7 @@
       transition: opacity 0.22s ease;
       pointer-events: none;
       z-index: 10;
-      padding-bottom: 190px;
+      padding-bottom: 220px;
     }
     #welcome-avatar {
       opacity: 0;
@@ -219,6 +219,14 @@
 
   <script>
     document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+
+    // Disable Google sign-in button after click to prevent double-taps
+    document.getElementById('btn-google').addEventListener('click', function(e) {
+      if (this.classList.contains('btn-clicked')) { e.preventDefault(); return; }
+      this.classList.add('btn-clicked');
+      this.style.opacity = '0.5';
+      this.style.pointerEvents = 'none';
+    });
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js');
     }
