@@ -107,6 +107,16 @@ router.post('/api/games', async (req, res) => {
   }
 });
 
+// Temp debug endpoint
+router.get('/api/debug-games', async (req, res) => {
+  const { userId } = req.query;
+  const [games] = await db.query(`SELECT * FROM games LIMIT 5`);
+  const [gqs] = await db.query(`SELECT * FROM game_questions LIMIT 10`);
+  const [gu] = await db.query(`SELECT * FROM game_users WHERE user_id = ${db.escape(userId)} LIMIT 5`);
+  const [cq] = await db.query(`SELECT gq.id, gq.game_id, gq.question_id FROM game_questions gq JOIN game_users gu ON gu.game_id = gq.game_id WHERE gu.user_id = ${db.escape(userId)} LIMIT 5`);
+  res.json({ games, game_questions: gqs, game_users: gu, cq_for_user: cq });
+});
+
 // API: get all games for a user
 router.get('/api/games', async (req, res) => {
   const { userId } = req.query;
