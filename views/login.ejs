@@ -93,8 +93,8 @@
     .btn-google-spin {
       position: absolute;
       right: 1.2rem;
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
       border: 2px solid rgba(0,0,0,0.15);
       border-top-color: #555;
       border-radius: 50%;
@@ -232,6 +232,17 @@
 
   <script>
     document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+
+    // Reset Google button if user navigates back via browser back button
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        const btn = document.getElementById('btn-google');
+        btn.classList.remove('btn-clicked');
+        btn.style.opacity = '';
+        btn.style.pointerEvents = '';
+        btn.querySelector('.btn-google-spin')?.remove();
+      }
+    });
 
     // Disable Google sign-in button after click to prevent double-taps
     document.getElementById('btn-google').addEventListener('click', function(e) {
