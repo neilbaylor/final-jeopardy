@@ -113,7 +113,7 @@ router.get('/api/games', async (req, res) => {
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
   try {
-    let [rows] = await db.query(
+    const [rows] = await db.query(
       `SELECT
          g.id,
          g.created_at,
@@ -135,41 +135,6 @@ router.get('/api/games', async (req, res) => {
        WHERE gu.user_id = ${db.escape(userId)}
        ORDER BY g.updated_at DESC`
     );
-
-    // Heal any games that are missing a current question (created before question-insert logic existed)
-    const missingQ = rows.filter(r => !r.cq_id);
-    if (missingQ.length > 0) {
-      const [[rq]] = await db.query('SELECT id FROM questions ORDER BY RAND() LIMIT 1');
-      if (rq) {
-        for (const row of missingQ) {
-          await db.query('INSERT INTO game_questions (game_id, question_id) VALUES (?, ?)', [row.id, rq.id]);
-        }
-        // Re-fetch with questions now present
-        const [rows2] = await db.query(
-          `SELECT
-             g.id,
-             g.created_at,
-             (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url))
-              FROM game_users gu2 JOIN users u ON gu2.user_id = u.id
-              WHERE gu2.game_id = g.id AND gu2.user_id != ${db.escape(userId)}) AS players,
-             (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_id,
-             (SELECT gq.asked_at FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_asked_at,
-             (SELECT q.id FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question_id,
-             (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question,
-             (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_answer,
-             (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_category,
-             (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'game_question_id', ga.game_question_id,
-                                               'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
-              FROM game_answers ga JOIN game_questions gq ON ga.game_question_id = gq.id
-              WHERE gq.game_id = g.id AND ga.user_id = ${db.escape(userId)}) AS my_answers
-           FROM games g
-           JOIN game_users gu ON g.id = gu.game_id
-           WHERE gu.user_id = ${db.escape(userId)}
-           ORDER BY g.updated_at DESC`
-        );
-        rows = rows2;
-      }
-    }
 
     const parse = v => typeof v === 'string' ? JSON.parse(v) : v;
     res.json(rows.map(row => ({
