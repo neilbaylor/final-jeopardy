@@ -453,10 +453,12 @@
           wrap.innerHTML = user.avatar_url
             ? `<img class="avatar" src="${user.avatar_url}" alt="${user.display_name}" />`
             : `<div class="avatar-placeholder">👤</div>`;
-          const firstName = user.display_name ? user.display_name.trim().split(' ')[0] : '';
+          const parts = user.display_name ? user.display_name.trim().split(' ') : [];
+          const firstName = parts[0] || '';
+          const initials = parts.length >= 2 ? parts[0][0].toUpperCase() + parts[parts.length - 1][0].toUpperCase() : (parts[0] ? parts[0][0].toUpperCase() : '');
           if (firstName) {
             const greeting = document.getElementById('topbar-greeting');
-            greeting.textContent = `Hi, ${firstName}!`;
+            greeting.textContent = `Hi, ${initials}!`;
             greeting.style.display = '';
           }
         })
