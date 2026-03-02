@@ -166,7 +166,8 @@
       gap: 6px;
       padding: 0 18px 0 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.18);
-      transition: transform 0.15s ease, opacity 0.15s ease;
+      opacity: 0;
+      transition: transform 0.15s ease, opacity 0.3s ease;
       -webkit-tap-highlight-color: transparent;
       font-family: 'Segoe UI', system-ui, sans-serif;
       font-size: 0.9rem;
@@ -187,7 +188,7 @@
       stroke-linecap: round;
     }
 
-    .topbar, .fab {
+    .topbar {
       opacity: 0;
       animation: fadeIn 0.25s ease forwards;
       animation-delay: 0.1s;
@@ -196,8 +197,6 @@
     @keyframes fadeIn {
       to { opacity: 1; }
     }
-
-    .fab { animation-delay: 0.18s; }
 
     /* MPA View Transition: login slides down, dashboard is revealed behind it */
     @view-transition { navigation: auto; }
@@ -216,8 +215,7 @@
 
     /* When arriving via a view transition, skip the topbar/fab fade-in so the
        transition screenshot captures them at full opacity (no flicker). */
-    :root.vt-entry .topbar,
-    :root.vt-entry .fab {
+    :root.vt-entry .topbar {
       animation: none;
       opacity: 1;
     }
@@ -289,7 +287,6 @@
       transform: scale(0.9);
     }
     #create-btn.loading:disabled {
-      opacity: 1;
       transform: none;
     }
     #create-btn .btn-spinner {
@@ -372,6 +369,14 @@
       stroke-linejoin: round;
       display: block;
     }
+
+    /* Spinner in main content while games load */
+    #games-spinner {
+      display: flex;
+      justify-content: center;
+      padding-top: 60px;
+    }
+    #games-spinner.hidden { display: none; }
 
     /* Spinner inside panel */
     #panel-spinner {
@@ -496,7 +501,9 @@
       </div>
     </div>
 
-    <div class="content" id="content"></div>
+    <div class="content" id="content">
+      <div id="games-spinner"><div class="panel-spin"></div></div>
+    </div>
 
     <button class="fab" id="new-game" aria-label="New game">
       <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -548,6 +555,8 @@
           }
         })
         .catch(() => location.replace('/'));
+
+      loadGames();
     }
 
     document.getElementById('topbar-user').addEventListener('click', e => {
@@ -635,6 +644,22 @@
         showErrorModal('Sorry, something went wrong');
       }
     });
+
+    function loadGames() {
+      const fab = document.getElementById('new-game');
+      const spinner = document.getElementById('games-spinner');
+
+      fetch(`/api/games?userId=${encodeURIComponent(userId)}`)
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(games => {
+          spinner.classList.add('hidden');
+          fab.style.opacity = '1';
+        })
+        .catch(() => {
+          spinner.classList.add('hidden');
+          fab.style.opacity = '1';
+        });
+    }
 
     let usersCache = null;
     let usersCacheAt = 0;
