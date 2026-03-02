@@ -171,9 +171,8 @@
       align-items: center;
       justify-content: center;
       gap: 28px;
-      background: #07102e;
       opacity: 0;
-      transition: opacity 0.45s ease;
+      transition: opacity 0.22s ease;
       pointer-events: none;
       z-index: 10;
       padding-bottom: 260px;
@@ -283,10 +282,7 @@
             document.getElementById('welcome-avatar').style.opacity = '1';
             document.getElementById('welcome-name').style.opacity = '1';
           }, 250);
-          setTimeout(() => {
-            document.getElementById('welcome-overlay').style.opacity = '0';
-          }, 1400);
-          setTimeout(() => location.replace('/dashboard'), 1900);
+          setTimeout(() => location.replace('/dashboard'), 1700);
         })
         .catch(() => location.replace('/dashboard'));
     }
