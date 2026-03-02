@@ -306,7 +306,7 @@
           showHint('Add this app to your Home Screen for the best experience.', () => {
             alert('Tap the Share button (□↑) in Safari, then choose "Add to Home Screen".');
           });
-        }, 1300);
+        }, 1475);
       } else {
         window.addEventListener('beforeinstallprompt', (e) => {
           e.preventDefault();
@@ -318,7 +318,7 @@
               deferredPrompt = null;
               document.querySelector('.install-hint')?.remove();
             });
-          }, 1300);
+          }, 1475);
         });
       }
     }
