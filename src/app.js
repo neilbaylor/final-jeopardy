@@ -69,20 +69,13 @@ async function initDB() {
     )`,
     `CREATE TABLE IF NOT EXISTS games (
       id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      host_user_id INT UNSIGNED NOT NULL,
-      status ENUM('waiting','active','finished') DEFAULT 'waiting',
-      current_question_id INT UNSIGNED DEFAULT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      FOREIGN KEY (host_user_id) REFERENCES users(id) ON DELETE CASCADE,
-      FOREIGN KEY (current_question_id) REFERENCES questions(id) ON DELETE SET NULL
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`,
     `CREATE TABLE IF NOT EXISTS game_users (
       id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       game_id INT UNSIGNED NOT NULL,
       user_id INT UNSIGNED NOT NULL,
-      score INT DEFAULT 0,
-      joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE KEY uq_game_user (game_id, user_id),
       FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -91,7 +84,6 @@ async function initDB() {
       id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       game_id INT UNSIGNED NOT NULL,
       question_id INT UNSIGNED NOT NULL,
-      order_index INT UNSIGNED NOT NULL,
       asked_at TIMESTAMP NULL DEFAULT NULL,
       UNIQUE KEY uq_game_question (game_id, question_id),
       FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
