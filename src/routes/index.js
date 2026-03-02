@@ -120,19 +120,18 @@ router.get('/api/games', async (req, res) => {
          (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url))
           FROM game_users gu2 JOIN users u ON gu2.user_id = u.id
           WHERE gu2.game_id = g.id AND gu2.user_id != ?) AS players,
-         cq.game_question_id, cq.asked_at, cq.question_id, cq.question, cq.answer, cq.category,
+         (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_id,
+         (SELECT gq.asked_at FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_asked_at,
+         (SELECT q.id FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question_id,
+         (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question,
+         (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_answer,
+         (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_category,
          (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'game_question_id', ga.game_question_id,
                                            'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
           FROM game_answers ga JOIN game_questions gq ON ga.game_question_id = gq.id
           WHERE gq.game_id = g.id AND ga.user_id = ?) AS my_answers
        FROM games g
        JOIN game_users gu ON g.id = gu.game_id
-       LEFT JOIN (
-         SELECT gq.id AS game_question_id, gq.game_id, gq.asked_at,
-                q.id AS question_id, q.question, q.answer, q.category
-         FROM game_questions gq JOIN questions q ON gq.question_id = q.id
-         WHERE gq.id = (SELECT MAX(gq2.id) FROM game_questions gq2 WHERE gq2.game_id = gq.game_id)
-       ) cq ON cq.game_id = g.id
        WHERE gu.user_id = ?
        ORDER BY g.updated_at DESC`,
       [userId, userId, userId]
@@ -143,13 +142,13 @@ router.get('/api/games', async (req, res) => {
       id: row.id,
       created_at: row.created_at,
       players: parse(row.players) || [],
-      current_question: row.game_question_id ? {
-        game_question_id: row.game_question_id,
-        asked_at: row.asked_at,
-        question_id: row.question_id,
-        question: row.question,
-        answer: row.answer,
-        category: row.category,
+      current_question: row.cq_id ? {
+        game_question_id: row.cq_id,
+        asked_at: row.cq_asked_at,
+        question_id: row.cq_question_id,
+        question: row.cq_question,
+        answer: row.cq_answer,
+        category: row.cq_category,
       } : null,
       my_answers: parse(row.my_answers) || [],
     })));

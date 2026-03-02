@@ -377,6 +377,10 @@
       padding-top: 60px;
     }
     #games-spinner.hidden { display: none; }
+    #games-spinner .panel-spin {
+      border-color: rgba(0,0,0,0.12);
+      border-top-color: #000;
+    }
 
     /* Spinner inside panel */
     #panel-spinner {
@@ -422,8 +426,8 @@
       will-change: transform;
     }
     #games-ptr-spinner {
-      border-color: rgba(255,255,255,0.2);
-      border-top-color: rgba(255,255,255,0.7);
+      border-color: rgba(0,0,0,0.12);
+      border-top-color: #000;
     }
     #ptr-spinner.ptr-spinning,
     #games-ptr-spinner.ptr-spinning {
@@ -657,7 +661,7 @@
     function loadGames(silent = false) {
       const fab = document.getElementById('new-game');
       const spinner = document.getElementById('games-spinner');
-      const delay = silent ? Promise.resolve() : new Promise(res => setTimeout(res, 400));
+      const delay = silent ? Promise.resolve() : new Promise(res => setTimeout(res, 700));
       const fetch$ = fetch(`/api/games?userId=${encodeURIComponent(userId)}`)
         .then(r => r.ok ? r.json() : Promise.reject());
 
