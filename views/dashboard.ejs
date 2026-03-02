@@ -342,6 +342,7 @@
       border-top-color: #07102e;
       border-radius: 50%;
       flex-shrink: 0;
+      will-change: transform;
     }
     #ptr-spinner.ptr-spinning {
       animation: panelSpin 0.7s linear infinite;
@@ -574,7 +575,9 @@
           ptr.style.height = '48px';
           ptrSpinner.style.opacity = '1';
           ptrSpinner.style.transform = '';
-          ptrSpinner.classList.add('ptr-spinning');
+          requestAnimationFrame(() => {
+            ptrSpinner.classList.add('ptr-spinning');
+          });
           usersCache = null;
           loadUsers(true).finally(() => {
             ptr.style.height = '0';
