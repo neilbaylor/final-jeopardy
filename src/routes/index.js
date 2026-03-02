@@ -136,6 +136,7 @@ router.get('/api/games', async (req, res) => {
        ORDER BY g.updated_at DESC`
     );
 
+    if (rows[0]) console.log('GET /api/games raw row[0]:', JSON.stringify(rows[0], (_, v) => typeof v === 'bigint' ? v.toString() : v));
     const parse = v => typeof v === 'string' ? JSON.parse(v) : v;
     res.json(rows.map(row => ({
       id: row.id,
