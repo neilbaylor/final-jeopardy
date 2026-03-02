@@ -297,6 +297,11 @@
       border-radius: 50%;
       animation: panelSpin 0.7s linear infinite;
     }
+    #create-btn.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     #create-btn.loading .btn-text { display: none; }
     #create-btn.loading .btn-spinner { display: block; }
     #error-modal-backdrop {
@@ -338,6 +343,7 @@
       font-weight: 700;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      margin-top: 10px;
     }
     #close-panel {
       background: none;
