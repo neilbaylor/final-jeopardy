@@ -9,14 +9,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/images/home-screen-ios.png",
-      "sizes": "768x768",
+      "src": "/images/hone-screen-new.png",
+      "sizes": "1282x1282",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/home-screen-ios.png",
-      "sizes": "768x768",
+      "src": "/images/hone-screen-new.png",
+      "sizes": "1282x1282",
       "type": "image/png",
       "purpose": "maskable"
     }
