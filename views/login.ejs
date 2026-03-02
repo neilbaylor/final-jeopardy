@@ -179,7 +179,7 @@
     }
     #welcome-avatar {
       opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.5s ease;
     }
     #welcome-avatar img {
       width: 88px;
@@ -201,7 +201,7 @@
     }
     #welcome-name {
       opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.5s ease;
       color: #fff;
       font-size: 1.2rem;
       font-weight: 400;
@@ -278,10 +278,10 @@
             document.getElementById('welcome-name').textContent = firstName ? `${greeting}, ${firstName}!` : `${greeting}!`;
           }
           document.getElementById('welcome-overlay').style.opacity = '1';
-          requestAnimationFrame(() => {
+          setTimeout(() => {
             document.getElementById('welcome-avatar').style.opacity = '1';
             document.getElementById('welcome-name').style.opacity = '1';
-          });
+          }, 250);
           setTimeout(() => location.replace('/dashboard'), 1600);
         })
         .catch(() => location.replace('/dashboard'));
