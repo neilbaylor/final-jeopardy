@@ -120,16 +120,19 @@ router.get('/api/games', async (req, res) => {
          (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url))
           FROM game_users gu2 JOIN users u ON gu2.user_id = u.id
           WHERE gu2.game_id = g.id AND gu2.user_id != ?) AS players,
-         (SELECT JSON_OBJECT('game_question_id', gq.id, 'asked_at', gq.asked_at,
-                             'question_id', q.id, 'question', q.question, 'answer', q.answer, 'category', q.category)
-          FROM game_questions gq JOIN questions q ON gq.question_id = q.id
-          WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS current_question,
+         cq.game_question_id, cq.asked_at, cq.question_id, cq.question, cq.answer, cq.category,
          (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'game_question_id', ga.game_question_id,
                                            'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
           FROM game_answers ga JOIN game_questions gq ON ga.game_question_id = gq.id
           WHERE gq.game_id = g.id AND ga.user_id = ?) AS my_answers
        FROM games g
        JOIN game_users gu ON g.id = gu.game_id
+       LEFT JOIN (
+         SELECT gq.id AS game_question_id, gq.game_id, gq.asked_at,
+                q.id AS question_id, q.question, q.answer, q.category
+         FROM game_questions gq JOIN questions q ON gq.question_id = q.id
+         WHERE gq.id = (SELECT MAX(gq2.id) FROM game_questions gq2 WHERE gq2.game_id = gq.game_id)
+       ) cq ON cq.game_id = g.id
        WHERE gu.user_id = ?
        ORDER BY g.updated_at DESC`,
       [userId, userId, userId]
@@ -140,7 +143,14 @@ router.get('/api/games', async (req, res) => {
       id: row.id,
       created_at: row.created_at,
       players: parse(row.players) || [],
-      current_question: parse(row.current_question),
+      current_question: row.game_question_id ? {
+        game_question_id: row.game_question_id,
+        asked_at: row.asked_at,
+        question_id: row.question_id,
+        question: row.question,
+        answer: row.answer,
+        category: row.category,
+      } : null,
       my_answers: parse(row.my_answers) || [],
     })));
   } catch (err) {
