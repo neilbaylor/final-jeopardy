@@ -97,10 +97,17 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.22);
       min-width: 120px;
       z-index: 100;
-      display: none;
       overflow: hidden;
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.20005s ease, transform 0.20005s ease;
     }
-    #user-popover.open { display: block; }
+    #user-popover.open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
     #logout-btn {
       display: block;
       width: 100%;
