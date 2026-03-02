@@ -1,6 +1,6 @@
 {
-  "name": "Final Jeopardy! With Friends",
-  "short_name": "FJ Friends",
+  "name": "Final Jeopardy with Friends",
+  "short_name": "FJ with Friends",
   "description": "Multiplayer Final Jeopardy with friends",
   "start_url": "/",
   "display": "standalone",
