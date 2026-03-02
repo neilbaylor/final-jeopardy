@@ -49,6 +49,19 @@ app.use('/auth', authRouter);
 
 async function initDB() {
   const conn = await db.getConnection();
+  // One-time migration: drop game tables if they have stale columns, recreate below
+  const [[gamesCol]] = await conn.query(
+    `SELECT COUNT(*) as n FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'games' AND COLUMN_NAME = 'host_user_id'`
+  );
+  if (gamesCol.n > 0) {
+    console.log('Migrating schema: dropping stale game tables...');
+    await conn.query('SET FOREIGN_KEY_CHECKS = 0');
+    for (const t of ['game_answers', 'game_questions', 'game_users', 'games']) {
+      await conn.query(`DROP TABLE IF EXISTS ${t}`);
+    }
+    await conn.query('SET FOREIGN_KEY_CHECKS = 1');
+  }
   const tables = [
     `CREATE TABLE IF NOT EXISTS users (
       id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
