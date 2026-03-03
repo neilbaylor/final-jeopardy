@@ -792,8 +792,9 @@
       const list = document.getElementById('users-list');
       const ptr = document.getElementById('ptr-indicator');
       const ptrSpinner = document.getElementById('ptr-spinner');
-      const THRESHOLD = 125;
-      const DEADZONE = 36;
+      const _standalone = window.navigator.standalone === true;
+      const THRESHOLD = _standalone ? 100 : 125;
+      const DEADZONE = _standalone ? 0 : 36;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
       const snapBack = () => {
@@ -874,8 +875,9 @@
       const content = document.getElementById('content');
       const ptr = document.getElementById('games-ptr-indicator');
       const ptrSpinner = document.getElementById('games-ptr-spinner');
-      const THRESHOLD = 125;
-      const DEADZONE = 36;
+      const _standalone = window.navigator.standalone === true;
+      const THRESHOLD = _standalone ? 100 : 125;
+      const DEADZONE = _standalone ? 0 : 36;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
       const snapBack = () => {
