@@ -806,7 +806,7 @@
         ptr.classList.add('ptr-snap');
         if (triggered) {
           ptr.style.height = '48px';
-          ptrSpinner.style.animationDelay = `${-(Math.min(lastDy * 0.45 / 56 * 360, 360) % 360) / 360 * 0.7}s`;
+          ptrSpinner.style.animationDelay = `${-(Math.min(Math.max(lastDy - 36, 0) * 0.45 / 56 * 360, 360) % 360) / 360 * 0.7}s`;
           ptrSpinner.style.transform = '';
           requestAnimationFrame(() => {
             ptrSpinner.classList.add('ptr-spinning');
@@ -879,7 +879,7 @@
         ptr.classList.add('ptr-snap');
         if (triggered) {
           ptr.style.height = '48px';
-          ptrSpinner.style.animationDelay = `${-(Math.min(lastDy * 2, 360) % 360) / 360 * 0.7}s`;
+          ptrSpinner.style.animationDelay = `${-(Math.min(Math.max(lastDy - 36, 0) * 2, 360) % 360) / 360 * 0.7}s`;
           ptrSpinner.style.transform = '';
           requestAnimationFrame(() => {
             ptrSpinner.classList.add('ptr-spinning');
