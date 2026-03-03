@@ -439,14 +439,14 @@
     #users-list {
       overflow-y: auto;
       flex: 1;
-      padding: 4px 0 12px;
+      padding: 0 0 12px;
       transition: opacity 0.22s ease;
     }
     .user-row {
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 8px 16px;
+      padding: 7px 16px;
       border-bottom: 1px solid #f0f0f0;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
@@ -476,8 +476,8 @@
       background-size: 12px 10px;
     }
     .user-row img, .user-row .user-avatar-placeholder {
-      width: 42px;
-      height: 42px;
+      width: 39px;
+      height: 39px;
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
@@ -783,6 +783,7 @@
           usersCache = null;
           loadUsers(true).finally(() => {
             setTimeout(() => {
+              ptr.classList.remove('ptr-snap');
               ptr.style.height = '0';
               ptrSpinner.classList.remove('ptr-spinning');
               ptrSpinner.style.animationDelay = '';
