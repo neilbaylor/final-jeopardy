@@ -839,14 +839,16 @@
           usersCache = null;
           loadUsers(true).finally(() => {
             setTimeout(() => {
-              ptr.style.opacity = '0';
-              setTimeout(() => {
-                ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
-                ptrSpinner.classList.remove('ptr-spinning');
-                ptrSpinner.style.animationDelay = '';
-                ptr.style.height = '0';
-                setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 275);
-              }, 275);
+              ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
+              ptrSpinner.classList.remove('ptr-spinning');
+              ptrSpinner.style.animationDelay = '';
+              requestAnimationFrame(() => {
+                ptr.style.opacity = '0';
+                setTimeout(() => {
+                  ptr.style.height = '0';
+                  setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 275);
+                }, 275);
+              });
             }, 640);
           });
         } else {
@@ -917,14 +919,16 @@
             ptrSpinner.classList.add('ptr-spinning');
           });
           loadGames(true).finally(() => {
-            ptr.style.opacity = '0';
-            setTimeout(() => {
-              ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
-              ptrSpinner.classList.remove('ptr-spinning');
-              ptrSpinner.style.animationDelay = '';
-              ptr.style.height = '0';
-              setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 275);
-            }, 275);
+            ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
+            ptrSpinner.classList.remove('ptr-spinning');
+            ptrSpinner.style.animationDelay = '';
+            requestAnimationFrame(() => {
+              ptr.style.opacity = '0';
+              setTimeout(() => {
+                ptr.style.height = '0';
+                setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 275);
+              }, 275);
+            });
           });
         } else {
           ptr.style.height = '0';
