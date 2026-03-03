@@ -20,11 +20,12 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { background: #fff; }
+    html { background: #fff; overscroll-behavior: none; }
 
     body {
       touch-action: manipulation;
       background: #fff;
+      overscroll-behavior: none;
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
@@ -148,6 +149,7 @@
     .content {
       flex: 1;
       overflow-y: auto;
+      background: #fff;
       padding: 20px 16px;
     }
 
