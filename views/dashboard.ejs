@@ -764,7 +764,7 @@
         lastDy = dy;
         ptr.style.height = Math.min(dy * 0.45, 75) + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
-        ptrSpinner.style.transform = `rotate(${Math.min(dy / 56 * 360, 360)}deg)`;
+        ptrSpinner.style.transform = `rotate(${Math.min(dy * 0.45 / 56 * 360, 360)}deg)`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
 
