@@ -515,7 +515,7 @@
 
     <div class="content" id="content">
       <div id="games-ptr-indicator"><div id="games-ptr-spinner"></div></div>
-      <div id="games-spinner"><div class="panel-spin"></div></div>
+      <div id="games-spinner" class="hidden"><div class="panel-spin"></div></div>
     </div>
 
     <button class="fab" id="new-game" aria-label="New game" style="opacity:0">
@@ -662,6 +662,7 @@
     function loadGames(silent = false) {
       const fab = document.getElementById('new-game');
       const spinner = document.getElementById('games-spinner');
+      if (!silent) spinner.classList.remove('hidden');
       const delay = silent ? Promise.resolve() : new Promise(res => setTimeout(res, 1000));
       const fetch$ = fetch(`/api/games?userId=${encodeURIComponent(userId)}`)
         .then(r => r.ok ? r.json() : Promise.reject());
