@@ -762,7 +762,6 @@
         e.preventDefault();
         lastDy = dy;
         ptr.style.height = Math.min(dy * 0.45, 110) + 'px';
-        ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 0.45 / 56 * 360, 360)}deg)`;
         const t = Math.min(dy * 0.45 / 56, 1);
         ptrSpinner.style.borderTopColor = `rgb(${Math.round(192*(1-t))},${Math.round(192*(1-t))},${Math.round(192*(1-t))})`;
@@ -775,7 +774,6 @@
         ptr.classList.add('ptr-snap');
         if (triggered) {
           ptr.style.height = '48px';
-          ptrSpinner.style.opacity = '1';
           ptrSpinner.style.animationDelay = `${-(Math.min(lastDy * 0.45 / 56 * 360, 360) % 360) / 360 * 0.7}s`;
           ptrSpinner.style.transform = '';
           requestAnimationFrame(() => {
@@ -823,7 +821,6 @@
         e.preventDefault();
         lastDy = dy;
         ptr.style.height = Math.min(dy * 0.45, 110) + 'px';
-        ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
         const t = Math.min(dy * 0.45 / 56, 1);
         ptrSpinner.style.borderTopColor = `rgb(${Math.round(192*(1-t))},${Math.round(192*(1-t))},${Math.round(192*(1-t))})`;
@@ -836,7 +833,6 @@
         ptr.classList.add('ptr-snap');
         if (triggered) {
           ptr.style.height = '48px';
-          ptrSpinner.style.opacity = '1';
           ptrSpinner.style.animationDelay = `${-(Math.min(lastDy * 2, 360) % 360) / 360 * 0.7}s`;
           ptrSpinner.style.transform = '';
           requestAnimationFrame(() => {
