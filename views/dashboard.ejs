@@ -767,7 +767,7 @@
         if (dy <= 0) { pulling = false; return; }
         e.preventDefault();
         lastDy = dy;
-        ptr.style.height = Math.min(dy * 0.45, 110) + 'px';
+        ptr.style.height = (dy * 0.45) + 'px';
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 0.45 / 56 * 360, 360)}deg)`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
@@ -821,7 +821,7 @@
         if (dy <= 0) { pulling = false; return; }
         e.preventDefault();
         lastDy = dy;
-        ptr.style.height = Math.min(dy * 0.45, 110) + 'px';
+        ptr.style.height = (dy * 0.45) + 'px';
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
