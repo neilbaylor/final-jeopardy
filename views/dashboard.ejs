@@ -779,7 +779,7 @@
       const list = document.getElementById('users-list');
       const ptr = document.getElementById('ptr-indicator');
       const ptrSpinner = document.getElementById('ptr-spinner');
-      const THRESHOLD = 100;
+      const THRESHOLD = 125;
       const DEADZONE = 36;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
@@ -841,8 +841,10 @@
               ptrSpinner.classList.remove('ptr-spinning');
               ptrSpinner.style.animationDelay = '';
               ptr.style.opacity = '0';
-              ptr.style.height = '0';
-              setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 275);
+              setTimeout(() => {
+                ptr.style.height = '0';
+                setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 275);
+              }, 275);
             }, 640);
           });
         } else {
@@ -857,7 +859,7 @@
       const content = document.getElementById('content');
       const ptr = document.getElementById('games-ptr-indicator');
       const ptrSpinner = document.getElementById('games-ptr-spinner');
-      const THRESHOLD = 100;
+      const THRESHOLD = 125;
       const DEADZONE = 36;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
@@ -917,8 +919,10 @@
             ptrSpinner.classList.remove('ptr-spinning');
             ptrSpinner.style.animationDelay = '';
             ptr.style.opacity = '0';
-            ptr.style.height = '0';
-            setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 275);
+            setTimeout(() => {
+              ptr.style.height = '0';
+              setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 275);
+            }, 275);
           });
         } else {
           ptr.style.height = '0';
