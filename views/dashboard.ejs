@@ -662,7 +662,7 @@
     function loadGames(silent = false) {
       const fab = document.getElementById('new-game');
       const spinner = document.getElementById('games-spinner');
-      const delay = silent ? Promise.resolve() : new Promise(res => setTimeout(res, 700));
+      const delay = silent ? Promise.resolve() : new Promise(res => setTimeout(res, 1000));
       const fetch$ = fetch(`/api/games?userId=${encodeURIComponent(userId)}`)
         .then(r => r.ok ? r.json() : Promise.reject());
 
