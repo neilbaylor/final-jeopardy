@@ -57,6 +57,16 @@ router.post('/api/games', async (req, res) => {
   try {
     await conn.beginTransaction();
 
+    // Check if the user is already at the game limit
+    const [[{ gameCount }]] = await conn.query(
+      'SELECT COUNT(*) AS gameCount FROM game_users WHERE user_id = ?',
+      [Number(userId)]
+    );
+    if (gameCount >= 10) {
+      await conn.rollback();
+      return res.status(409).json({ error: 'You have reached the maximum number of games' });
+    }
+
     // Check if a game already exists with exactly these users
     const [existing] = await conn.query(
       `SELECT gu.game_id
