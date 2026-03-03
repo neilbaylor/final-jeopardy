@@ -802,9 +802,9 @@
           const edy = Math.max(0, dy - DEADZONE);
           list.style.transform = '';
           lastDy = dy;
-          ptr.style.height = (edy * 0.47) + 'px';
+          ptr.style.height = (edy * 0.44) + 'px';
           const spinEdy = Math.max(0, edy - 18);
-          ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 0.47 / 56 * 360, 360)}deg)`;
+          ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 0.44 / 56 * 360, 360)}deg)`;
           triggered = dy >= THRESHOLD;
         } else {
           triggered = false;
@@ -878,7 +878,7 @@
           const edy = Math.max(0, dy - DEADZONE);
           content.style.transform = '';
           lastDy = dy;
-          ptr.style.height = (edy * 0.47) + 'px';
+          ptr.style.height = (edy * 0.44) + 'px';
           const spinEdy = Math.max(0, edy - 18);
           ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 2, 360)}deg)`;
           triggered = dy >= THRESHOLD;
