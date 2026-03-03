@@ -2,6 +2,16 @@ const express = require('express');
 const db = require('../config/database');
 const router = express.Router();
 
+// Temp admin: delete all games
+router.post('/admin/delete-all-games', async (req, res) => {
+  if (req.headers['x-admin-token'] !== process.env.ADMIN_TOKEN) return res.status(403).json({ error: 'forbidden' });
+  const conn = await db.getConnection();
+  await conn.query('DELETE FROM games');
+  const [[{ cnt }]] = await conn.query('SELECT COUNT(*) AS cnt FROM games');
+  conn.release();
+  res.json({ deleted: true, remaining: Number(cnt) });
+});
+
 // Login page
 router.get('/', (req, res) => {
   res.render('login', { error: req.query.error || null, user: req.user || null });
