@@ -440,7 +440,7 @@
       overflow-y: auto;
       flex: 1;
       padding: 4px 0 12px;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.22s ease;
     }
     .user-row {
       display: flex;
@@ -728,7 +728,7 @@
           };
           if (silent && list.querySelector('.user-row')) {
             list.style.opacity = '0';
-            setTimeout(applyUsers, 300);
+            setTimeout(applyUsers, 220);
           } else {
             applyUsers();
           }
@@ -782,9 +782,11 @@
           });
           usersCache = null;
           loadUsers(true).finally(() => {
-            ptr.style.height = '0';
-            ptrSpinner.classList.remove('ptr-spinning');
-            ptrSpinner.style.animationDelay = '';
+            setTimeout(() => {
+              ptr.style.height = '0';
+              ptrSpinner.classList.remove('ptr-spinning');
+              ptrSpinner.style.animationDelay = '';
+            }, 440);
           });
         } else {
           ptr.style.height = '0';
