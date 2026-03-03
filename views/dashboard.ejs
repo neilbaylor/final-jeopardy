@@ -440,7 +440,7 @@
       overflow-y: auto;
       flex: 1;
       padding: 4px 0 12px;
-      transition: opacity 0.15s ease;
+      transition: opacity 0.3s ease;
     }
     .user-row {
       display: flex;
@@ -728,7 +728,7 @@
           };
           if (silent && list.querySelector('.user-row')) {
             list.style.opacity = '0';
-            setTimeout(applyUsers, 150);
+            setTimeout(applyUsers, 300);
           } else {
             applyUsers();
           }
