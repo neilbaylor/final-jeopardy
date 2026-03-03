@@ -778,6 +778,7 @@
           triggered = false;
           list.style.transition = '';
           ptr.classList.remove('ptr-snap');
+          ptr.style.height = '0';
           ptrSpinner.style.transform = 'rotate(0deg)';
         }
       }, { passive: true });
@@ -791,7 +792,8 @@
           list.style.transform = '';
           lastDy = dy;
           ptr.style.height = (edy * 0.45) + 'px';
-          ptrSpinner.style.transform = `rotate(${Math.min(edy * 0.45 / 56 * 360, 360)}deg)`;
+          const spinEdy = Math.max(0, edy - 18);
+          ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 0.45 / 56 * 360, 360)}deg)`;
           triggered = dy >= THRESHOLD;
         } else {
           triggered = false;
@@ -852,6 +854,7 @@
           triggered = false;
           content.style.transition = '';
           ptr.classList.remove('ptr-snap');
+          ptr.style.height = '0';
           ptrSpinner.style.transform = 'rotate(0deg)';
         }
       }, { passive: true });
@@ -865,7 +868,8 @@
           content.style.transform = '';
           lastDy = dy;
           ptr.style.height = (edy * 0.45) + 'px';
-          ptrSpinner.style.transform = `rotate(${Math.min(edy * 2, 360)}deg)`;
+          const spinEdy = Math.max(0, edy - 18);
+          ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 2, 360)}deg)`;
           triggered = dy >= THRESHOLD;
         } else {
           triggered = false;
