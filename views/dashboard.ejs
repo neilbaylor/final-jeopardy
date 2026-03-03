@@ -670,13 +670,13 @@
         .then(() => {
           if (!silent) {
             spinner.classList.add('hidden');
-            fab.style.opacity = '1';
+            setTimeout(() => { fab.style.opacity = '1'; }, 200);
           }
         })
         .catch(() => {
           if (!silent) {
             spinner.classList.add('hidden');
-            fab.style.opacity = '1';
+            setTimeout(() => { fab.style.opacity = '1'; }, 200);
           }
         });
     }
