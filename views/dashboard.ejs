@@ -575,7 +575,7 @@
     </button>
   </div>
 
-  <div id="new-game-panel">
+  <div id="new-game-panel" style="display:none">
     <div id="panel-header">
       <button id="close-panel" aria-label="Back">
         <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
@@ -635,14 +635,24 @@
       location.replace('/');
     });
 
-    document.getElementById('new-game').addEventListener('click', () => {
-      document.body.classList.add('panel-open');
-      loadUsers();
-    });
-    document.getElementById('close-panel').addEventListener('click', () => {
+    const _panel = document.getElementById('new-game-panel');
+    function openPanel() {
+      _panel.style.display = 'flex';
+      requestAnimationFrame(() => document.body.classList.add('panel-open'));
+    }
+    function closePanel() {
       document.body.classList.remove('panel-open');
       document.getElementById('create-btn').disabled = true;
+      setTimeout(() => {
+        if (!document.body.classList.contains('panel-open')) _panel.style.display = 'none';
+      }, 430);
+    }
+
+    document.getElementById('new-game').addEventListener('click', () => {
+      openPanel();
+      loadUsers();
     });
+    document.getElementById('close-panel').addEventListener('click', closePanel);
 
     function showErrorModal(msg) {
       document.getElementById('error-modal-msg').textContent = msg;
@@ -695,7 +705,7 @@
 
         if (res.ok) {
           await loadGames(true);
-          document.body.classList.remove('panel-open');
+          closePanel();
           btn.style.width = '';
           btn.classList.remove('loading');
           btn.disabled = true;
