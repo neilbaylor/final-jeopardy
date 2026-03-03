@@ -756,7 +756,7 @@
         const capped = Math.min(dy * 0.45, 56);
         ptr.style.height = capped + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
-        ptrSpinner.style.transform = `rotate(${dy * 2}deg)`;
+        ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
 
@@ -810,7 +810,7 @@
         const capped = Math.min(dy * 0.45, 56);
         ptr.style.height = capped + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
-        ptrSpinner.style.transform = `rotate(${dy * 2}deg)`;
+        ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
 
