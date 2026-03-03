@@ -422,7 +422,7 @@
       width: 28px;
       height: 28px;
       border: 3px solid rgba(0,0,0,0.12);
-      border-top-color: #c0c0c0;
+      border-top-color: #000;
       border-radius: 50%;
       flex-shrink: 0;
       will-change: transform;
@@ -751,7 +751,6 @@
           pulling = true;
           triggered = false;
           ptr.classList.remove('ptr-snap');
-          ptrSpinner.style.borderTopColor = '';
         }
       }, { passive: true });
 
@@ -763,8 +762,6 @@
         lastDy = dy;
         ptr.style.height = Math.min(dy * 0.45, 110) + 'px';
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 0.45 / 56 * 360, 360)}deg)`;
-        const t = Math.min(dy * 0.45 / 56, 1);
-        ptrSpinner.style.borderTopColor = `rgb(${Math.round(192*(1-t))},${Math.round(192*(1-t))},${Math.round(192*(1-t))})`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
 
@@ -786,12 +783,10 @@
               ptr.style.height = '0';
               ptrSpinner.classList.remove('ptr-spinning');
               ptrSpinner.style.animationDelay = '';
-              ptrSpinner.style.borderTopColor = '';
             }, 640);
           });
         } else {
           ptr.style.height = '0';
-          ptrSpinner.style.borderTopColor = '';
         }
       });
     })();
@@ -810,7 +805,6 @@
           pulling = true;
           triggered = false;
           ptr.classList.remove('ptr-snap');
-          ptrSpinner.style.borderTopColor = '';
         }
       }, { passive: true });
 
@@ -822,8 +816,6 @@
         lastDy = dy;
         ptr.style.height = Math.min(dy * 0.45, 110) + 'px';
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
-        const t = Math.min(dy * 0.45 / 56, 1);
-        ptrSpinner.style.borderTopColor = `rgb(${Math.round(192*(1-t))},${Math.round(192*(1-t))},${Math.round(192*(1-t))})`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
 
@@ -842,11 +834,9 @@
             ptr.style.height = '0';
             ptrSpinner.classList.remove('ptr-spinning');
             ptrSpinner.style.animationDelay = '';
-            ptrSpinner.style.borderTopColor = '';
           });
         } else {
           ptr.style.height = '0';
-          ptrSpinner.style.borderTopColor = '';
         }
       });
     })();
