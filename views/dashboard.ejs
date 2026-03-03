@@ -254,7 +254,9 @@
       background: #fafafa;
       color: #111;
       transform: translateY(100%);
-      transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+      visibility: hidden;
+      transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0s 0.42s;
       will-change: transform;
       z-index: 50;
       display: flex;
@@ -264,6 +266,9 @@
     }
     body.panel-open #new-game-panel {
       transform: translateY(0);
+      visibility: visible;
+      transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0s;
     }
     /* Panel header */
     #panel-header {
