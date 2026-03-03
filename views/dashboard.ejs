@@ -35,11 +35,6 @@
       flex-direction: column;
       font-family: 'Segoe UI', system-ui, sans-serif;
       color: #111;
-      /* Absorb safe areas at the body level so the white background fills the
-         status-bar zone at the top and the toolbar zone at the bottom, instead
-         of letting the dark topbar bleed into those regions. */
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     .topbar {
@@ -47,12 +42,12 @@
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      padding-top: 12px;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
       padding-bottom: 8px;
       padding-left: calc(env(safe-area-inset-left, 0px) + 6px);
       padding-right: 14px;
-      height: 60px;
-      min-height: 60px;
+      height: calc(env(safe-area-inset-top, 0px) + 60px);
+      min-height: calc(env(safe-area-inset-top, 0px) + 60px);
       flex-shrink: 0;
       box-shadow: 0 4px 10px rgba(0,0,0,0.23);
       position: relative;
