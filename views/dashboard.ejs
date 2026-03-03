@@ -253,12 +253,13 @@
       opacity: 0.96;
     }
     #new-game-panel {
-      position: fixed;
+      position: absolute;
       inset: 0;
       background: #fafafa;
       color: #111;
       transform: translateY(100%);
       transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
       z-index: 50;
       display: flex;
       flex-direction: column;
