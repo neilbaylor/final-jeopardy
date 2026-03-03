@@ -455,8 +455,8 @@
     .user-row input[type="checkbox"] {
       appearance: none;
       -webkit-appearance: none;
-      width: 22px;
-      height: 22px;
+      width: 19px;
+      height: 19px;
       border-radius: 50%;
       border: 2px solid #ccc;
       margin-left: auto;
@@ -479,6 +479,12 @@
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
+      border: 2px solid transparent;
+      box-sizing: border-box;
+    }
+    .user-row:has(input:checked) img,
+    .user-row:has(input:checked) .user-avatar-placeholder {
+      border-color: #07102e;
     }
     .user-avatar-placeholder {
       background: #e8eaf0;
@@ -487,6 +493,7 @@
       justify-content: center;
       font-size: 1.3rem;
     }
+    .user-row:has(input:checked) .user-name { font-weight: 600; }
     .user-name {
       font-size: 1rem;
       font-weight: 500;
