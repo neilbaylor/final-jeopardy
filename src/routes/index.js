@@ -2,16 +2,6 @@ const express = require('express');
 const db = require('../config/database');
 const router = express.Router();
 
-// Temp admin: db stats
-router.get('/admin/db-stats', async (req, res) => {
-  if (req.headers['x-admin-token'] !== process.env.ADMIN_TOKEN) return res.status(403).json({ error: 'forbidden' });
-  const conn = await db.getConnection();
-  const [[{ questions }]] = await conn.query('SELECT COUNT(*) AS questions FROM questions');
-  const [[{ games }]] = await conn.query('SELECT COUNT(*) AS games FROM games');
-  conn.release();
-  res.json({ questions: Number(questions), games: Number(games) });
-});
-
 // Login page
 router.get('/', (req, res) => {
   res.render('login', { error: req.query.error || null, user: req.user || null });
