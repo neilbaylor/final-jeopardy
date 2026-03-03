@@ -115,6 +115,15 @@ async function initDB() {
     )`,
   ];
   for (const sql of tables) await conn.query(sql);
+
+  // Backfill asked_at for any game_questions rows that were created without it
+  await conn.query(
+    `UPDATE game_questions gq
+     JOIN games g ON gq.game_id = g.id
+     SET gq.asked_at = g.created_at
+     WHERE gq.asked_at IS NULL`
+  );
+
   conn.release();
   console.log('Database tables ready');
 }
