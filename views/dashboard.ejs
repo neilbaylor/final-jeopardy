@@ -186,6 +186,13 @@
       transform: scale(0.93);
       opacity: 0.8;
     }
+    @keyframes fabPulse {
+      0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,0.18), 0 0 0 0 rgba(255,213,0,0.45); }
+      60%       { box-shadow: 0 4px 14px rgba(0,0,0,0.18), 0 0 0 12px rgba(255,213,0,0); }
+    }
+    .fab.fab-pulse {
+      animation: fabPulse 2.2s ease-out infinite;
+    }
 
     .fab svg {
       width: 24px;
@@ -696,11 +703,12 @@
         .then(r => r.ok ? r.json() : Promise.reject());
 
       return Promise.all([fetch$, delay])
-        .then(() => {
+        .then(([games]) => {
           if (!silent) {
             spinner.classList.add('hidden');
             setTimeout(() => { fab.style.opacity = '1'; }, 200);
           }
+          fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
         })
         .catch(() => {
           if (!silent) {
@@ -828,6 +836,7 @@
           usersCache = null;
           loadUsers(true).finally(() => {
             setTimeout(() => {
+              ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
               ptrSpinner.classList.remove('ptr-spinning');
               ptrSpinner.style.animationDelay = '';
               ptr.style.height = '0';
@@ -902,6 +911,7 @@
             ptrSpinner.classList.add('ptr-spinning');
           });
           loadGames(true).finally(() => {
+            ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
             ptrSpinner.classList.remove('ptr-spinning');
             ptrSpinner.style.animationDelay = '';
             ptr.style.height = '0';
