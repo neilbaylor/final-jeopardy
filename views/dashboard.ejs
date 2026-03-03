@@ -421,14 +421,13 @@
     #games-ptr-spinner {
       width: 28px;
       height: 28px;
-      border: 3px solid rgba(7,16,46,0.15);
-      border-top-color: #07102e;
+      border: 3px solid rgba(0,0,0,0.12);
+      border-top-color: #c0c0c0;
       border-radius: 50%;
       flex-shrink: 0;
       will-change: transform;
     }
     #games-ptr-spinner {
-      border-color: rgba(0,0,0,0.12);
       border-top-color: #000;
     }
     #ptr-spinner.ptr-spinning,
@@ -769,7 +768,7 @@
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 0.45 / 56 * 360, 360)}deg)`;
         const t = Math.min(dy * 0.45 / 56, 1);
-        ptrSpinner.style.borderTopColor = `rgb(${Math.round(51*(1-t))},${Math.round(51*(1-t))},${Math.round(51*(1-t))})`;
+        ptrSpinner.style.borderTopColor = `rgb(${Math.round(192*(1-t))},${Math.round(192*(1-t))},${Math.round(192*(1-t))})`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
 
