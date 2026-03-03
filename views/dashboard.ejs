@@ -406,7 +406,8 @@
     #games-ptr-indicator {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
+      padding-top: 12px;
       height: 0;
       overflow: hidden;
       flex-shrink: 0;
@@ -761,7 +762,7 @@
         if (dy <= 0) { pulling = false; return; }
         e.preventDefault();
         lastDy = dy;
-        ptr.style.height = (dy * 0.45) + 'px';
+        ptr.style.height = Math.min(dy * 0.45, 90) + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
         triggered = dy >= THRESHOLD;
@@ -814,7 +815,7 @@
         if (dy <= 0) { pulling = false; return; }
         e.preventDefault();
         lastDy = dy;
-        ptr.style.height = (dy * 0.45) + 'px';
+        ptr.style.height = Math.min(dy * 0.45, 90) + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
         triggered = dy >= THRESHOLD;
