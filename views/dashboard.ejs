@@ -760,6 +760,7 @@
       const ptr = document.getElementById('ptr-indicator');
       const ptrSpinner = document.getElementById('ptr-spinner');
       const THRESHOLD = 64;
+      const DEADZONE = 12;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
       const snapBack = () => {
@@ -785,10 +786,11 @@
         const dy = e.touches[0].clientY - startY;
         e.preventDefault();
         if (dy > 0) {
+          const edy = Math.max(0, dy - DEADZONE);
           list.style.transform = '';
           lastDy = dy;
-          ptr.style.height = (dy * 0.45) + 'px';
-          ptrSpinner.style.transform = `rotate(${Math.min(dy * 0.45 / 56 * 360, 360)}deg)`;
+          ptr.style.height = (edy * 0.45) + 'px';
+          ptrSpinner.style.transform = `rotate(${Math.min(edy * 0.45 / 56 * 360, 360)}deg)`;
           triggered = dy >= THRESHOLD;
         } else {
           triggered = false;
@@ -831,6 +833,7 @@
       const ptr = document.getElementById('games-ptr-indicator');
       const ptrSpinner = document.getElementById('games-ptr-spinner');
       const THRESHOLD = 64;
+      const DEADZONE = 12;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
       const snapBack = () => {
@@ -856,10 +859,11 @@
         const dy = e.touches[0].clientY - startY;
         e.preventDefault();
         if (dy > 0) {
+          const edy = Math.max(0, dy - DEADZONE);
           content.style.transform = '';
           lastDy = dy;
-          ptr.style.height = (dy * 0.45) + 'px';
-          ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
+          ptr.style.height = (edy * 0.45) + 'px';
+          ptrSpinner.style.transform = `rotate(${Math.min(edy * 2, 360)}deg)`;
           triggered = dy >= THRESHOLD;
         } else {
           triggered = false;
