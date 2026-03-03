@@ -426,7 +426,7 @@
     }
     #ptr-indicator.ptr-snap,
     #games-ptr-indicator.ptr-snap {
-      transition: height 0.45s ease;
+      transition: height 0.275s ease;
     }
     #ptr-spinner,
     #games-ptr-spinner {
@@ -828,10 +828,10 @@
           usersCache = null;
           loadUsers(true).finally(() => {
             setTimeout(() => {
-              ptr.classList.remove('ptr-snap');
-              ptr.style.height = '0';
               ptrSpinner.classList.remove('ptr-spinning');
               ptrSpinner.style.animationDelay = '';
+              ptr.style.height = '0';
+              setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 275);
             }, 640);
           });
         } else {
@@ -902,9 +902,10 @@
             ptrSpinner.classList.add('ptr-spinning');
           });
           loadGames(true).finally(() => {
-            ptr.style.height = '0';
             ptrSpinner.classList.remove('ptr-spinning');
             ptrSpinner.style.animationDelay = '';
+            ptr.style.height = '0';
+            setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 275);
           });
         } else {
           ptr.style.height = '0';
