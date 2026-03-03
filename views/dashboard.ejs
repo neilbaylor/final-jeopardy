@@ -46,7 +46,8 @@
       padding-bottom: 8px;
       padding-left: calc(env(safe-area-inset-left, 0px) + 6px);
       padding-right: 14px;
-      min-height: calc(env(safe-area-inset-top, 0px) + 56px);
+      height: calc(env(safe-area-inset-top, 0px) + 60px);
+      min-height: calc(env(safe-area-inset-top, 0px) + 60px);
       flex-shrink: 0;
       box-shadow: 0 4px 10px rgba(0,0,0,0.23);
       position: relative;
@@ -63,6 +64,7 @@
       opacity: 0.95;
       object-fit: contain;
       pointer-events: none;
+      z-index: 1;
     }
 
     .avatar {
@@ -259,7 +261,8 @@
       align-items: center;
       background: #07102e;
       padding: 6px 6px 6px 0px;
-      min-height: 48px;
+      height: 60px;
+      min-height: 60px;
       flex-shrink: 0;
       clip-path: inset(0 -20px -20px -20px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.23);
@@ -450,6 +453,12 @@
       transition: opacity 0.29s ease;
       will-change: transform;
       background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    @media (display-mode: standalone) {
+      #new-game-panel {
+        background: #fff;
+      }
     }
     .user-row {
       display: flex;
@@ -478,8 +487,8 @@
       touch-action: manipulation;
     }
     .user-row input[type="checkbox"]:checked {
-      border-color: #3a4a6b;
-      background: #3a4a6b;
+      border-color: #07102e;
+      background: #07102e;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23fff' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: center;
@@ -761,7 +770,7 @@
       const list = document.getElementById('users-list');
       const ptr = document.getElementById('ptr-indicator');
       const ptrSpinner = document.getElementById('ptr-spinner');
-      const THRESHOLD = 200;
+      const THRESHOLD = 120;
       const DEADZONE = 36;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
@@ -793,14 +802,14 @@
           const edy = Math.max(0, dy - DEADZONE);
           list.style.transform = '';
           lastDy = dy;
-          ptr.style.height = (edy * 0.45) + 'px';
+          ptr.style.height = (edy * 0.6) + 'px';
           const spinEdy = Math.max(0, edy - 18);
-          ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 0.45 / 56 * 360, 360)}deg)`;
+          ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 0.6 / 56 * 360, 360)}deg)`;
           triggered = dy >= THRESHOLD;
         } else {
           triggered = false;
           ptr.style.height = '0';
-          list.style.transform = `translateY(${dy * 0.3}px)`;
+          list.style.transform = `translateY(${dy * 0.42}px)`;
         }
       }, { passive: false });
 
@@ -837,7 +846,7 @@
       const content = document.getElementById('content');
       const ptr = document.getElementById('games-ptr-indicator');
       const ptrSpinner = document.getElementById('games-ptr-spinner');
-      const THRESHOLD = 200;
+      const THRESHOLD = 120;
       const DEADZONE = 36;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
@@ -869,14 +878,14 @@
           const edy = Math.max(0, dy - DEADZONE);
           content.style.transform = '';
           lastDy = dy;
-          ptr.style.height = (edy * 0.45) + 'px';
+          ptr.style.height = (edy * 0.6) + 'px';
           const spinEdy = Math.max(0, edy - 18);
           ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 2, 360)}deg)`;
           triggered = dy >= THRESHOLD;
         } else {
           triggered = false;
           ptr.style.height = '0';
-          content.style.transform = `translateY(${dy * 0.3}px)`;
+          content.style.transform = `translateY(${dy * 0.42}px)`;
         }
       }, { passive: false });
 
