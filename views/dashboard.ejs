@@ -795,8 +795,8 @@
       const ptr = document.getElementById('ptr-indicator');
       const ptrSpinner = document.getElementById('ptr-spinner');
       const _standalone = window.navigator.standalone === true;
-      const THRESHOLD = _standalone ? 100 : 125;
-      const DEADZONE = _standalone ? 0 : 36;
+      const THRESHOLD = 125;
+      const DEADZONE = 36;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
       const snapBack = () => {
@@ -816,8 +816,9 @@
           ptr.classList.remove('ptr-snap');
           ptr.style.height = '0';
           ptrSpinner.style.transform = 'rotate(0deg)';
+          if (_standalone) e.preventDefault();
         }
-      }, { passive: true });
+      }, { passive: !window.navigator.standalone });
 
       list.addEventListener('touchmove', e => {
         if (!pulling) return;
@@ -878,8 +879,8 @@
       const ptr = document.getElementById('games-ptr-indicator');
       const ptrSpinner = document.getElementById('games-ptr-spinner');
       const _standalone = window.navigator.standalone === true;
-      const THRESHOLD = _standalone ? 100 : 125;
-      const DEADZONE = _standalone ? 0 : 36;
+      const THRESHOLD = 125;
+      const DEADZONE = 36;
       let startY = 0, pulling = false, triggered = false, lastDy = 0;
 
       const snapBack = () => {
@@ -899,8 +900,9 @@
           ptr.classList.remove('ptr-snap');
           ptr.style.height = '0';
           ptrSpinner.style.transform = 'rotate(0deg)';
+          if (_standalone) e.preventDefault();
         }
-      }, { passive: true });
+      }, { passive: !window.navigator.standalone });
 
       content.addEventListener('touchmove', e => {
         if (!pulling) return;
