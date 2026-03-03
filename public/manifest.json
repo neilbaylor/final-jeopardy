@@ -9,16 +9,16 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/images/hone-screen-new.png",
-      "sizes": "1282x1282",
+      "src": "/images/android-chrome-192x192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/hone-screen-new.png",
-      "sizes": "1282x1282",
+      "src": "/images/android-chrome-512x512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ]
 }
