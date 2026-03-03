@@ -446,6 +446,7 @@
       flex-shrink: 0;
       will-change: transform;
       margin-top: 8px;
+      transition: opacity 0.275s ease;
     }
     #ptr-spinner.ptr-spinning,
     #games-ptr-spinner.ptr-spinning {
@@ -840,8 +841,9 @@
               ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
               ptrSpinner.classList.remove('ptr-spinning');
               ptrSpinner.style.animationDelay = '';
+              ptrSpinner.style.opacity = '0';
               ptr.style.height = '0';
-              setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 275);
+              setTimeout(() => { ptr.classList.remove('ptr-snap'); ptrSpinner.style.opacity = ''; }, 275);
             }, 640);
           });
         } else {
@@ -915,8 +917,9 @@
             ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
             ptrSpinner.classList.remove('ptr-spinning');
             ptrSpinner.style.animationDelay = '';
+            ptrSpinner.style.opacity = '0';
             ptr.style.height = '0';
-            setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 275);
+            setTimeout(() => { ptr.classList.remove('ptr-snap'); ptrSpinner.style.opacity = ''; }, 275);
           });
         } else {
           ptr.style.height = '0';
