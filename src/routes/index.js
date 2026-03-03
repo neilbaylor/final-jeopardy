@@ -67,6 +67,23 @@ router.post('/api/games', async (req, res) => {
       return res.status(409).json({ error: 'You have reached the maximum number of games' });
     }
 
+    // Check if any friend is at the game limit
+    const friendPlaceholders = friendIds.map(() => '?').join(',');
+    const [friendCounts] = await conn.query(
+      `SELECT u.display_name, COUNT(gu.game_id) AS gameCount
+       FROM users u
+       LEFT JOIN game_users gu ON gu.user_id = u.id
+       WHERE u.id IN (${friendPlaceholders})
+       GROUP BY u.id`,
+      friendIds.map(Number)
+    );
+    for (const friend of friendCounts) {
+      if (friend.gameCount >= 10) {
+        await conn.rollback();
+        return res.status(409).json({ error: `Sorry, ${friend.display_name} has reached the maximum number of games` });
+      }
+    }
+
     // Check if a game already exists with exactly these users
     const [existing] = await conn.query(
       `SELECT gu.game_id
@@ -83,7 +100,7 @@ router.post('/api/games', async (req, res) => {
 
     if (existing.length > 0) {
       await conn.rollback();
-      return res.status(409).json({ error: 'A game already exists with those friends' });
+      return res.status(409).json({ error: friendIds.length === 1 ? 'A game already exists with that friend' : 'A game already exists with those friends' });
     }
 
     // Create the game
