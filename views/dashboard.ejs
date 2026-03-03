@@ -751,8 +751,7 @@
         if (dy <= 0) { pulling = false; return; }
         e.preventDefault();
         lastDy = dy;
-        const capped = Math.min(dy * 0.45, 56);
-        ptr.style.height = capped + 'px';
+        ptr.style.height = (dy * 0.45) + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
         triggered = dy >= THRESHOLD;
@@ -805,8 +804,7 @@
         if (dy <= 0) { pulling = false; return; }
         e.preventDefault();
         lastDy = dy;
-        const capped = Math.min(dy * 0.45, 56);
-        ptr.style.height = capped + 'px';
+        ptr.style.height = (dy * 0.45) + 'px';
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 2, 360)}deg)`;
         triggered = dy >= THRESHOLD;
