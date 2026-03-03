@@ -569,7 +569,7 @@
         })
         .catch(() => location.replace('/'));
 
-      loadGames();
+      setTimeout(() => loadGames(), 200);
     }
 
     document.getElementById('topbar-user').addEventListener('click', e => {
