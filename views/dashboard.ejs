@@ -777,7 +777,7 @@
         if (triggered) {
           ptr.style.height = '48px';
           ptrSpinner.style.opacity = '1';
-          ptrSpinner.style.animationDelay = `${-(Math.min(lastDy * 2, 360) % 360) / 360 * 0.7}s`;
+          ptrSpinner.style.animationDelay = `${-(Math.min(lastDy * 0.45 / 56 * 360, 360) % 360) / 360 * 0.7}s`;
           ptrSpinner.style.transform = '';
           requestAnimationFrame(() => {
             ptrSpinner.classList.add('ptr-spinning');
