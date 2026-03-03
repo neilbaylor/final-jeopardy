@@ -92,7 +92,7 @@ router.post('/api/games', async (req, res) => {
       return res.status(500).json({ error: 'No questions available' });
     }
     await conn.query(
-      'INSERT INTO game_questions (game_id, question_id) VALUES (?, ?)',
+      'INSERT INTO game_questions (game_id, question_id, asked_at) VALUES (?, ?, NOW())',
       [gameId, question.id]
     );
 
