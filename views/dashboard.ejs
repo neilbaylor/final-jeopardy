@@ -769,7 +769,7 @@
         ptrSpinner.style.opacity = String(Math.min(dy / THRESHOLD, 1));
         ptrSpinner.style.transform = `rotate(${Math.min(dy * 0.45 / 56 * 360, 360)}deg)`;
         const t = Math.min(dy * 0.45 / 56, 1);
-        ptrSpinner.style.borderTopColor = `rgb(${Math.round(7*(1-t))},${Math.round(16*(1-t))},${Math.round(46*(1-t))})`;
+        ptrSpinner.style.borderTopColor = `rgb(${Math.round(51*(1-t))},${Math.round(51*(1-t))},${Math.round(51*(1-t))})`;
         triggered = dy >= THRESHOLD;
       }, { passive: false });
 
