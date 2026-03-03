@@ -439,6 +439,7 @@
       overflow-y: auto;
       flex: 1;
       padding: 4px 0 12px;
+      transition: opacity 0.15s ease;
     }
     .user-row {
       display: flex;
@@ -706,21 +707,30 @@
       return Promise.all([fetchUsers, delay])
         .then(([users]) => {
           if (!silent) spinner.classList.add('hidden');
-          const selected = new Set([...list.querySelectorAll('.user-row input:checked')]
-            .map(cb => cb.closest('.user-row').dataset.userId));
-          list.innerHTML = users.map(u => `
-            <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()">
-              ${u.avatar_url
-                ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
-                : `<div class="user-avatar-placeholder">👤</div>`}
-              <span class="user-name">${u.display_name}</span>
-              <input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" />
-            </div>
-          `).join('');
-          list.querySelectorAll('.user-row').forEach(row => {
-            if (selected.has(row.dataset.userId)) row.querySelector('input').checked = true;
-          });
-          updateCreateBtn();
+          const applyUsers = () => {
+            const selected = new Set([...list.querySelectorAll('.user-row input:checked')]
+              .map(cb => cb.closest('.user-row').dataset.userId));
+            list.innerHTML = users.map(u => `
+              <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()">
+                ${u.avatar_url
+                  ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
+                  : `<div class="user-avatar-placeholder">👤</div>`}
+                <span class="user-name">${u.display_name}</span>
+                <input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" />
+              </div>
+            `).join('');
+            list.querySelectorAll('.user-row').forEach(row => {
+              if (selected.has(row.dataset.userId)) row.querySelector('input').checked = true;
+            });
+            updateCreateBtn();
+            list.style.opacity = '1';
+          };
+          if (silent && list.querySelector('.user-row')) {
+            list.style.opacity = '0';
+            setTimeout(applyUsers, 150);
+          } else {
+            applyUsers();
+          }
         })
         .catch(() => {
           if (!silent) spinner.classList.add('hidden');
