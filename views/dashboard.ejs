@@ -23,7 +23,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { background: #07102e; }
+    html { background: #07102e; overflow: hidden; }
 
     body {
       touch-action: manipulation;
@@ -467,7 +467,7 @@
       overflow-y: auto;
       overscroll-behavior-y: contain;
       flex: 1;
-      padding: 0 0 12px;
+      padding: 0;
       transition: opacity 0.36s ease;
       will-change: transform;
       background: #fff;
@@ -481,9 +481,7 @@
         background: #fff;
         padding-bottom: 0;
       }
-      #users-list {
-        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
-      }
+
     }
     .user-row {
       display: flex;
