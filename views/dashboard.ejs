@@ -249,7 +249,7 @@
       opacity: 0.96;
     }
     #new-game-panel {
-      position: fixed;
+      position: absolute;
       inset: 0;
       background: #fafafa;
       color: #111;
@@ -257,7 +257,6 @@
       visibility: hidden;
       transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
                   visibility 0s 0.42s;
-      will-change: transform;
       z-index: 50;
       display: flex;
       flex-direction: column;
@@ -636,12 +635,15 @@
       location.replace('/');
     });
 
+    const _panel = document.getElementById('new-game-panel');
     function openPanel() {
-      document.body.classList.add('panel-open');
+      _panel.style.willChange = 'transform';
+      requestAnimationFrame(() => document.body.classList.add('panel-open'));
     }
     function closePanel() {
       document.body.classList.remove('panel-open');
       document.getElementById('create-btn').disabled = true;
+      setTimeout(() => { _panel.style.willChange = ''; }, 430);
     }
 
     document.getElementById('new-game').addEventListener('click', () => {
