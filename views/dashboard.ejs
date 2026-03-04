@@ -504,20 +504,20 @@
     .player-avatar-wrap {
       position: relative;
       flex-shrink: 0;
-      width: 24px;
-      height: 24px;
+      width: 25px;
+      height: 25px;
     }
     .player-avatar {
-      width: 24px;
-      height: 24px;
+      width: 25px;
+      height: 25px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid rgba(0,0,0,0.08);
       display: block;
     }
     .player-avatar-placeholder {
-      width: 24px;
-      height: 24px;
+      width: 25px;
+      height: 25px;
       border-radius: 50%;
       background: #e8eaf0;
       display: flex;
@@ -530,11 +530,11 @@
       position: absolute;
       bottom: -2px;
       right: -2px;
-      width: 10px;
-      height: 10px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
       background: #43a047;
-      border: 1.5px solid #fff;
+      border: 0.5px solid #fff;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -580,8 +580,8 @@
 
     /* Answer button */
     @keyframes answerPulse {
-      0%   { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 0   rgba(255,213,0,0.55); }
-      100% { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 10px rgba(255,213,0,0); }
+      0%   { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 0   rgba(7,16,46,0.4); }
+      100% { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 10px rgba(7,16,46,0); }
     }
     .answer-btn {
       flex-shrink: 0;
@@ -589,7 +589,7 @@
       right: 10px;
       position: absolute;
       top: 25px;
-      background: rgba(255, 213, 0, 0.88);
+      background: #07102e;
       border: none;
       border-radius: 999px;
       padding: 0 16px;
@@ -597,7 +597,7 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
       font-size: 0.8rem;
       font-weight: 600;
-      color: #07102e;
+      color: #fff;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       animation: answerPulse 1.4s ease-out infinite;
@@ -1125,7 +1125,7 @@
     }
 
     function setupSwipeToDelete() {
-      const DELETE_W = 70;
+      const DELETE_W = 55;
       // Track whether the content container is scrolling vertically
       let contentIsScrolling = false;
       let contentScrollTimer = null;
