@@ -164,7 +164,7 @@
       flex: 1;
       overflow-y: auto;
       overscroll-behavior-y: contain;
-      padding: 20px 16px;
+      padding: 0 16px;
     }
 
     .fab {
@@ -419,7 +419,10 @@
       font-size: 1.3rem;
       font-weight: 700;
       color: #111;
-      padding: 4px 0 12px;
+      padding: 24px 0 12px;
+    }
+    #games-list {
+      margin-top: 4px;
     }
 
     /* Game row wrapper (swipe-to-delete) */
@@ -444,11 +447,11 @@
       background: none;
       border: none;
       color: #fff;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      font-size: 0.9rem;
-      font-weight: 700;
       cursor: pointer;
       padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -456,7 +459,8 @@
     .game-row {
       background: #fff;
       border-radius: 14px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      box-shadow: 0 2px 14px rgba(0,0,0,0.18);
+      border: 1px solid rgba(0,0,0,0.07);
       overflow: hidden;
       position: relative;
       z-index: 1;
@@ -464,7 +468,7 @@
       transition: transform 0.25s ease;
     }
     .game-row-header {
-      padding: 14px 14px 0;
+      padding: 10px 12px 0;
     }
     .game-category {
       font-size: 1rem;
@@ -474,12 +478,12 @@
     .game-row-body {
       display: flex;
       align-items: center;
-      padding: 12px 14px 14px;
-      gap: 12px;
+      padding: 8px 12px 10px;
+      gap: 8px;
     }
     .game-players {
       display: flex;
-      gap: 14px;
+      gap: 10px;
       flex: 1;
       min-width: 0;
       flex-wrap: nowrap;
@@ -488,38 +492,38 @@
     .game-player {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 5px;
       flex-shrink: 0;
     }
     .player-avatar {
-      width: 40px;
-      height: 40px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid rgba(0,0,0,0.08);
       flex-shrink: 0;
     }
     .player-avatar-placeholder {
-      width: 40px;
-      height: 40px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: #e8eaf0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 0.8rem;
       flex-shrink: 0;
       border: 2px solid rgba(0,0,0,0.06);
     }
     .player-overflow-circle {
-      width: 40px;
-      height: 40px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: #e8eaf0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.78rem;
+      font-size: 0.65rem;
       font-weight: 700;
       color: #555;
       flex-shrink: 0;
@@ -530,10 +534,10 @@
       gap: 1px;
     }
     .player-name {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
       color: #222;
-      max-width: 60px;
+      max-width: 52px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -552,13 +556,14 @@
     }
     .answer-btn {
       flex-shrink: 0;
+      margin-left: auto;
       background: rgba(255,213,0,0.88);
       border: none;
       border-radius: 999px;
-      padding: 0 18px;
-      height: 38px;
+      padding: 0 14px;
+      height: 30px;
       font-family: 'Segoe UI', system-ui, sans-serif;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: #07102e;
       cursor: pointer;
@@ -571,11 +576,20 @@
     /* Summary bar */
     .game-row-summary {
       background: #f5f5f5;
-      padding: 8px 14px;
-      font-size: 0.75rem;
+      padding: 6px 12px;
+      font-size: 0.72rem;
       font-weight: 500;
       color: #888;
       text-align: center;
+    }
+
+    /* Row fade-in */
+    @keyframes rowFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .game-row-wrapper {
+      animation: rowFadeIn 0.3s ease both;
     }
 
     /* Delete confirmation modal */
@@ -622,7 +636,7 @@
       color: #555;
       border: none;
       border-radius: 999px;
-      padding: 0 24px;
+      width: 100px;
       height: 38px;
       font-family: 'Segoe UI', system-ui, sans-serif;
       font-size: 0.9rem;
@@ -635,15 +649,13 @@
       color: #07102e;
       border: none;
       border-radius: 999px;
-      padding: 0 24px;
+      width: 100px;
       height: 38px;
       font-family: 'Segoe UI', system-ui, sans-serif;
       font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
-      animation: answerPulse 1.4s ease-out infinite;
-      will-change: box-shadow;
     }
 
     /* Spinner inside panel */
@@ -1007,9 +1019,11 @@
       }
 
       const MAX_VISIBLE = 3;
+      const toTitleCase = str => str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 
-      list.innerHTML = games.map(game => {
-        const category = game.current_question ? game.current_question.category : 'No question yet';
+      list.innerHTML = games.map((game, idx) => {
+        const rawCategory = game.current_question ? game.current_question.category : 'No question yet';
+        const category = `Category: ${toTitleCase(rawCategory)}`;
         const cqId = game.current_question ? game.current_question.game_question_id : null;
         const iAnswered = cqId && game.my_answers && game.my_answers.some(a => a.game_question_id === cqId);
 
@@ -1022,16 +1036,22 @@
         const visible = overflow > 0 ? combined.slice(0, MAX_VISIBLE) : combined;
 
         const playerHtml = visible.map(p => {
-          const firstName = escHtml((p.display_name || '').trim().split(' ')[0] || '');
+          const rawName = (p.display_name || '').trim();
+          const parts = rawName.split(' ');
+          const fn = parts[0] || '';
+          const initials = parts.length >= 2
+            ? parts[0][0].toUpperCase() + parts[parts.length - 1][0].toUpperCase()
+            : (parts[0] ? parts[0][0].toUpperCase() : '');
+          const displayName = escHtml(fn.length <= 7 ? fn : initials);
           const avatarHtml = p.avatar_url
-            ? `<img class="player-avatar" src="${escHtml(p.avatar_url)}" alt="${firstName}" />`
+            ? `<img class="player-avatar" src="${escHtml(p.avatar_url)}" alt="${displayName}" />`
             : `<div class="player-avatar-placeholder">👤</div>`;
           const statusClass = p._answered ? 'answered' : 'waiting';
           const statusText = p._answered ? 'Answered' : 'Waiting';
           return `<div class="game-player">
             ${avatarHtml}
             <div class="game-player-info">
-              <span class="player-name">${firstName}</span>
+              <span class="player-name">${displayName}</span>
               <span class="player-status ${statusClass}">${statusText}</span>
             </div>
           </div>`;
@@ -1041,9 +1061,14 @@
           ? `<div class="game-player"><div class="player-overflow-circle">+${overflow}</div></div>`
           : '';
 
-        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}">
+        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="animation-delay:${idx * 0.06}s">
           <div class="game-row-delete-action">
-            <button class="delete-game-btn">Delete</button>
+            <button class="delete-game-btn" aria-label="Delete game">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
           </div>
           <div class="game-row">
             <div class="game-row-header">
@@ -1053,7 +1078,7 @@
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               <button class="answer-btn">Answer</button>
             </div>
-            <div class="game-row-summary">New Question coming once everyone answers</div>
+            <div class="game-row-summary">A new question coming when everyone answers</div>
           </div>
         </div>`;
       }).join('');
@@ -1063,33 +1088,81 @@
 
     function setupSwipeToDelete() {
       const DELETE_W = 80;
+      // Track whether the content container is scrolling vertically
+      let contentIsScrolling = false;
+      let contentScrollTimer = null;
+      const contentEl = document.getElementById('content');
+      if (contentEl) {
+        contentEl.addEventListener('scroll', () => {
+          contentIsScrolling = true;
+          clearTimeout(contentScrollTimer);
+          contentScrollTimer = setTimeout(() => { contentIsScrolling = false; }, 150);
+        }, { passive: true });
+      }
+
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
         const row = wrapper.querySelector('.game-row');
         const deleteBtn = wrapper.querySelector('.delete-game-btn');
-        let startX = 0, startTx = 0, tracking = false, isOpen = false;
+        let startX = 0, startY = 0, startTx = 0;
+        let tracking = false, isOpen = false;
+        let dirLocked = null; // 'h' | 'v' | null
+        let lastTouchX = 0, lastTouchTime = 0, velocityX = 0;
 
         const getTx = () => {
           const m = row.style.transform.match(/translateX\(([-\d.]+)px\)/);
           return m ? parseFloat(m[1]) : 0;
         };
         const snapTo = (tx) => {
-          row.style.transition = 'transform 0.25s ease';
+          row.style.transition = 'transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
           row.style.transform = tx > 0 ? `translateX(${tx}px)` : '';
           isOpen = tx > 0;
-          setTimeout(() => { row.style.transition = ''; }, 260);
+          setTimeout(() => { row.style.transition = ''; }, 230);
         };
 
         row.addEventListener('touchstart', e => {
           if (e.touches.length !== 1) return;
+          if (contentIsScrolling) return;
           startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
           startTx = getTx();
           tracking = true;
+          dirLocked = null;
+          lastTouchX = startX;
+          lastTouchTime = Date.now();
+          velocityX = 0;
           row.style.transition = '';
         }, { passive: true });
 
         row.addEventListener('touchmove', e => {
           if (!tracking || e.touches.length !== 1) return;
-          const dx = e.touches[0].clientX - startX;
+          const cx = e.touches[0].clientX;
+          const cy = e.touches[0].clientY;
+          const dx = cx - startX;
+          const dy = cy - startY;
+
+          // Lock direction on first significant movement
+          if (!dirLocked) {
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+              dirLocked = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
+            } else {
+              return;
+            }
+          }
+
+          if (dirLocked === 'v') {
+            // Vertical scroll — cancel horizontal tracking, snap to stable state
+            tracking = false;
+            snapTo(isOpen ? DELETE_W : 0);
+            return;
+          }
+
+          // Track velocity
+          const now = Date.now();
+          const dt = now - lastTouchTime;
+          if (dt > 0) velocityX = (cx - lastTouchX) / dt;
+          lastTouchX = cx;
+          lastTouchTime = now;
+
           const newTx = Math.max(0, Math.min(DELETE_W, startTx + dx));
           row.style.transform = newTx > 0 ? `translateX(${newTx}px)` : '';
         }, { passive: true });
@@ -1097,13 +1170,23 @@
         row.addEventListener('touchend', () => {
           if (!tracking) return;
           tracking = false;
-          snapTo(getTx() > DELETE_W / 2 ? DELETE_W : 0);
+          const currentTx = getTx();
+          // Use velocity to determine intent: fast rightward → open, fast leftward → close
+          let shouldOpen;
+          if (velocityX > 0.3) {
+            shouldOpen = true;
+          } else if (velocityX < -0.3) {
+            shouldOpen = false;
+          } else {
+            shouldOpen = currentTx > DELETE_W / 2;
+          }
+          snapTo(shouldOpen ? DELETE_W : 0);
         });
 
         row.addEventListener('touchcancel', () => {
           if (!tracking) return;
           tracking = false;
-          snapTo(0);
+          snapTo(isOpen ? DELETE_W : 0);
         });
 
         // Tap on the row content while open → close it
