@@ -249,7 +249,7 @@
       opacity: 0.96;
     }
     #new-game-panel {
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: #fafafa;
       color: #111;
@@ -257,6 +257,7 @@
       visibility: hidden;
       transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
                   visibility 0s 0.42s;
+      will-change: transform;
       z-index: 50;
       display: flex;
       flex-direction: column;
