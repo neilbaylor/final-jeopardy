@@ -1166,6 +1166,9 @@
             return;
           }
 
+          // Horizontal swipe — block scroll and pull-to-refresh
+          e.preventDefault();
+
           // Track velocity
           const now = Date.now();
           const dt = now - lastTouchTime;
@@ -1175,7 +1178,7 @@
 
           const newTx = Math.max(0, Math.min(DELETE_W, startTx + dx));
           row.style.transform = newTx > 0 ? `translateX(${newTx}px)` : '';
-        }, { passive: true });
+        }, { passive: false });
 
         row.addEventListener('touchend', () => {
           if (!tracking) return;
