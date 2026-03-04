@@ -37,6 +37,13 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
       color: #111;
     }
+    #dashboard-root {
+      position: relative;
+      overflow: clip;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
     .topbar {
       background: #07102e;
@@ -257,6 +264,7 @@
       visibility: hidden;
       transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
                   visibility 0s 0.42s;
+      will-change: transform;
       z-index: 50;
       display: flex;
       flex-direction: column;
@@ -573,7 +581,6 @@
       <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       New Game
     </button>
-  </div>
 
   <div id="new-game-panel">
     <div id="panel-header">
@@ -586,6 +593,7 @@
     <div id="panel-spinner"><div class="panel-spin"></div></div>
     <div id="ptr-indicator"><div id="ptr-spinner"></div></div>
     <div id="users-list"></div>
+  </div>
   </div>
 
   <div id="error-modal-backdrop">
@@ -613,8 +621,8 @@
           const initials = parts.length >= 2 ? parts[0][0].toUpperCase() + parts[parts.length - 1][0].toUpperCase() : (parts[0] ? parts[0][0].toUpperCase() : '');
           if (firstName) {
             const greeting = document.getElementById('topbar-greeting');
-            const label = firstName.length <= 8 ? firstName : initials;
-            greeting.textContent = `Hi, ${label}!`;
+            const label = firstName.length <= 7 ? firstName : initials;
+            greeting.textContent = `Hi, ${label}`;
             greeting.style.display = '';
           }
         })
@@ -635,15 +643,12 @@
       location.replace('/');
     });
 
-    const _panel = document.getElementById('new-game-panel');
     function openPanel() {
-      _panel.style.willChange = 'transform';
-      requestAnimationFrame(() => document.body.classList.add('panel-open'));
+      document.body.classList.add('panel-open');
     }
     function closePanel() {
       document.body.classList.remove('panel-open');
       document.getElementById('create-btn').disabled = true;
-      setTimeout(() => { _panel.style.willChange = ''; }, 430);
     }
 
     document.getElementById('new-game').addEventListener('click', () => {
