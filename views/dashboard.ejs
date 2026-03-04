@@ -257,7 +257,6 @@
       visibility: hidden;
       transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
                   visibility 0s 0.42s;
-      will-change: transform;
       z-index: 50;
       display: flex;
       flex-direction: column;
@@ -575,7 +574,7 @@
     </button>
   </div>
 
-  <div id="new-game-panel" style="display:none">
+  <div id="new-game-panel">
     <div id="panel-header">
       <button id="close-panel" aria-label="Back">
         <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
@@ -635,17 +634,12 @@
       location.replace('/');
     });
 
-    const _panel = document.getElementById('new-game-panel');
     function openPanel() {
-      _panel.style.display = 'flex';
-      requestAnimationFrame(() => document.body.classList.add('panel-open'));
+      document.body.classList.add('panel-open');
     }
     function closePanel() {
       document.body.classList.remove('panel-open');
       document.getElementById('create-btn').disabled = true;
-      setTimeout(() => {
-        if (!document.body.classList.contains('panel-open')) _panel.style.display = 'none';
-      }, 430);
     }
 
     document.getElementById('new-game').addEventListener('click', () => {
