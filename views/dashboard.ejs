@@ -750,8 +750,6 @@
       const spinner = document.getElementById('panel-spinner');
       const list = document.getElementById('users-list');
       const scroller = document.getElementById('users-list-scroller');
-      // TEST: 50 fake users for scroll testing — remove before ship
-      { const fakeUsers = Array.from({length: 50}, (_, i) => ({ id: i + 1, display_name: `Test User ${i + 1}`, avatar_url: null })); spinner.classList.add('hidden'); scroller.innerHTML = fakeUsers.map(u => `<div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()"><div class="user-avatar-placeholder">👤</div><span class="user-name">${u.display_name}</span><input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" /></div>`).join(''); list.style.opacity = '1'; updateCreateBtn(); return; }
       if (!silent) {
         spinner.classList.remove('hidden');
         scroller.innerHTML = '';
