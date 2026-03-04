@@ -437,23 +437,24 @@
       left: 0;
       top: 0;
       height: 100%;
-      width: 80px;
+      width: 70px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #e53935;
       border-radius: 14px 0 0 14px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
     .delete-game-btn {
       background: none;
       border: none;
       color: #fff;
-      cursor: pointer;
+      pointer-events: none;
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      -webkit-tap-highlight-color: transparent;
     }
 
     /* Game row card */
@@ -1088,7 +1089,7 @@
     }
 
     function setupSwipeToDelete() {
-      const DELETE_W = 80;
+      const DELETE_W = 70;
       // Track whether the content container is scrolling vertically
       let contentIsScrolling = false;
       let contentScrollTimer = null;
@@ -1103,7 +1104,7 @@
 
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
         const row = wrapper.querySelector('.game-row');
-        const deleteBtn = wrapper.querySelector('.delete-game-btn');
+        const deleteAction = wrapper.querySelector('.game-row-delete-action');
         let startX = 0, startY = 0, startTx = 0;
         let tracking = false, isOpen = false;
         let dirLocked = null; // 'h' | 'v' | null
@@ -1195,7 +1196,7 @@
           if (isOpen) { snapTo(0); }
         });
 
-        deleteBtn.addEventListener('click', e => {
+        deleteAction.addEventListener('click', e => {
           e.stopPropagation();
           snapTo(0);
           document.getElementById('delete-modal-backdrop').classList.add('open');
