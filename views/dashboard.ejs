@@ -1052,7 +1052,7 @@
           const initials = parts.length >= 2
             ? parts[0][0].toUpperCase() + parts[parts.length - 1][0].toUpperCase()
             : (parts[0] ? parts[0][0].toUpperCase() : '');
-          const displayName = escHtml(fn.length <= 7 ? fn : initials);
+          const displayName = escHtml(fn.length <= 5 ? fn : initials);
           const avatarHtml = p.avatar_url
             ? `<img class="player-avatar" src="${escHtml(p.avatar_url)}" alt="${displayName}" />`
             : `<div class="player-avatar-placeholder">👤</div>`;
