@@ -826,9 +826,8 @@
           ptr.classList.remove('ptr-snap');
           ptr.style.height = '0';
           ptrSpinner.style.transform = 'rotate(0deg)';
-          if (_standalone) e.preventDefault();
         }
-      }, { passive: !window.navigator.standalone });
+      }, { passive: true });
 
       list.addEventListener('touchmove', e => {
         if (!pulling) return;
@@ -910,9 +909,8 @@
           ptr.classList.remove('ptr-snap');
           ptr.style.height = '0';
           ptrSpinner.style.transform = 'rotate(0deg)';
-          if (_standalone) e.preventDefault();
         }
-      }, { passive: !window.navigator.standalone });
+      }, { passive: true });
 
       content.addEventListener('touchmove', e => {
         if (!pulling) return;
