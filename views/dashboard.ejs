@@ -473,6 +473,11 @@
       box-shadow: 0 1px 0 #f0f0f0;
     }
     @media (display-mode: standalone) {
+      html {
+        /* Prevent iOS rubber-band overscroll from revealing the system grey
+           background behind the document in add-to-home-screen mode. */
+        overscroll-behavior: none;
+      }
       body {
         overflow: clip;
       }
@@ -638,7 +643,11 @@
     const _panel = document.getElementById('new-game-panel');
     function openPanel() {
       _panel.style.display = 'flex';
-      requestAnimationFrame(() => document.body.classList.add('panel-open'));
+      // Double rAF: Mobile Safari can batch the display change and class addition
+      // into the same render cycle, causing a flicker before the transform transition
+      // starts. The second rAF guarantees the initial translateY(100%) state is
+      // painted before panel-open triggers the slide-up animation.
+      requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('panel-open')));
     }
     function closePanel() {
       document.body.classList.remove('panel-open');
