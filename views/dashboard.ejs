@@ -464,14 +464,18 @@
 
     /* Users list */
     #users-list {
-      overflow-y: auto;
-      overscroll-behavior-y: contain;
       flex: 1;
       padding: 0;
       transition: opacity 0.36s ease;
       will-change: transform;
       background: #fff;
       box-shadow: 0 1px 0 #f0f0f0;
+      overflow: hidden;
+    }
+    #users-list-scroller {
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      height: 100%;
     }
     @media (display-mode: standalone) {
       body {
@@ -584,7 +588,7 @@
     </div>
     <div id="panel-spinner"><div class="panel-spin"></div></div>
     <div id="ptr-indicator"><div id="ptr-spinner"></div></div>
-    <div id="users-list"></div>
+    <div id="users-list"><div id="users-list-scroller"></div></div>
   </div>
   </div>
 
@@ -745,11 +749,12 @@
     function loadUsers(silent = false) {
       const spinner = document.getElementById('panel-spinner');
       const list = document.getElementById('users-list');
+      const scroller = document.getElementById('users-list-scroller');
       // TEST: 50 fake users for scroll testing — remove before ship
-      { const fakeUsers = Array.from({length: 50}, (_, i) => ({ id: i + 1, display_name: `Test User ${i + 1}`, avatar_url: null })); spinner.classList.add('hidden'); list.innerHTML = fakeUsers.map(u => `<div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()"><div class="user-avatar-placeholder">👤</div><span class="user-name">${u.display_name}</span><input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" /></div>`).join(''); list.style.opacity = '1'; updateCreateBtn(); return; }
+      { const fakeUsers = Array.from({length: 50}, (_, i) => ({ id: i + 1, display_name: `Test User ${i + 1}`, avatar_url: null })); spinner.classList.add('hidden'); scroller.innerHTML = fakeUsers.map(u => `<div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()"><div class="user-avatar-placeholder">👤</div><span class="user-name">${u.display_name}</span><input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" /></div>`).join(''); list.style.opacity = '1'; updateCreateBtn(); return; }
       if (!silent) {
         spinner.classList.remove('hidden');
-        list.innerHTML = '';
+        scroller.innerHTML = '';
       }
 
       const now = Date.now();
@@ -766,9 +771,9 @@
         .then(([users]) => {
           if (!silent) spinner.classList.add('hidden');
           const applyUsers = () => {
-            const selected = new Set([...list.querySelectorAll('.user-row input:checked')]
+            const selected = new Set([...scroller.querySelectorAll('.user-row input:checked')]
               .map(cb => cb.closest('.user-row').dataset.userId));
-            list.innerHTML = users.map(u => `
+            scroller.innerHTML = users.map(u => `
               <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()">
                 ${u.avatar_url
                   ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
@@ -777,13 +782,13 @@
                 <input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" />
               </div>
             `).join('');
-            list.querySelectorAll('.user-row').forEach(row => {
+            scroller.querySelectorAll('.user-row').forEach(row => {
               if (selected.has(row.dataset.userId)) row.querySelector('input').checked = true;
             });
             updateCreateBtn();
             list.style.opacity = '1';
           };
-          if (silent && list.querySelector('.user-row')) {
+          if (silent && scroller.querySelector('.user-row')) {
             list.style.opacity = '0';
             setTimeout(applyUsers, 360);
           } else {
@@ -792,13 +797,14 @@
         })
         .catch(() => {
           if (!silent) spinner.classList.add('hidden');
-          list.innerHTML = '<p style="padding:16px;color:#888;">Could not load users.</p>';
+          scroller.innerHTML = '<p style="padding:16px;color:#888;">Could not load users.</p>';
         });
     }
 
     // Pull-to-refresh on #users-list
     (function() {
       const list = document.getElementById('users-list');
+      const scroller = document.getElementById('users-list-scroller');
       const ptr = document.getElementById('ptr-indicator');
       const ptrSpinner = document.getElementById('ptr-spinner');
       const _standalone = window.navigator.standalone === true;
@@ -815,7 +821,7 @@
       };
 
       list.addEventListener('touchstart', e => {
-        if (list.scrollTop === 0 && e.touches.length === 1) {
+        if (scroller.scrollTop === 0 && e.touches.length === 1) {
           startY = e.touches[0].clientY;
           pulling = true;
           triggered = false;
