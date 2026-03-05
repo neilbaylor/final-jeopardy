@@ -1034,7 +1034,7 @@
     if (!userId) {
       location.replace('/');
     } else {
-      fetch(`/api/me?userId=${encodeURIComponent(userId)}`)
+      const mePromise = fetch(`/api/me?userId=${encodeURIComponent(userId)}`)
         .then(r => r.ok ? r.json() : Promise.reject())
         .then(user => {
           currentUser = user;
@@ -1056,9 +1056,12 @@
 
       const cachedGames = getCachedGames();
       if (cachedGames) {
-        renderGames(cachedGames);
-        const fab = document.getElementById('new-game');
-        setTimeout(() => { fab.style.opacity = '1'; }, 200);
+        // Wait for currentUser before rendering so "You" appears correctly
+        mePromise.then(() => {
+          renderGames(cachedGames);
+          const fab = document.getElementById('new-game');
+          setTimeout(() => { fab.style.opacity = '1'; }, 200);
+        });
         // Background refresh — new games get the green fade-in via new-row class
         fetch(`/api/games?userId=${encodeURIComponent(userId)}&test=1`)
           .then(r => r.ok ? r.json() : Promise.reject())
