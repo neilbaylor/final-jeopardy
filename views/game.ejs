@@ -266,10 +266,8 @@
     answerBtn.addEventListener('click', () => {
       answerBtn.classList.remove('visible');
       categoryEl.classList.add('dismissing');
-      setTimeout(() => {
-        questionEl.textContent = currentQuestion;
-        questionEl.classList.add('visible');
-      }, 7000);
+      questionEl.textContent = currentQuestion;
+      questionEl.classList.add('visible');
     }, { once: true });
   </script>
 </body>
