@@ -1064,7 +1064,7 @@
         .then(([games]) => {
           if (!silent) {
             spinner.classList.add('hidden');
-            setTimeout(() => { fab.style.opacity = '1'; }, 400);
+            setTimeout(() => { fab.style.opacity = '1'; }, 575);
           }
           fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
           if (silent && gamesList.querySelector('.game-row-wrapper')) {
@@ -1077,7 +1077,7 @@
         .catch(() => {
           if (!silent) {
             spinner.classList.add('hidden');
-            setTimeout(() => { fab.style.opacity = '1'; }, 400);
+            setTimeout(() => { fab.style.opacity = '1'; }, 575);
           }
         });
     }
