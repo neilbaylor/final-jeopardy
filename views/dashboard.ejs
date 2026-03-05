@@ -1075,7 +1075,12 @@
           })
           .catch(() => {});
       } else {
-        setTimeout(() => loadGames(), 500);
+        const fromGame = document.documentElement.classList.contains('vt-from-game');
+        if (fromGame) {
+          loadGames(true);
+        } else {
+          setTimeout(() => loadGames(), 500);
+        }
       }
     }
 
