@@ -425,6 +425,10 @@
       padding: 13px 4px 0;
       text-align: center;
     }
+    .games-empty-logo {
+      display: block;
+      margin-top: 200px;
+    }
     .games-title {
       font-size: 1.3rem;
       font-weight: 700;
@@ -1105,7 +1109,7 @@
     function renderGames(games) {
       const list = document.getElementById('games-list');
       if (!Array.isArray(games) || games.length === 0) {
-        list.innerHTML = '<p class="games-empty">You aren\'t a member of any games</p>';
+        list.innerHTML = '<p class="games-empty">You aren\'t a member of any games</p><img src="/images/fjwf_logo.svg" class="games-empty-logo" alt="Final Jeopardy logo">';
         prevGameIds = new Set();
         return;
       }
