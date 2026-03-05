@@ -110,7 +110,7 @@
       color: #fff;
       text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 0 24px rgba(255,255,255,0.15);
       opacity: 0;
-      transition: opacity 0.75s ease;
+      transition: opacity 1.15s ease;
     }
     #category-label .dots {
       display: inline-block;
@@ -128,7 +128,7 @@
       color: #fff;
       text-shadow: 0 2px 8px rgba(0,0,0,0.35);
       opacity: 0;
-      transition: opacity 0.75s ease;
+      transition: opacity 1.15s ease;
       line-height: 1.35;
     }
     #category-text.visible { opacity: 1; }
@@ -209,7 +209,7 @@
         setTimeout(() => {
           labelEl.classList.add('visible');
 
-          // Animate . → .. → ... at 275ms per step, 4 total cycles (12 steps)
+          // Animate . → .. → ... at 315ms per step, 4 total cycles (12 steps)
           const totalSteps = 12;
           let step = 0;
           dotsEl.textContent = '.';
@@ -222,10 +222,10 @@
               labelEl.classList.remove('visible');
               categoryEl.textContent = category;
               categoryEl.classList.add('visible');
-              // 1000ms later: Answer button
-              setTimeout(() => answerBtn.classList.add('visible'), 1000);
+              // 1500ms later: Answer button
+              setTimeout(() => answerBtn.classList.add('visible'), 1500);
             }
-          }, 275);
+          }, 315);
         }, 200);
 
       } catch (err) {
