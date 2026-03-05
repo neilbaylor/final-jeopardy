@@ -424,6 +424,7 @@
     }
     #games-list {
       margin-top: 4px;
+      transition: opacity 0.36s ease;
     }
 
     /* Game row wrapper (swipe-to-delete) */
@@ -598,7 +599,7 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
       font-size: 0.8rem;
       font-weight: 600;
-      color: #07102e;
+      color: #333;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       animation: answerPulse 1.4s ease-out infinite;
@@ -1027,6 +1028,7 @@
     function loadGames(silent = false) {
       const fab = document.getElementById('new-game');
       const spinner = document.getElementById('games-spinner');
+      const gamesList = document.getElementById('games-list');
       if (!silent) spinner.classList.remove('hidden');
       const delay = silent ? Promise.resolve() : new Promise(res => setTimeout(res, 1000));
       const fetch$ = fetch(`/api/games?userId=${encodeURIComponent(userId)}`)
@@ -1039,7 +1041,12 @@
             setTimeout(() => { fab.style.opacity = '1'; }, 200);
           }
           fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
-          renderGames(games);
+          if (silent && gamesList.querySelector('.game-row-wrapper')) {
+            gamesList.style.opacity = '0';
+            setTimeout(() => { renderGames(games); gamesList.style.opacity = '1'; }, 360);
+          } else {
+            renderGames(games);
+          }
         })
         .catch(() => {
           if (!silent) {
@@ -1478,16 +1485,18 @@
             ptrSpinner.classList.add('ptr-spinning');
           });
           loadGames(true).finally(() => {
-            ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
-            ptrSpinner.classList.remove('ptr-spinning');
-            ptrSpinner.style.animationDelay = '';
-            requestAnimationFrame(() => {
-              ptr.style.opacity = '0';
-              setTimeout(() => {
-                ptr.style.height = '0';
-                setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 180);
-              }, 275);
-            });
+            setTimeout(() => {
+              ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
+              ptrSpinner.classList.remove('ptr-spinning');
+              ptrSpinner.style.animationDelay = '';
+              requestAnimationFrame(() => {
+                ptr.style.opacity = '0';
+                setTimeout(() => {
+                  ptr.style.height = '0';
+                  setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 180);
+                }, 275);
+              });
+            }, 640);
           });
         } else {
           ptr.style.height = '0';
