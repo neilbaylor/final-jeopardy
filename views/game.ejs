@@ -13,6 +13,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
   <link rel="apple-touch-icon" href="/images/hone-screen-new.png" />
+  <script src="/js/player-cards.js"></script>
   <title>Final Jeopardy With Friends</title>
   <script>
     // Signal to dashboard that we're coming back from game, for the reverse transition.
@@ -188,7 +189,7 @@
         0 2px 6px rgba(0,0,0,0.3);
       overflow: hidden;
       transform: translateY(-100%);
-      transition: transform 0.7s ease 0.7s;
+      transition: transform 0.28s ease 0.7s;
       z-index: 9;
     }
     #progress-bar.visible { transform: translateY(0); }
@@ -212,7 +213,7 @@
     /* Countdown circle */
     #timer-count {
       position: absolute;
-      top: calc(env(safe-area-inset-top, 0px) + 16px);
+      top: calc(env(safe-area-inset-top, 0px) + 19px);
       left: 50%;
       transform: translateX(-50%);
       width: 44px; height: 44px;
@@ -275,6 +276,31 @@
       line-height: 1.45;
     }
     #answer-text.visible { opacity: 1; }
+
+    /* Player cards above answer button */
+    #game-players {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 116px);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #game-players.visible { opacity: 1; }
+    #game-players .game-player { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+    #game-players .player-avatar-wrap { position: relative; flex-shrink: 0; width: 27px; height: 27px; }
+    #game-players .player-avatar { width: 27px; height: 27px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); display: block; }
+    #game-players .player-avatar-placeholder { width: 27px; height: 27px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+    #game-players .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
+    #game-players .player-answered-badge svg { display: block; }
+    #game-players .game-player-info { display: flex; flex-direction: column; gap: 1px; }
+    #game-players .player-name { font-size: 0.7rem; font-weight: 600; color: rgba(255,255,255,0.9); max-width: 44px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #game-players .player-status { font-size: 0.65rem; font-weight: 600; }
+    #game-players .player-status.waiting  { color: rgba(255,255,255,0.4); }
+    #game-players .player-status.answered { color: #81c784; }
   </style>
 </head>
 <body>
@@ -294,6 +320,7 @@
   <div id="answer-text"></div>
   <div id="timer-msg">You have 30 seconds, starting now</div>
 
+  <div id="game-players"></div>
   <button id="answer-btn">Answer</button>
 
   <script>
@@ -313,7 +340,9 @@
     const answerBtn     = document.getElementById('answer-btn');
     const backBtn       = document.getElementById('back-btn');
     const timerCountEl  = document.getElementById('timer-count');
+    const gamePlayersEl = document.getElementById('game-players');
     let countdownInterval = null;
+    let gamePlayers = [];
 
     // Reveal spinner + back btn after page transition completes (0.42s)
     setTimeout(() => {
@@ -360,6 +389,7 @@
         const category = toTitleCase(game.current_question?.category || '—');
         currentQuestion = game.current_question?.question || '';
         currentAnswer   = game.current_question?.answer   || '';
+        gamePlayers = (game.players || []).map(p => ({ ...p, _answered: false }));
 
         // Enforce minimum 500ms spinner
         const elapsed = Date.now() - loadStart;
@@ -389,8 +419,14 @@
               categoryEl.style.fontSize = cs.fontSize;
               categoryEl.style.top = cs.top;
               categoryEl.classList.add('visible');
-              // 1825ms later: Answer button
-              setTimeout(() => answerBtn.classList.add('visible'), 1825);
+              // 1825ms later: Answer button + player cards
+              setTimeout(() => {
+                answerBtn.classList.add('visible');
+                if (gamePlayers.length > 0) {
+                  gamePlayersEl.innerHTML = gamePlayers.map(buildPlayerCardHtml).join('');
+                  gamePlayersEl.classList.add('visible');
+                }
+              }, 1825);
             }
           }, 345);
         }, 200);
@@ -417,10 +453,13 @@
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
       answerBtn.classList.remove('visible');
+      gamePlayersEl.classList.remove('visible');
+      gamePlayersEl.innerHTML = '';
       backBtn.classList.remove('disabled');
       dotsEl.textContent = '';
       currentQuestion = '';
       currentAnswer   = '';
+      gamePlayers     = [];
     }
 
     loadGame();
@@ -476,9 +515,9 @@
               answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
               answerTextEl.textContent = currentAnswer;
               answerTextEl.classList.add('visible');
-              progressBar.style.transition = 'transform 0.7s ease 0.4s';
+              progressBar.style.transition = 'transform 0.4s ease 0.8s';
               progressBar.classList.remove('visible');
-              setTimeout(() => progressBar.style.transition = '', 1200);
+              setTimeout(() => progressBar.style.transition = '', 1300);
               timerCountEl.classList.remove('visible');
               backBtn.classList.remove('disabled');
             }, 30000);
