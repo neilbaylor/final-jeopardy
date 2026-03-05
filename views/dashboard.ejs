@@ -285,7 +285,8 @@
       clip-path: inset(0 -20px -20px -20px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.23);
       position: relative;
-      z-index: 1;
+      z-index: 2;
+      will-change: transform;
     }
     #panel-title {
       font-size: 0.9rem;
@@ -1106,7 +1107,7 @@
       const MAX_VISIBLE = 3;
       const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
-      const staggerMs = Math.max(15, 60 - (games.length - 5) * (2 / 3));
+      const staggerMs = games.length > 1 ? Math.max(10, Math.round(70 / Math.sqrt(games.length - 1))) : 0;
       list.innerHTML = games.map((game, idx) => {
         const rawCategory = game.current_question ? game.current_question.category : 'No question yet';
         const category = `Category: ${toTitleCase(rawCategory)}`;
@@ -1302,8 +1303,9 @@
           const applyUsers = () => {
             const selected = new Set([...scroller.querySelectorAll('.user-row input:checked')]
               .map(cb => cb.closest('.user-row').dataset.userId));
+            const userStaggerMs = users.length > 1 ? Math.max(10, Math.round(70 / Math.sqrt(users.length - 1))) : 0;
             scroller.innerHTML = users.map((u, i) => `
-              <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()" style="animation-delay:${i * 0.06}s">
+              <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()" style="animation-delay:${(i * userStaggerMs / 1000).toFixed(3)}s">
                 ${u.avatar_url
                   ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
                   : `<div class="user-avatar-placeholder">👤</div>`}
