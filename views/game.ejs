@@ -134,6 +134,26 @@
       line-height: 1.35;
     }
     #category-text.visible { opacity: 1; }
+    #category-text.dismissing {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 0;
+      transform: translateY(-48px);
+    }
+
+    #question-text {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 95px);
+      left: 40px; right: 40px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      opacity: 0;
+      transition: opacity 1.35s ease;
+      line-height: 1.35;
+    }
+    #question-text.visible { opacity: 1; }
 
     /* Answer button */
     @keyframes answerPulse {
@@ -176,6 +196,7 @@
   <div id="spinner"></div>
   <div id="category-label">Your Category is<span id="dots" class="dots"></span></div>
   <div id="category-text"></div>
+  <div id="question-text"></div>
 
   <button id="answer-btn">Answer</button>
 
@@ -188,9 +209,12 @@
     const labelEl     = document.getElementById('category-label');
     const dotsEl      = document.getElementById('dots');
     const categoryEl  = document.getElementById('category-text');
+    const questionEl  = document.getElementById('question-text');
     const answerBtn   = document.getElementById('answer-btn');
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
+
+    let currentQuestion = '';
 
     async function loadGame() {
       const loadStart = Date.now();
@@ -199,6 +223,7 @@
         const res  = await fetch(url);
         const game = await res.json();
         const category = toTitleCase(game.current_question?.category || '—');
+        currentQuestion = game.current_question?.question || '';
 
         // Enforce minimum 500ms spinner
         const elapsed = Date.now() - loadStart;
@@ -237,6 +262,15 @@
     }
 
     loadGame();
+
+    answerBtn.addEventListener('click', () => {
+      answerBtn.classList.remove('visible');
+      categoryEl.classList.add('dismissing');
+      setTimeout(() => {
+        questionEl.textContent = currentQuestion;
+        questionEl.classList.add('visible');
+      }, 7000);
+    }, { once: true });
   </script>
 </body>
 </html>
