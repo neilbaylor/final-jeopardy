@@ -212,7 +212,7 @@
       position: absolute;
       top: calc(env(safe-area-inset-top, 0px) + 7px);
       left: 50%;
-      transform: translateX(-50%) translateY(-200%);
+      transform: translateX(-50%);
       width: 44px; height: 44px;
       display: flex;
       align-items: center;
@@ -224,10 +224,10 @@
       font-family: inherit;
       color: #fff;
       opacity: 0;
-      transition: opacity 0.7s ease, transform 0.7s ease;
+      transition: opacity 0.7s ease;
       z-index: 11;
     }
-    #timer-count.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #timer-count.visible { opacity: 1; }
 
     /* Answer button */
     @keyframes answerPulse {
