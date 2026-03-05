@@ -1092,6 +1092,7 @@
       const MAX_VISIBLE = 3;
       const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
+      const staggerMs = Math.max(15, 60 - (games.length - 5) * (2 / 3));
       list.innerHTML = games.map((game, idx) => {
         const rawCategory = game.current_question ? game.current_question.category : 'No question yet';
         const category = `Category: ${toTitleCase(rawCategory)}`;
@@ -1134,7 +1135,7 @@
           ? `<div class="game-player"><div class="player-overflow-circle">+${overflow}</div></div>`
           : '';
 
-        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="animation-delay:${idx * 0.06}s">
+        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s">
           <div class="game-row-delete-action">
             <button class="delete-game-btn" aria-label="Delete game">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
