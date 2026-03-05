@@ -693,6 +693,22 @@
       will-change: box-shadow;
     }
     .answer-btn:active { transform: scale(0.93); }
+    @keyframes btn-spin { to { transform: rotate(360deg); } }
+    .answer-btn.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .btn-spinner {
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(7, 16, 46, 0.2);
+      border-top-color: #07102e;
+      border-radius: 50%;
+      animation: btn-spin 0.65s linear infinite;
+      flex-shrink: 0;
+    }
 
     /* Summary bar */
     .game-row-summary {
@@ -1320,6 +1336,12 @@
           if (wrapper.classList.contains('swipe-open')) {
             closeAllSwipes();
             return;
+          }
+          const btn = wrapper.querySelector('.answer-btn');
+          if (btn) {
+            btn.style.width = btn.offsetWidth + 'px';
+            btn.innerHTML = '<span class="btn-spinner"></span>';
+            btn.classList.add('loading');
           }
           window.location.href = `/game?id=${wrapper.dataset.gameId}`;
         });
