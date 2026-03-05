@@ -229,9 +229,23 @@
       pointer-events: none;
       transition: opacity 0.2s ease;
     }
-    #install-modal-backdrop.open {
+    #install-modal-backdrop.open,
+    #desktop-modal-backdrop.open {
       opacity: 1;
       pointer-events: auto;
+    }
+    #desktop-modal-backdrop {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
     }
     #install-modal {
       background: #fff;
