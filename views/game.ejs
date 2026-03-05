@@ -77,6 +77,7 @@
       transition: opacity 0.15s;
     }
     #back-btn:active { opacity: 0.55; }
+    #back-btn.disabled { opacity: 0.25; pointer-events: none; }
     #back-btn svg { flex-shrink: 0; }
 
     /* Spinner */
@@ -287,6 +288,7 @@
     const progressBar   = document.getElementById('progress-bar');
     const progressFill  = document.getElementById('progress-bar-fill');
     const answerBtn     = document.getElementById('answer-btn');
+    const backBtn       = document.getElementById('back-btn');
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
@@ -382,6 +384,7 @@
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
       answerBtn.classList.remove('visible');
+      backBtn.classList.remove('disabled');
       dotsEl.textContent = '';
       currentQuestion = '';
       currentAnswer   = '';
@@ -402,6 +405,7 @@
       categoryEl.classList.add('dismissing');
       questionEl.textContent = currentQuestion;
       questionEl.classList.add('visible');
+      backBtn.classList.add('disabled');
 
       // After reading time, show timer message just below the question
       setTimeout(() => {
@@ -429,6 +433,7 @@
             answerTextEl.textContent = currentAnswer;
             answerTextEl.classList.add('visible');
             progressBar.style.opacity = '0.5';
+            backBtn.classList.remove('disabled');
           }, 30000);
         }, 2000);
       }, readingDelay(currentQuestion));
