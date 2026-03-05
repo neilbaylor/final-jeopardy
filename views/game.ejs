@@ -209,18 +209,18 @@
 
     /* Countdown circle */
     #timer-count {
-      position: fixed;
+      position: absolute;
       top: calc(env(safe-area-inset-top, 0px) + 7px);
       left: 50%;
       transform: translateX(-50%) translateY(-200%);
-      width: 52px; height: 52px;
+      width: 44px; height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
       border: 2px solid rgba(255,255,255,0.65);
       border-radius: 50%;
-      font-size: 1.8rem;
-      font-weight: 700;
+      font-size: 1.5rem;
+      font-weight: 600;
       font-family: inherit;
       color: #fff;
       opacity: 0;
@@ -442,34 +442,38 @@
         setTimeout(() => {
           timerMsgEl.classList.remove('visible');
           progressBar.classList.add('visible');
-          progressFill.style.animation = 'progressFill 30s linear forwards';
-          // Start countdown
-          let count = 30;
-          timerCountEl.textContent = count;
-          timerCountEl.classList.add('visible');
-          countdownInterval = setInterval(() => {
-            count--;
-            timerCountEl.textContent = count;
-            if (count <= 0) clearInterval(countdownInterval);
-          }, 1000);
 
-          // When timer expires: question fades out, answer cross-fades in
+          // Wait for progress bar to fully slide in (1s delay + 0.7s transition = 1700ms)
           setTimeout(() => {
-            // Capture question bounds before fading it out
-            const qRect = questionEl.getBoundingClientRect();
-            questionEl.classList.remove('visible');
-            const as = categoryStyle(currentAnswer);
-            answerTextEl.style.fontSize = as.fontSize;
-            // Center answer text within the question's vertical span
-            const answerLineH = parseFloat(as.fontSize) * 16 * 1.45;
-            const qCenterY = (qRect.top + qRect.bottom) / 2;
-            answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
-            answerTextEl.textContent = currentAnswer;
-            answerTextEl.classList.add('visible');
-            progressBar.classList.remove('visible');
-            timerCountEl.classList.remove('visible');
-            backBtn.classList.remove('disabled');
-          }, 30000);
+            progressFill.style.animation = 'progressFill 30s linear forwards';
+            // Start countdown
+            let count = 30;
+            timerCountEl.textContent = count;
+            timerCountEl.classList.add('visible');
+            countdownInterval = setInterval(() => {
+              count--;
+              timerCountEl.textContent = count;
+              if (count <= 0) clearInterval(countdownInterval);
+            }, 1000);
+
+            // When timer expires: question fades out, answer cross-fades in
+            setTimeout(() => {
+              // Capture question bounds before fading it out
+              const qRect = questionEl.getBoundingClientRect();
+              questionEl.classList.remove('visible');
+              const as = categoryStyle(currentAnswer);
+              answerTextEl.style.fontSize = as.fontSize;
+              // Center answer text within the question's vertical span
+              const answerLineH = parseFloat(as.fontSize) * 16 * 1.45;
+              const qCenterY = (qRect.top + qRect.bottom) / 2;
+              answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
+              answerTextEl.textContent = currentAnswer;
+              answerTextEl.classList.add('visible');
+              progressBar.classList.remove('visible');
+              timerCountEl.classList.remove('visible');
+              backBtn.classList.remove('disabled');
+            }, 30000);
+          }, 1700);
         }, 2525);
       }, readingDelay(currentQuestion));
     }, { once: true });
