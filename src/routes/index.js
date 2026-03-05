@@ -182,29 +182,7 @@ router.get('/api/games', async (req, res) => {
       my_answers: parse(row.my_answers) || [],
     }));
 
-    if (req.query.test === '1') {
-      const categories = ['Science', 'History', 'Sports', 'Movies', 'Geography', 'Music', 'Literature', 'Technology'];
-      const fakeNames = ['Alice', 'Bob', 'Carol', 'Dave', 'Eve'];
-      const fakeGames = Array.from({ length: 50 }, (_, i) => ({
-        id: `test-${i + 1}`,
-        created_at: new Date(Date.now() - (i + 1) * 3600000).toISOString(),
-        players: fakeNames.slice(0, (i % 3) + 1).map((name, j) => ({
-          id: `fake-user-${i}-${j}`,
-          display_name: name,
-          avatar_url: null,
-        })),
-        current_question: {
-          game_question_id: `fake-gq-${i}`,
-          asked_at: new Date().toISOString(),
-          question_id: `fake-q-${i}`,
-          question: `Test question #${i + 1}`,
-          answer: `Answer ${i + 1}`,
-          category: categories[i % categories.length],
-        },
-        my_answers: [],
-      }));
-      return res.json([...real, ...fakeGames]);
-    }
+
 
     res.json(real);
   } catch (err) {
