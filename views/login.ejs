@@ -389,7 +389,7 @@
 
     const isMobile = /iphone|ipad|ipod|android|mobile/i.test(navigator.userAgent);
 
-    if (!isMobile && !isStandalone && !dismissed && !uid) {
+    if (!isMobile && !isStandalone && !uid) {
       setTimeout(() => {
         const hint = document.createElement('div');
         hint.className = 'install-hint';
