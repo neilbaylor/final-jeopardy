@@ -104,7 +104,7 @@
       top: calc(env(safe-area-inset-top, 0px) + 80px);
       left: 0; right: 0;
       text-align: center;
-      font-size: 1rem;
+      font-size: 1.3rem;
       font-weight: 700;
       letter-spacing: 0.04em;
       color: #fff;
@@ -205,9 +205,8 @@
         setTimeout(() => {
           labelEl.classList.add('visible');
 
-          // Animate . → .. → ... over 400ms, 3 total cycles (~1200ms)
-          const stepMs = Math.round(400 / 3);
-          const totalSteps = 9; // 3 states × 3 cycles
+          // Animate . → .. → ... at 333ms per step, 3 total cycles (9 steps)
+          const totalSteps = 9;
           let step = 0;
           dotsEl.textContent = '.';
           const dotsInterval = setInterval(() => {
@@ -215,13 +214,14 @@
             dotsEl.textContent = '.'.repeat((step % 3) + 1);
             if (step >= totalSteps - 1) {
               clearInterval(dotsInterval);
-              // Show category text immediately after dots finish
+              // Fade out label, fade in category text simultaneously
+              labelEl.classList.remove('visible');
               categoryEl.textContent = category;
               categoryEl.classList.add('visible');
               // 1000ms later: Answer button
               setTimeout(() => answerBtn.classList.add('visible'), 1000);
             }
-          }, stepMs);
+          }, 333);
         }, 200);
 
       } catch (err) {
