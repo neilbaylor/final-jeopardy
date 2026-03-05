@@ -1133,6 +1133,61 @@
         </div>`;
       }).join('');
 
+      const DELETE_REVEAL = 55;
+
+      function closeAllSwipes(except) {
+        document.querySelectorAll('.game-row-wrapper.swipe-open').forEach(w => {
+          if (w === except) return;
+          const r = w.querySelector('.game-row');
+          r.style.transition = 'transform 0.25s ease';
+          r.style.transform = '';
+          w.classList.remove('swipe-open');
+        });
+      }
+
+      document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
+        const row = wrapper.querySelector('.game-row');
+        let startX, startY, moved = false;
+
+        row.addEventListener('touchstart', e => {
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+          moved = false;
+          row.style.transition = 'none';
+        }, { passive: true });
+
+        row.addEventListener('touchmove', e => {
+          const dx = e.touches[0].clientX - startX;
+          const dy = Math.abs(e.touches[0].clientY - startY);
+          if (dy > Math.abs(dx) + 5) return;
+          moved = true;
+          const isOpen = wrapper.classList.contains('swipe-open');
+          const base = isOpen ? DELETE_REVEAL : 0;
+          row.style.transform = `translateX(${Math.max(0, Math.min(DELETE_REVEAL, base + dx))}px)`;
+        }, { passive: true });
+
+        function finishSwipe(endX) {
+          if (!moved) return;
+          moved = false;
+          const dx = endX - startX;
+          const isOpen = wrapper.classList.contains('swipe-open');
+          row.style.transition = 'transform 0.25s ease';
+          if (!isOpen && dx > 30) {
+            closeAllSwipes(wrapper);
+            row.style.transform = `translateX(${DELETE_REVEAL}px)`;
+            wrapper.classList.add('swipe-open');
+          } else if (isOpen && dx < -30) {
+            row.style.transform = '';
+            wrapper.classList.remove('swipe-open');
+          } else {
+            row.style.transform = isOpen ? `translateX(${DELETE_REVEAL}px)` : '';
+          }
+        }
+
+        row.addEventListener('touchend', e => finishSwipe(e.changedTouches[0].clientX), { passive: true });
+        row.addEventListener('touchcancel', e => finishSwipe(e.changedTouches[0].clientX), { passive: true });
+      });
+
       document.querySelectorAll('.game-row-delete-action').forEach(deleteAction => {
         deleteAction.addEventListener('click', e => {
           e.stopPropagation();
