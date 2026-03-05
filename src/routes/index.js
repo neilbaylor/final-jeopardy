@@ -12,6 +12,11 @@ router.get('/dashboard', (req, res) => {
   res.render('dashboard');
 });
 
+// Game
+router.get('/game', (req, res) => {
+  res.render('game');
+});
+
 // API: fetch current user by ID (used by client-side localStorage auth)
 router.get('/api/me', async (req, res) => {
   const { userId } = req.query;

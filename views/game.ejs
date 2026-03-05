@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Final Jeopardy" />
+  <meta name="theme-color" content="#07102e" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/images/hone-screen-new.png" />
+  <title>Final Jeopardy With Friends</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Slide in from right over dashboard; dashboard parallaxes left */
+    @view-transition { navigation: auto; }
+
+    @keyframes slide-in-from-right {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+    @keyframes parallax-out-left {
+      from { transform: translateX(0);    opacity: 1;    }
+      to   { transform: translateX(-25%); opacity: 0.85; }
+    }
+
+    ::view-transition-new(root) {
+      animation: slide-in-from-right 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      z-index: 2;
+    }
+    ::view-transition-old(root) {
+      animation: parallax-out-left 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      z-index: 1;
+    }
+
+    body {
+      touch-action: manipulation;
+      background: #07102e;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #fff;
+      padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    }
+  </style>
+</head>
+<body>
+</body>
+</html>
