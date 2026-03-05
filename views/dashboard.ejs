@@ -20,7 +20,8 @@
     window.addEventListener('pagereveal', e => {
       if (e.viewTransition) {
         document.documentElement.classList.add('vt-entry');
-        if (document.referrer && new URL(document.referrer).pathname.startsWith('/game')) {
+        if (sessionStorage.getItem('vt-from-game')) {
+          sessionStorage.removeItem('vt-from-game');
           document.documentElement.classList.add('vt-from-game');
         }
       }

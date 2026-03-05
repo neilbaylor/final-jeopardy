@@ -14,6 +14,12 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
   <link rel="apple-touch-icon" href="/images/hone-screen-new.png" />
   <title>Final Jeopardy With Friends</title>
+  <script>
+    // Signal to dashboard that we're coming back from game, for the reverse transition.
+    window.addEventListener('pageswap', e => {
+      if (e.viewTransition) sessionStorage.setItem('vt-from-game', '1');
+    });
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
