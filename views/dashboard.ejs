@@ -8,6 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Final Jeopardy" />
   <meta name="theme-color" content="#ffffff" />
+  <link rel="preload" href="/images/fjwf_logo.webp" as="image" type="image/webp" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
@@ -137,6 +138,7 @@
       font-weight: 500;
       color: #333;
       cursor: pointer;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.08);
       -webkit-tap-highlight-color: transparent;
     }
     #logout-btn:active { background: #fdf0ef; }
@@ -192,6 +194,7 @@
       font-size: 1rem;
       font-weight: 600;
       color: #07102e;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.4);
     }
 
     .fab:active {
@@ -307,6 +310,7 @@
       font-size: 0.95rem;
       font-weight: 700;
       color: #07102e;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.4);
       cursor: pointer;
       flex-shrink: 0;
       transition: opacity 0.3s ease, transform 0.3s ease;
@@ -373,6 +377,7 @@
     #error-modal-ok {
       background: #07102e;
       color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.25);
       border: none;
       border-radius: 999px;
       padding: 0 28px;
@@ -421,6 +426,10 @@
       display: flex;
       flex-direction: column;
     }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
     .games-empty {
       font-size: 1.1rem;
       color: #999;
@@ -428,12 +437,14 @@
       text-align: center;
       text-shadow: 0 1px 2px rgba(0,0,0,0.1);
       opacity: 0.85;
+      animation: fadeIn 250ms ease-in-out;
     }
     .games-empty-logo {
       display: block;
       width: 350px;
       opacity: 0.35;
       margin: 0 auto;
+      animation: fadeIn 250ms ease-in-out;
     }
     .games-title {
       font-size: 1.3rem;
@@ -633,6 +644,7 @@
       font-size: 0.9rem;
       font-weight: 600;
       color: #07102e;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.4);
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       animation: answerPulse 1.4s ease-out infinite;
@@ -706,6 +718,7 @@
     #delete-modal-cancel {
       background: #e0e0e0;
       color: #555;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.08);
       border: none;
       border-radius: 999px;
       width: 45%;
@@ -719,6 +732,7 @@
     #delete-modal-confirm {
       background: linear-gradient(to top, rgba(255, 221, 0, 0.88), rgba(255, 203, 0, 0.88));
       color: #07102e;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.4);
       border: none;
       border-radius: 999px;
       width: 45%;
@@ -1116,7 +1130,7 @@
     function renderGames(games) {
       const list = document.getElementById('games-list');
       if (!Array.isArray(games) || games.length === 0) {
-        list.innerHTML = '<p class="games-empty">You aren\'t a member of any games</p><img src="/images/fjwf_logo.svg" class="games-empty-logo" alt="Final Jeopardy logo">';
+        list.innerHTML = '<p class="games-empty">You aren\'t a member of any games</p><picture><source srcset="/images/fjwf_logo.webp" type="image/webp"><img src="/images/fjwf_logo_compressed.png" class="games-empty-logo" alt="Final Jeopardy logo"></picture>';
         prevGameIds = new Set();
         return;
       }
