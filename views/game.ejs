@@ -175,7 +175,7 @@
     #progress-bar {
       position: fixed;
       top: calc(env(safe-area-inset-top, 0px) + 28px);
-      left: 60px; right: 40px;
+      left: 65px; right: 35px;
       height: 10px;
       border-radius: 5px;
       background: rgba(0,0,0,0.45);
@@ -193,13 +193,7 @@
     #progress-bar-fill {
       height: 100%;
       width: 100%;
-      /* yellow for first 20s (~67%), then gradient to red for last 10s */
-      background: linear-gradient(90deg,
-        #FFD700 0%,
-        #FFD700 62%,
-        #FF6600 82%,
-        #CC0000 100%
-      );
+      background: #FFD700;
       border-radius: 5px;
       transform-origin: left;
       transform: scaleX(0);
@@ -209,8 +203,9 @@
         inset 0 1px 0 rgba(255,255,255,0.35);
     }
     @keyframes progressFill {
-      from { transform: scaleX(0); }
-      to   { transform: scaleX(1); }
+      0%      { transform: scaleX(0);     background: #FFD700; }
+      66.67%  { transform: scaleX(0.667); background: #FFD700; }
+      100%    { transform: scaleX(1);     background: #CC0000; }
     }
 
     /* Answer button */
@@ -421,10 +416,15 @@
 
           // When timer expires: question fades out, answer cross-fades in
           setTimeout(() => {
+            // Capture question bounds before fading it out
+            const qRect = questionEl.getBoundingClientRect();
             questionEl.classList.remove('visible');
             const as = categoryStyle(currentAnswer);
             answerTextEl.style.fontSize = as.fontSize;
-            answerTextEl.style.top = as.top;
+            // Center answer text within the question's vertical span
+            const answerLineH = parseFloat(as.fontSize) * 16 * 1.45;
+            const qCenterY = (qRect.top + qRect.bottom) / 2;
+            answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
             answerTextEl.textContent = currentAnswer;
             answerTextEl.classList.add('visible');
           }, 30000);
