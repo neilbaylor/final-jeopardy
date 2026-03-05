@@ -373,6 +373,27 @@
     const dismissed = sessionStorage.getItem('installDismissed');
 
     const isMobile = /iphone|ipad|ipod|android|mobile/i.test(navigator.userAgent);
+
+    if (!isMobile && !isStandalone && !dismissed && !uid) {
+      setTimeout(() => {
+        const hint = document.createElement('div');
+        hint.className = 'install-hint';
+        hint.innerHTML = `
+          <span>This website is best viewed in mobile browsers.</span>
+          <button id="desktop-more-btn">More</button>
+          <button class="dismiss" aria-label="Dismiss">✕</button>
+        `;
+        document.body.appendChild(hint);
+        hint.querySelector('#desktop-more-btn').addEventListener('click', () => {
+          document.getElementById('desktop-modal-backdrop').classList.add('open');
+        });
+        hint.querySelector('.dismiss').addEventListener('click', () => {
+          sessionStorage.setItem('installDismissed', '1');
+          hint.remove();
+        });
+      }, 1300);
+    }
+
     if (isMobile && !isStandalone && !dismissed && !uid) {
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
       let deferredPrompt = null;
@@ -422,9 +443,21 @@
       <button id="install-modal-ok">OK</button>
     </div>
   </div>
+  <div id="desktop-modal-backdrop">
+    <div id="install-modal">
+      <p>This website uses touch-events and is optimized for a small screen.</p>
+      <button id="desktop-modal-ok">OK</button>
+    </div>
+  </div>
   <script>
     document.getElementById('install-modal-ok').addEventListener('click', () => {
       document.getElementById('install-modal-backdrop').classList.remove('open');
+    });
+    document.getElementById('desktop-modal-ok').addEventListener('click', () => {
+      document.getElementById('desktop-modal-backdrop').classList.remove('open');
+    });
+    document.getElementById('desktop-modal-backdrop').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
     });
   </script>
 </body>
