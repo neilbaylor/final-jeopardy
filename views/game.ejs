@@ -236,8 +236,8 @@
         setTimeout(() => {
           labelEl.classList.add('visible');
 
-          // Animate "" → . → .. → ... at 350ms/step, 2.25–3.25 random cycles
-          const cycles = 2.25 + Math.random() * 1.0;
+          // Animate "" → . → .. → ... at 335ms/step, 1.25–2.25 random cycles
+          const cycles = 1.25 + Math.random() * 1.0;
           const totalSteps = Math.round(cycles * 4);
           let step = 0;
           dotsEl.textContent = '';
@@ -253,7 +253,7 @@
               // 1300ms later: Answer button
               setTimeout(() => answerBtn.classList.add('visible'), 1300);
             }
-          }, 350);
+          }, 335);
         }, 200);
 
       } catch (err) {
