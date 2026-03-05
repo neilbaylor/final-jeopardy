@@ -104,19 +104,23 @@
       top: calc(env(safe-area-inset-top, 0px) + 80px);
       left: 0; right: 0;
       text-align: center;
-      font-size: 1.3rem;
+      font-size: 1.55rem;
       font-weight: 700;
       letter-spacing: 0.04em;
       color: #fff;
       text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 0 24px rgba(255,255,255,0.15);
       opacity: 0;
-      transition: opacity 0.35s ease;
+      transition: opacity 0.75s ease;
+    }
+    #category-label .dots {
+      display: inline-block;
+      position: absolute;
     }
     #category-label.visible { opacity: 1; }
 
     #category-text {
       position: absolute;
-      top: calc(env(safe-area-inset-top, 0px) + 122px);
+      top: calc(env(safe-area-inset-top, 0px) + 80px);
       left: 24px; right: 24px;
       text-align: center;
       font-size: 1.55rem;
@@ -124,7 +128,7 @@
       color: #fff;
       text-shadow: 0 2px 8px rgba(0,0,0,0.35);
       opacity: 0;
-      transition: opacity 0.35s ease;
+      transition: opacity 0.75s ease;
       line-height: 1.35;
     }
     #category-text.visible { opacity: 1; }
@@ -168,7 +172,7 @@
   </button>
 
   <div id="spinner"></div>
-  <div id="category-label">Your Category is<span id="dots"></span></div>
+  <div id="category-label">Your Category is<span id="dots" class="dots"></span></div>
   <div id="category-text"></div>
 
   <button id="answer-btn">Answer</button>
@@ -205,8 +209,8 @@
         setTimeout(() => {
           labelEl.classList.add('visible');
 
-          // Animate . → .. → ... at 333ms per step, 3 total cycles (9 steps)
-          const totalSteps = 9;
+          // Animate . → .. → ... at 275ms per step, 4 total cycles (12 steps)
+          const totalSteps = 12;
           let step = 0;
           dotsEl.textContent = '.';
           const dotsInterval = setInterval(() => {
@@ -214,14 +218,14 @@
             dotsEl.textContent = '.'.repeat((step % 3) + 1);
             if (step >= totalSteps - 1) {
               clearInterval(dotsInterval);
-              // Fade out label, fade in category text simultaneously
+              // Cross-fade: label out, category in simultaneously
               labelEl.classList.remove('visible');
               categoryEl.textContent = category;
               categoryEl.classList.add('visible');
               // 1000ms later: Answer button
               setTimeout(() => answerBtn.classList.add('visible'), 1000);
             }
-          }, 333);
+          }, 275);
         }, 200);
 
       } catch (err) {
