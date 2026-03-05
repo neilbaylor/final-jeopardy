@@ -295,10 +295,10 @@
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
-    // Reading delay: linear 4s (≤10 chars) → 11s (≥150 chars)
+    // Reading delay: linear 4s (≤90 chars) → 8s (≥250 chars)
     function readingDelay(str) {
-      const t = Math.min(Math.max((str.length - 10) / 140, 0), 1);
-      return (4 + t * 7) * 1000;
+      const t = Math.min(Math.max((str.length - 90) / 160, 0), 1);
+      return (4 + t * 4) * 1000;
     }
 
     // Scale category font + top offset so the vertical center stays locked to the label
