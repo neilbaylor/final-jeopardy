@@ -340,7 +340,7 @@
           labelEl.classList.add('visible');
 
           // Animate "" → . → .. → ... at 345ms/step, 2.15–2.75 random cycles
-          const cycles = 2.15 + Math.random() * 0.6;
+          const cycles = 1.5 + Math.random() * 0.75;
           const totalSteps = Math.round(cycles * 4);
           let step = 0;
           dotsEl.textContent = '';
