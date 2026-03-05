@@ -238,7 +238,7 @@
         setTimeout(() => {
           labelEl.classList.add('visible');
 
-          // Animate "" → . → .. → ... at 335ms/step, 2.35–3.1 random cycles
+          // Animate "" → . → .. → ... at 345ms/step, 2.35–3.1 random cycles
           const cycles = 2.35 + Math.random() * 0.75;
           const totalSteps = Math.round(cycles * 4);
           let step = 0;
@@ -255,7 +255,7 @@
               // 1300ms later: Answer button
               setTimeout(() => answerBtn.classList.add('visible'), 1300);
             }
-          }, 335);
+          }, 345);
         }, 200);
 
       } catch (err) {
