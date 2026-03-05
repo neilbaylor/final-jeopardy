@@ -238,8 +238,8 @@
         setTimeout(() => {
           labelEl.classList.add('visible');
 
-          // Animate "" → . → .. → ... at 335ms/step, 2.25–3.25 random cycles
-          const cycles = 2.25 + Math.random() * 1.0;
+          // Animate "" → . → .. → ... at 335ms/step, 2.35–3.1 random cycles
+          const cycles = 2.35 + Math.random() * 0.75;
           const totalSteps = Math.round(cycles * 4);
           let step = 0;
           dotsEl.textContent = '';
