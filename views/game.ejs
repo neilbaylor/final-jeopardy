@@ -277,28 +277,27 @@
     }
     #answer-text.visible { opacity: 1; }
 
-    /* Player cards above answer button */
+    /* Player cards below category */
     #game-players {
       position: absolute;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 116px);
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 12px;
+      gap: 14px;
       white-space: nowrap;
       opacity: 0;
       transition: opacity 0.4s ease;
     }
     #game-players.visible { opacity: 1; }
-    #game-players .game-player { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
-    #game-players .player-avatar-wrap { position: relative; flex-shrink: 0; width: 27px; height: 27px; }
-    #game-players .player-avatar { width: 27px; height: 27px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); display: block; }
-    #game-players .player-avatar-placeholder { width: 27px; height: 27px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
-    #game-players .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
-    #game-players .player-answered-badge svg { display: block; }
+    #game-players .game-player { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    #game-players .player-avatar-wrap { position: relative; flex-shrink: 0; width: 32px; height: 32px; }
+    #game-players .player-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); display: block; }
+    #game-players .player-avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    #game-players .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 17px; height: 17px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
+    #game-players .player-answered-badge svg { display: block; width: 9px; height: 9px; }
     #game-players .game-player-info { display: flex; flex-direction: column; gap: 1px; }
-    #game-players .player-name { font-size: 0.7rem; font-weight: 600; color: rgba(255,255,255,0.9); max-width: 44px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #game-players .player-status { font-size: 0.65rem; font-weight: 600; }
+    #game-players .player-name { font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.9); max-width: 53px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #game-players .player-status { font-size: 0.78rem; font-weight: 600; }
     #game-players .player-status.waiting  { color: rgba(255,255,255,0.4); }
     #game-players .player-status.answered { color: #81c784; }
   </style>
@@ -419,11 +418,12 @@
               categoryEl.style.fontSize = cs.fontSize;
               categoryEl.style.top = cs.top;
               categoryEl.classList.add('visible');
-              // 1825ms later: Answer button + player cards
+              // 1825ms later: Answer button + player cards (max 4, 30px below category)
               setTimeout(() => {
                 answerBtn.classList.add('visible');
                 if (gamePlayers.length > 0) {
-                  gamePlayersEl.innerHTML = gamePlayers.map(buildPlayerCardHtml).join('');
+                  gamePlayersEl.innerHTML = gamePlayers.slice(0, 4).map(buildPlayerCardHtml).join('');
+                  gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
                   gamePlayersEl.classList.add('visible');
                 }
               }, 1825);
@@ -453,6 +453,7 @@
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
       answerBtn.classList.remove('visible');
+      gamePlayersEl.style.transition = '';
       gamePlayersEl.classList.remove('visible');
       gamePlayersEl.innerHTML = '';
       backBtn.classList.remove('disabled');
@@ -474,6 +475,8 @@
 
     answerBtn.addEventListener('click', () => {
       answerBtn.classList.remove('visible');
+      gamePlayersEl.style.transition = 'opacity 0.15s ease';
+      gamePlayersEl.classList.remove('visible');
       categoryEl.classList.add('dismissing');
       questionEl.textContent = currentQuestion;
       questionEl.classList.add('visible');
