@@ -232,6 +232,28 @@
     }
     #timer-count.visible { opacity: 0.9; }
 
+    /* Header category (fades in when timer starts) */
+    #header-category {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 14px);
+      left: calc(env(safe-area-inset-left, 0px) + 52px);
+      right: calc(50% + 32px);
+      height: 36px;
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: rgba(255,255,255,0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+      z-index: 10;
+    }
+    #header-category.visible { opacity: 1; }
+
     /* Answer button */
     @keyframes answerPulse {
       0%   { box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 0 0 0 rgba(255,215,0,0.55); }
@@ -310,6 +332,7 @@
     </svg>
   </button>
 
+  <div id="header-category"></div>
   <div id="progress-bar"><div id="progress-bar-fill"></div></div>
   <div id="timer-count">30</div>
   <div id="spinner" class="pre-enter"></div>
@@ -339,9 +362,11 @@
     const answerBtn     = document.getElementById('answer-btn');
     const backBtn       = document.getElementById('back-btn');
     const timerCountEl  = document.getElementById('timer-count');
-    const gamePlayersEl = document.getElementById('game-players');
+    const gamePlayersEl    = document.getElementById('game-players');
+    const headerCategoryEl = document.getElementById('header-category');
     let countdownInterval = null;
     let gamePlayers = [];
+    let currentCategory = '';
 
     // Reveal spinner + back btn after page transition completes (0.42s)
     setTimeout(() => {
@@ -386,8 +411,9 @@
         const res  = await fetch(url);
         const game = await res.json();
         const category = toTitleCase(game.current_question?.category || '—');
-        currentQuestion = game.current_question?.question || '';
-        currentAnswer   = game.current_question?.answer   || '';
+        currentQuestion  = game.current_question?.question || '';
+        currentAnswer    = game.current_question?.answer   || '';
+        currentCategory  = category;
         gamePlayers = (game.players || []).map(p => ({ ...p, _answered: false }));
 
         // Enforce minimum 500ms spinner
@@ -458,9 +484,12 @@
       gamePlayersEl.innerHTML = '';
       backBtn.classList.remove('disabled');
       dotsEl.textContent = '';
-      currentQuestion = '';
-      currentAnswer   = '';
-      gamePlayers     = [];
+      headerCategoryEl.classList.remove('visible');
+      headerCategoryEl.textContent = '';
+      currentQuestion  = '';
+      currentAnswer    = '';
+      currentCategory  = '';
+      gamePlayers      = [];
     }
 
     loadGame();
@@ -495,6 +524,8 @@
 
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
+            headerCategoryEl.textContent = currentCategory;
+            headerCategoryEl.classList.add('visible');
             // Start countdown — only show circle when ≤10s remain
             let count = 30;
             timerCountEl.textContent = count;
@@ -505,24 +536,26 @@
               if (count <= 0) clearInterval(countdownInterval);
             }, 1000);
 
-            // When timer expires: question fades out, answer cross-fades in
+            // When timer expires: question fades out, then 900ms later answer fades in
             setTimeout(() => {
-              // Capture question bounds before fading it out
               const qRect = questionEl.getBoundingClientRect();
               questionEl.classList.remove('visible');
-              const as = categoryStyle(currentAnswer);
-              answerTextEl.style.fontSize = as.fontSize;
-              // Center answer text within the question's vertical span
-              const answerLineH = parseFloat(as.fontSize) * 16 * 1.45;
-              const qCenterY = (qRect.top + qRect.bottom) / 2;
-              answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
-              answerTextEl.textContent = currentAnswer;
-              answerTextEl.classList.add('visible');
-              progressBar.style.transition = 'transform 0.4s ease 0.8s';
-              progressBar.classList.remove('visible');
-              setTimeout(() => progressBar.style.transition = '', 1300);
-              timerCountEl.classList.remove('visible');
-              backBtn.classList.remove('disabled');
+              setTimeout(() => {
+                const as = categoryStyle(currentAnswer);
+                answerTextEl.style.fontSize = as.fontSize;
+                // Center answer text within the question's vertical span
+                const answerLineH = parseFloat(as.fontSize) * 16 * 1.45;
+                const qCenterY = (qRect.top + qRect.bottom) / 2;
+                answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
+                answerTextEl.textContent = currentAnswer;
+                answerTextEl.classList.add('visible');
+                headerCategoryEl.classList.remove('visible');
+                progressBar.style.transition = 'transform 0.4s ease 0.8s';
+                progressBar.classList.remove('visible');
+                setTimeout(() => progressBar.style.transition = '', 1300);
+                timerCountEl.classList.remove('visible');
+                backBtn.classList.remove('disabled');
+              }, 900);
             }, 30000);
           }
         }, 2525);
