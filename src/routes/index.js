@@ -191,4 +191,15 @@ router.get('/api/games', async (req, res) => {
   }
 });
 
+router.delete('/api/games/:gameId', async (req, res) => {
+  const { gameId } = req.params;
+  try {
+    await db.query('DELETE FROM games WHERE id = ?', [Number(gameId)]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Delete game error:', err);
+    res.status(500).json({ error: 'Failed to delete game' });
+  }
+});
+
 module.exports = router;

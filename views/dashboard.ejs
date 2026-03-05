@@ -711,7 +711,21 @@
       font-weight: 700;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+    #delete-modal-confirm .dm-spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(7,16,46,0.25);
+      border-top-color: #07102e;
+      border-radius: 50%;
+      animation: panelSpin 0.7s linear infinite;
+    }
+    #delete-modal-confirm.loading .dm-spinner { display: block; }
+    #delete-modal-confirm.loading .dm-text { display: none; }
 
     /* Spinner inside panel */
     #panel-spinner {
@@ -904,7 +918,7 @@
       <p>Are you sure you want to delete this game?</p>
       <div class="delete-modal-buttons">
         <button id="delete-modal-cancel">Cancel</button>
-        <button id="delete-modal-confirm">Yes</button>
+        <button id="delete-modal-confirm"><span class="dm-text">Yes</span><div class="dm-spinner"></div></button>
       </div>
     </div>
   </div>
@@ -1209,6 +1223,8 @@
       document.querySelectorAll('.game-row-delete-action').forEach(deleteAction => {
         deleteAction.addEventListener('click', e => {
           e.stopPropagation();
+          const gameId = deleteAction.closest('.game-row-wrapper').dataset.gameId;
+          document.getElementById('delete-modal-backdrop').dataset.gameId = gameId;
           document.getElementById('delete-modal-backdrop').classList.add('open');
         });
       });
@@ -1218,8 +1234,26 @@
     document.getElementById('delete-modal-cancel').addEventListener('click', () => {
       document.getElementById('delete-modal-backdrop').classList.remove('open');
     });
-    document.getElementById('delete-modal-confirm').addEventListener('click', () => {
-      document.getElementById('delete-modal-backdrop').classList.remove('open');
+    document.getElementById('delete-modal-confirm').addEventListener('click', async () => {
+      const backdrop = document.getElementById('delete-modal-backdrop');
+      const gameId = backdrop.dataset.gameId;
+      const confirmBtn = document.getElementById('delete-modal-confirm');
+      const cancelBtn = document.getElementById('delete-modal-cancel');
+
+      confirmBtn.classList.add('loading');
+      confirmBtn.disabled = true;
+      cancelBtn.disabled = true;
+
+      try {
+        await fetch(`/api/games/${encodeURIComponent(gameId)}`, { method: 'DELETE' });
+      } catch (e) { /* continue regardless */ }
+
+      await loadGames(true);
+
+      backdrop.classList.remove('open');
+      confirmBtn.classList.remove('loading');
+      confirmBtn.disabled = false;
+      cancelBtn.disabled = false;
     });
 
     let usersCache = null;
