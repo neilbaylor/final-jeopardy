@@ -164,7 +164,7 @@
       text-align: center;
       font-size: 1.1rem;
       font-weight: 500;
-      color: rgba(255,255,255,0.82);
+      color: rgba(255,255,255,0.72);
       letter-spacing: 0.02em;
       opacity: 0;
       transition: opacity 0.5s ease;
@@ -362,7 +362,7 @@
               categoryEl.style.top = cs.top;
               categoryEl.classList.add('visible');
               // 1425ms later: Answer button
-              setTimeout(() => answerBtn.classList.add('visible'), 1425);
+              setTimeout(() => answerBtn.classList.add('visible'), 1375);
             }
           }, 345);
         }, 200);
@@ -410,7 +410,7 @@
       // After reading time, show timer message just below the question
       setTimeout(() => {
         const qRect = questionEl.getBoundingClientRect();
-        timerMsgEl.style.top = (qRect.bottom + 20) + 'px';
+        timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
         timerMsgEl.classList.add('visible');
 
         // 1.6s later: fade out message, fade in progress bar, start 30s timer
@@ -428,7 +428,7 @@
             answerTextEl.textContent = currentAnswer;
             answerTextEl.classList.add('visible');
           }, 30000);
-        }, 1600);
+        }, 2000);
       }, readingDelay(currentQuestion));
     }, { once: true });
   </script>
