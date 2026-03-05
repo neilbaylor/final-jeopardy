@@ -506,20 +506,20 @@
     .player-avatar-wrap {
       position: relative;
       flex-shrink: 0;
-      width: 25px;
-      height: 25px;
+      width: 27px;
+      height: 27px;
     }
     .player-avatar {
-      width: 25px;
-      height: 25px;
+      width: 27px;
+      height: 27px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid rgba(0,0,0,0.08);
       display: block;
     }
     .player-avatar-placeholder {
-      width: 25px;
-      height: 25px;
+      width: 27px;
+      height: 27px;
       border-radius: 50%;
       background: #e8eaf0;
       display: flex;
@@ -1131,123 +1131,9 @@
         </div>`;
       }).join('');
 
-      setupSwipeToDelete();
-    }
-
-    function setupSwipeToDelete() {
-      const DELETE_W = 55;
-      // Track whether the content container is scrolling vertically
-      let contentIsScrolling = false;
-      let contentScrollTimer = null;
-      const contentEl = document.getElementById('content');
-      if (contentEl) {
-        contentEl.addEventListener('scroll', () => {
-          contentIsScrolling = true;
-          clearTimeout(contentScrollTimer);
-          contentScrollTimer = setTimeout(() => { contentIsScrolling = false; }, 150);
-        }, { passive: true });
-      }
-
-      document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
-        const row = wrapper.querySelector('.game-row');
-        const deleteAction = wrapper.querySelector('.game-row-delete-action');
-        let startX = 0, startY = 0, startTx = 0;
-        let tracking = false, isOpen = false;
-        let dirLocked = null; // 'h' | 'v' | null
-        let lastTouchX = 0, lastTouchTime = 0, velocityX = 0;
-
-        const getTx = () => {
-          const m = row.style.transform.match(/translateX\(([-\d.]+)px\)/);
-          return m ? parseFloat(m[1]) : 0;
-        };
-        const snapTo = (tx) => {
-          row.style.transition = 'transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-          row.style.transform = tx > 0 ? `translateX(${tx}px)` : '';
-          isOpen = tx > 0;
-          setTimeout(() => { row.style.transition = ''; }, 230);
-        };
-
-        row.addEventListener('touchstart', e => {
-          if (e.touches.length !== 1) return;
-          if (contentIsScrolling) return;
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-          startTx = getTx();
-          tracking = true;
-          dirLocked = null;
-          lastTouchX = startX;
-          lastTouchTime = Date.now();
-          velocityX = 0;
-          row.style.transition = '';
-        }, { passive: true });
-
-        row.addEventListener('touchmove', e => {
-          if (!tracking || e.touches.length !== 1) return;
-          const cx = e.touches[0].clientX;
-          const cy = e.touches[0].clientY;
-          const dx = cx - startX;
-          const dy = cy - startY;
-
-          // Lock direction on first significant movement
-          if (!dirLocked) {
-            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-              dirLocked = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
-            } else {
-              return;
-            }
-          }
-
-          if (dirLocked === 'v') {
-            // Vertical scroll — cancel horizontal tracking, snap to stable state
-            tracking = false;
-            snapTo(isOpen ? DELETE_W : 0);
-            return;
-          }
-
-          // Horizontal swipe — block scroll and pull-to-refresh
-          e.preventDefault();
-
-          // Track velocity
-          const now = Date.now();
-          const dt = now - lastTouchTime;
-          if (dt > 0) velocityX = (cx - lastTouchX) / dt;
-          lastTouchX = cx;
-          lastTouchTime = now;
-
-          const newTx = Math.max(0, Math.min(DELETE_W, startTx + dx));
-          row.style.transform = newTx > 0 ? `translateX(${newTx}px)` : '';
-        }, { passive: false });
-
-        row.addEventListener('touchend', () => {
-          if (!tracking) return;
-          tracking = false;
-          const currentTx = getTx();
-          // Use velocity to determine intent: fast rightward → open, fast leftward → close
-          let shouldOpen;
-          if (velocityX > 0.3) {
-            shouldOpen = true;
-          } else if (velocityX < -0.3) {
-            shouldOpen = false;
-          } else {
-            shouldOpen = currentTx > DELETE_W / 2;
-          }
-          snapTo(shouldOpen ? DELETE_W : 0);
-        });
-
-        row.addEventListener('touchcancel', () => {
-          if (!tracking) return;
-          tracking = false;
-          snapTo(isOpen ? DELETE_W : 0);
-        });
-
-        // Tap on the row content while open → close it
-        row.addEventListener('click', () => {
-          if (isOpen) { snapTo(0); }
-        });
-
+      document.querySelectorAll('.game-row-delete-action').forEach(deleteAction => {
         deleteAction.addEventListener('click', e => {
           e.stopPropagation();
-          snapTo(0);
           document.getElementById('delete-modal-backdrop').classList.add('open');
         });
       });
@@ -1429,10 +1315,10 @@
       const content = document.getElementById('content');
       const ptr = document.getElementById('games-ptr-indicator');
       const ptrSpinner = document.getElementById('games-ptr-spinner');
-      const _standalone = window.navigator.standalone === true;
       const THRESHOLD = 125;
       const DEADZONE = 36;
-      let startY = 0, pulling = false, triggered = false, lastDy = 0;
+      let startY = 0, mode = null, triggered = false, lastDy = 0;
+      // mode: null = undecided/native | 'ptr' = pull-to-refresh | 'push' = bottom overscroll
 
       const snapBack = () => {
         if (content.style.transform) {
@@ -1443,67 +1329,88 @@
       };
 
       content.addEventListener('touchstart', e => {
-        if (content.scrollTop === 0 && e.touches.length === 1) {
-          startY = e.touches[0].clientY;
-          pulling = true;
-          triggered = false;
-          content.style.transition = '';
-          ptr.classList.remove('ptr-snap');
-          ptr.style.height = '0';
-          ptrSpinner.style.transform = 'rotate(0deg)';
-        }
+        if (e.touches.length !== 1) return;
+        startY = e.touches[0].clientY;
+        mode = null;
+        triggered = false;
+        lastDy = 0;
+        content.style.transition = '';
+        ptr.classList.remove('ptr-snap');
       }, { passive: true });
 
       content.addEventListener('touchmove', e => {
-        if (!pulling) return;
         const dy = e.touches[0].clientY - startY;
-        e.preventDefault();
-        if (dy > 0) {
-          const edy = Math.max(0, dy - DEADZONE);
+
+        if (mode === null) {
+          if (dy > 3 && content.scrollTop <= 0) {
+            mode = 'ptr';
+            startY = e.touches[0].clientY;
+            ptr.style.height = '0';
+            ptrSpinner.style.transform = 'rotate(0deg)';
+          } else if (dy < -3 && content.scrollTop >= content.scrollHeight - content.clientHeight - 1) {
+            mode = 'push';
+            startY = e.touches[0].clientY;
+          } else {
+            return; // let native scroll handle it
+          }
+        }
+
+        const d = e.touches[0].clientY - startY;
+        if (mode === 'ptr') {
+          e.preventDefault();
           content.style.transform = '';
-          lastDy = dy;
-          ptr.style.height = (edy * 0.44) + 'px';
-          const spinEdy = Math.max(0, edy - 18);
-          ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 2, 360)}deg)`;
-          triggered = dy >= THRESHOLD;
-        } else {
-          triggered = false;
-          ptr.style.height = '0';
-          content.style.transform = `translateY(${dy * 0.55}px)`;
+          if (d > 0) {
+            const edy = Math.max(0, d - DEADZONE);
+            lastDy = d;
+            ptr.style.height = (edy * 0.44) + 'px';
+            const spinEdy = Math.max(0, edy - 18);
+            ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 2, 360)}deg)`;
+            triggered = d >= THRESHOLD;
+          } else {
+            triggered = false;
+            ptr.style.height = '0';
+          }
+        } else if (mode === 'push') {
+          e.preventDefault();
+          content.style.transform = d < 0 ? `translateY(${d * 0.41}px)` : '';
         }
       }, { passive: false });
 
       content.addEventListener('touchend', () => {
-        if (!pulling) return;
-        pulling = false;
+        if (mode === null) return;
+        const wasMode = mode;
+        mode = null;
         snapBack();
-        ptr.classList.add('ptr-snap');
-        if (triggered) {
-          ptr.style.height = '48px';
-          ptrSpinner.style.animationDelay = `${-(Math.min(Math.max(lastDy - 36, 0) * 2, 360) % 360) / 360 * 0.7}s`;
-          ptrSpinner.style.transform = '';
-          requestAnimationFrame(() => {
-            ptrSpinner.classList.add('ptr-spinning');
-          });
-          loadGames(true).finally(() => {
-            setTimeout(() => {
-              ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
-              ptrSpinner.classList.remove('ptr-spinning');
-              ptrSpinner.style.animationDelay = '';
-              requestAnimationFrame(() => {
-                ptr.style.opacity = '0';
-                setTimeout(() => {
-                  ptr.style.height = '0';
-                  setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 180);
-                }, 275);
-              });
-            }, 640);
-          });
-        } else {
-          ptr.style.height = '0';
+        if (wasMode === 'ptr') {
+          ptr.classList.add('ptr-snap');
+          if (triggered) {
+            triggered = false;
+            ptr.style.height = '48px';
+            ptrSpinner.style.animationDelay = `${-(Math.min(Math.max(lastDy - 36, 0) * 2, 360) % 360) / 360 * 0.7}s`;
+            ptrSpinner.style.transform = '';
+            requestAnimationFrame(() => {
+              ptrSpinner.classList.add('ptr-spinning');
+            });
+            loadGames(true).finally(() => {
+              setTimeout(() => {
+                ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
+                ptrSpinner.classList.remove('ptr-spinning');
+                ptrSpinner.style.animationDelay = '';
+                requestAnimationFrame(() => {
+                  ptr.style.opacity = '0';
+                  setTimeout(() => {
+                    ptr.style.height = '0';
+                    setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 180);
+                  }, 275);
+                });
+              }, 640);
+            });
+          } else {
+            ptr.style.height = '0';
+          }
         }
       });
-      content.addEventListener('touchcancel', () => { pulling = false; snapBack(); });
+      content.addEventListener('touchcancel', () => { mode = null; snapBack(); });
     })();
   </script>
 </body>
