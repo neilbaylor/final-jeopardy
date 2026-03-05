@@ -211,13 +211,13 @@
         setTimeout(() => {
           labelEl.classList.add('visible');
 
-          // Animate . → .. → ... at 315ms per step, 4 total cycles (12 steps)
-          const totalSteps = 12;
+          // Animate "" → . → .. → ... at 400ms/step, 3.5 cycles (14 steps)
+          const totalSteps = 14;
           let step = 0;
-          dotsEl.textContent = '.';
+          dotsEl.textContent = '';
           const dotsInterval = setInterval(() => {
             step++;
-            dotsEl.textContent = '.'.repeat((step % 3) + 1);
+            dotsEl.textContent = '.'.repeat(step % 4);
             if (step >= totalSteps - 1) {
               clearInterval(dotsInterval);
               // Cross-fade: label out, category in simultaneously
@@ -227,7 +227,7 @@
               // 1500ms later: Answer button
               setTimeout(() => answerBtn.classList.add('visible'), 1500);
             }
-          }, 315);
+          }, 400);
         }, 200);
 
       } catch (err) {
