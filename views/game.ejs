@@ -248,7 +248,7 @@
       color: #fff;
       text-shadow: 0 2px 8px rgba(0,0,0,0.35);
       opacity: 0;
-      transition: opacity 1.35s ease;
+      transition: opacity 1.35s ease 150ms;
       line-height: 1.45;
     }
     #answer-text.visible { opacity: 1; }
@@ -378,6 +378,7 @@
       answerTextEl.textContent = '';
       timerMsgEl.classList.remove('visible');
       progressBar.classList.remove('visible');
+      progressBar.style.opacity = '';
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
       answerBtn.classList.remove('visible');
@@ -427,6 +428,7 @@
             answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
             answerTextEl.textContent = currentAnswer;
             answerTextEl.classList.add('visible');
+            progressBar.style.opacity = '0.5';
           }, 30000);
         }, 2000);
       }, readingDelay(currentQuestion));
