@@ -31,15 +31,12 @@ router.get('/api/users', async (req, res) => {
   const { userId } = req.query;
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
-  try {
-    const [rows] = await db.execute(
-      'SELECT id, display_name, avatar_url FROM users WHERE id != ? ORDER BY display_name ASC',
-      [userId]
-    );
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Database error' });
-  }
+  const fakeUsers = Array.from({ length: 50 }, (_, i) => ({
+    id: `fake-${i + 1}`,
+    display_name: `Test User ${i + 1}`,
+    avatar_url: null,
+  }));
+  return res.json(fakeUsers);
 });
 
 // API: create a new game
