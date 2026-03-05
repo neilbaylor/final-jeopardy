@@ -333,6 +333,14 @@
     }
     #create-btn.loading .btn-text { display: none; }
     #create-btn.loading .btn-spinner { display: block; }
+    @keyframes createBtnPulse {
+      0%   { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 0   rgba(255,213,0,0.55); }
+      100% { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 10px rgba(255,213,0,0); }
+    }
+    #create-btn.pulse {
+      animation: createBtnPulse 1.4s ease-out infinite;
+      will-change: box-shadow;
+    }
     #error-modal-backdrop {
       display: flex;
       position: absolute;
@@ -974,7 +982,9 @@
 
     function updateCreateBtn() {
       const anyChecked = document.querySelector('#users-list input:checked');
-      document.getElementById('create-btn').disabled = !anyChecked;
+      const btn = document.getElementById('create-btn');
+      btn.disabled = !anyChecked;
+      btn.classList.toggle('pulse', !!anyChecked && !btn.classList.contains('loading'));
     }
 
     document.getElementById('create-btn').addEventListener('click', async () => {
@@ -1000,6 +1010,7 @@
       btn.style.width = btn.offsetWidth + 'px';
       btn.disabled = true;
       btn.classList.add('loading');
+      btn.classList.remove('pulse');
       rows.forEach(row => {
         row.style.pointerEvents = 'none';
         row.style.opacity = '0.45';
