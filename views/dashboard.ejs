@@ -1147,7 +1147,7 @@
       const MAX_VISIBLE = 3;
       const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
-      const staggerMs = games.length > 1 ? Math.max(19, Math.round(70 / Math.sqrt(games.length - 1))) : 0;
+      const staggerMs = games.length > 1 ? Math.max(28, Math.round(70 / Math.sqrt(games.length - 1))) : 0;
       list.innerHTML = games.map((game, idx) => {
         const rawCategory = game.current_question ? game.current_question.category : 'No question yet';
         const category = toTitleCase(rawCategory);
@@ -1343,7 +1343,7 @@
           const applyUsers = () => {
             const selected = new Set([...scroller.querySelectorAll('.user-row input:checked')]
               .map(cb => cb.closest('.user-row').dataset.userId));
-            const userStaggerMs = (!cached && users.length > 1) ? Math.max(19, Math.round(70 / Math.sqrt(users.length - 1))) : 0;
+            const userStaggerMs = (!cached && users.length > 1) ? Math.max(28, Math.round(70 / Math.sqrt(users.length - 1))) : 0;
             scroller.innerHTML = users.map((u, i) => `
               <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()" style="animation-delay:${(i * userStaggerMs / 1000).toFixed(3)}s">
                 ${u.avatar_url
