@@ -467,6 +467,17 @@
       justify-content: center;
     }
 
+    @keyframes new-row-highlight {
+      0%   { background-color: transparent; }
+      14%  { background-color: #e8f5e9; }
+      86%  { background-color: #e8f5e9; }
+      100% { background-color: transparent; }
+    }
+    .game-row-wrapper.new-row .game-row {
+      animation: new-row-highlight 3500ms ease forwards;
+      animation-delay: 200ms;
+    }
+
     /* Game row card */
     .game-row {
       background: #fff;
@@ -1082,10 +1093,13 @@
         });
     }
 
+    let prevGameIds = null;
+
     function renderGames(games) {
       const list = document.getElementById('games-list');
       if (!Array.isArray(games) || games.length === 0) {
         list.innerHTML = '<p class="games-empty">You aren\'t a member of any games</p>';
+        prevGameIds = new Set();
         return;
       }
 
@@ -1156,6 +1170,15 @@
           </div>
         </div>`;
       }).join('');
+
+      if (prevGameIds !== null) {
+        list.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
+          if (!prevGameIds.has(wrapper.dataset.gameId)) {
+            wrapper.classList.add('new-row');
+          }
+        });
+      }
+      prevGameIds = new Set(games.map(g => String(g.id)));
 
       const DELETE_REVEAL = 70;
 
