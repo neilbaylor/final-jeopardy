@@ -1593,19 +1593,6 @@
       });
       content.addEventListener('touchcancel', () => { mode = null; snapBack(); });
     })();
-
-    // Scroll to top when user taps the status bar area (top ~24px of screen)
-    document.addEventListener('touchend', e => {
-      if (e.changedTouches[0].clientY > 24) return;
-      const panelOpen = document.body.classList.contains('panel-open');
-      const target = panelOpen
-        ? document.getElementById('users-list-scroller')
-        : document.querySelector('.content');
-      if (target && target.scrollTop > 0) {
-        e.preventDefault();
-        target.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }, { passive: false });
   </script>
 </body>
 </html>
