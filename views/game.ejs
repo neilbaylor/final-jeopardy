@@ -500,25 +500,29 @@
             headerCategoryEl.textContent = currentCategory;
             headerCategoryEl.classList.add('visible');
 
-            // When timer expires: question fades out, then 900ms later answer fades in
+            // When timer expires: slide out progress bar, then 600ms after it finishes
+            // fade question out, then 900ms later fade answer in
             setTimeout(() => {
+              headerCategoryEl.classList.remove('visible');
+              progressBar.style.transition = 'transform 0.4s ease 1.2s';
+              progressBar.classList.remove('visible');
+              setTimeout(() => progressBar.style.transition = '', 1700);
+              // progress bar fully gone after 1200 + 400 = 1600ms; wait 600ms more
               const qRect = questionEl.getBoundingClientRect();
-              questionEl.classList.remove('visible');
               setTimeout(() => {
-                const as = categoryStyle(currentAnswer);
-                answerTextEl.style.fontSize = as.fontSize;
-                // Center answer text within the question's vertical span
-                const answerLineH = parseFloat(as.fontSize) * 16 * 1.45;
-                const qCenterY = (qRect.top + qRect.bottom) / 2;
-                answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
-                answerTextEl.textContent = currentAnswer;
-                answerTextEl.classList.add('visible');
-                headerCategoryEl.classList.remove('visible');
-                progressBar.style.transition = 'transform 0.4s ease 1.2s';
-                progressBar.classList.remove('visible');
-                setTimeout(() => progressBar.style.transition = '', 1700);
-                backBtn.classList.remove('disabled');
-              }, 900);
+                questionEl.classList.remove('visible');
+                setTimeout(() => {
+                  const as = categoryStyle(currentAnswer);
+                  answerTextEl.style.fontSize = as.fontSize;
+                  // Center answer text within the question's vertical span
+                  const answerLineH = parseFloat(as.fontSize) * 16 * 1.45;
+                  const qCenterY = (qRect.top + qRect.bottom) / 2;
+                  answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
+                  answerTextEl.textContent = currentAnswer;
+                  answerTextEl.classList.add('visible');
+                  backBtn.classList.remove('disabled');
+                }, 900);
+              }, 2200);
             }, 30000);
           }
         }, 2525);
