@@ -172,7 +172,7 @@
     .fab {
       position: absolute;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
-      left: calc(env(safe-area-inset-left, 0px) + 8px);
+      right: calc(env(safe-area-inset-right, 0px) + 8px);
       height: 48px;
       border-radius: 999px;
       background: linear-gradient(to top, rgba(255, 221, 0, 0.88), rgba(255, 203, 0, 0.88));
@@ -333,14 +333,7 @@
     }
     #create-btn.loading .btn-text { display: none; }
     #create-btn.loading .btn-spinner { display: block; }
-    @keyframes createBtnPulse {
-      0%   { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 0   rgba(255,213,0,0.55); }
-      100% { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 10px rgba(255,213,0,0); }
-    }
-    #create-btn.pulse {
-      animation: createBtnPulse 1.4s ease-out infinite;
-      will-change: box-shadow;
-    }
+
     #error-modal-backdrop {
       display: flex;
       position: absolute;
@@ -426,9 +419,9 @@
       flex-direction: column;
     }
     .games-empty {
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: #999;
-      padding: 8px 4px 0;
+      padding: 5px 4px 0;
     }
     .games-title {
       font-size: 1.3rem;
@@ -700,8 +693,8 @@
       -webkit-tap-highlight-color: transparent;
     }
     #delete-modal-confirm {
-      background: linear-gradient(to top, rgba(255, 221, 0, 0.88), rgba(255, 203, 0, 0.88));
-      color: #07102e;
+      background: #e53935;
+      color: #fff;
       border: none;
       border-radius: 999px;
       width: 45%;
@@ -719,8 +712,8 @@
       display: none;
       width: 16px;
       height: 16px;
-      border: 2px solid rgba(7,16,46,0.25);
-      border-top-color: #07102e;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
       border-radius: 50%;
       animation: panelSpin 0.7s linear infinite;
     }
@@ -998,7 +991,6 @@
       const anyChecked = document.querySelector('#users-list input:checked');
       const btn = document.getElementById('create-btn');
       btn.disabled = !anyChecked;
-      btn.classList.toggle('pulse', !!anyChecked && !btn.classList.contains('loading'));
     }
 
     document.getElementById('create-btn').addEventListener('click', async () => {
@@ -1024,7 +1016,7 @@
       btn.style.width = btn.offsetWidth + 'px';
       btn.disabled = true;
       btn.classList.add('loading');
-      btn.classList.remove('pulse');
+
       rows.forEach(row => {
         row.style.pointerEvents = 'none';
         row.style.opacity = '0.45';
@@ -1093,7 +1085,7 @@
     function renderGames(games) {
       const list = document.getElementById('games-list');
       if (!Array.isArray(games) || games.length === 0) {
-        list.innerHTML = '<p class="games-empty">You aren\'t in any games yet, create a new one below.</p>';
+        list.innerHTML = '<p class="games-empty">You aren\'t a member of any games</p>';
         return;
       }
 
@@ -1159,7 +1151,7 @@
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               <button class="answer-btn">Answer</button>
             </div>
-            <div class="game-row-summary">A new question is coming in <strong>3 hours</strong> or after everyone answers</div>
+            <div class="game-row-summary">New question in <strong>3 hours</strong> or after everyone answers</div>
           </div>
         </div>`;
       }).join('');
@@ -1204,11 +1196,11 @@
           const dx = endX - startX;
           const isOpen = wrapper.classList.contains('swipe-open');
           row.style.transition = 'transform 0.25s ease';
-          if (!isOpen && dx > 15) {
+          if (!isOpen && dx > 30) {
             closeAllSwipes(wrapper);
             row.style.transform = `translateX(${DELETE_REVEAL}px)`;
             wrapper.classList.add('swipe-open');
-          } else if (isOpen && dx < -15) {
+          } else if (isOpen && dx < -30) {
             row.style.transform = '';
             wrapper.classList.remove('swipe-open');
           } else {
