@@ -989,7 +989,12 @@
       openPanel();
       loadUsers();
     });
-    document.getElementById('close-panel').addEventListener('click', closePanel);
+    const closePanelBtn = document.getElementById('close-panel');
+    closePanelBtn.addEventListener('touchend', e => {
+      e.preventDefault();
+      closePanel();
+    });
+    closePanelBtn.addEventListener('click', closePanel);
 
     function showErrorModal(msg) {
       document.getElementById('error-modal-msg').textContent = msg;
@@ -1303,7 +1308,7 @@
           const applyUsers = () => {
             const selected = new Set([...scroller.querySelectorAll('.user-row input:checked')]
               .map(cb => cb.closest('.user-row').dataset.userId));
-            const userStaggerMs = users.length > 1 ? Math.max(30, Math.round(70 / Math.sqrt(users.length - 1))) : 0;
+            const userStaggerMs = (!cached && users.length > 1) ? Math.max(30, Math.round(70 / Math.sqrt(users.length - 1))) : 0;
             scroller.innerHTML = users.map((u, i) => `
               <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()" style="animation-delay:${(i * userStaggerMs / 1000).toFixed(3)}s">
                 ${u.avatar_url
