@@ -175,27 +175,25 @@
     /* Progress bar */
     #progress-bar {
       position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 28px);
-      left: 65px; right: 35px;
+      top: 0; left: 0; right: 0;
       height: 10px;
-      border-radius: 5px;
       background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(0,0,0,0.5);
+      border-bottom: 1px solid rgba(0,0,0,0.5);
       box-shadow:
         inset 0 2px 5px rgba(0,0,0,0.7),
         inset 0 -1px 2px rgba(0,0,0,0.4),
-        0 1px 0 rgba(255,255,255,0.08);
+        0 2px 6px rgba(0,0,0,0.3);
       overflow: hidden;
       opacity: 0;
-      transition: opacity 0.5s ease;
+      transform: translateY(-100%);
+      transition: opacity 0.45s ease, transform 0.45s ease;
       z-index: 9;
     }
-    #progress-bar.visible { opacity: 1; }
+    #progress-bar.visible { opacity: 1; transform: translateY(0); }
     #progress-bar-fill {
       height: 100%;
       width: 100%;
       background: #FFD700;
-      border-radius: 5px;
       transform-origin: left;
       transform: scaleX(0);
       box-shadow:
@@ -380,7 +378,6 @@
       answerTextEl.textContent = '';
       timerMsgEl.classList.remove('visible');
       progressBar.classList.remove('visible');
-      progressBar.style.opacity = '';
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
       answerBtn.classList.remove('visible');
@@ -432,7 +429,7 @@
             answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
             answerTextEl.textContent = currentAnswer;
             answerTextEl.classList.add('visible');
-            progressBar.style.opacity = '0';
+            progressBar.classList.remove('visible');
             backBtn.classList.remove('disabled');
           }, 30000);
         }, 2525);
