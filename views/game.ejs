@@ -216,6 +216,15 @@
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
+    // Scale category font: 2.7rem at ≤10 chars, drops quickly to 1.6rem min
+    function categoryFontSize(str) {
+      const len = str.length;
+      if (len <= 10) return '2.7rem';
+      const t = Math.min((len - 10) / 18, 1); // 0 at 10 chars, 1 at 28+ chars
+      const size = 2.7 - Math.sqrt(t) * 1.1;  // sqrt biases towards min
+      return Math.max(size, 1.6).toFixed(2) + 'rem';
+    }
+
     let currentQuestion = '';
 
     async function loadGame() {
@@ -251,6 +260,7 @@
               // Cross-fade: label out, category in simultaneously
               labelEl.classList.remove('visible');
               categoryEl.textContent = category;
+              categoryEl.style.fontSize = categoryFontSize(category);
               categoryEl.classList.add('visible');
               // 1300ms later: Answer button
               setTimeout(() => answerBtn.classList.add('visible'), 1300);
