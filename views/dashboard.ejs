@@ -1064,7 +1064,7 @@
         .then(([games]) => {
           if (!silent) {
             spinner.classList.add('hidden');
-            setTimeout(() => { fab.style.opacity = '1'; }, 700);
+            setTimeout(() => { fab.style.opacity = '1'; }, 500);
           }
           fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
           if (silent && gamesList.querySelector('.game-row-wrapper')) {
@@ -1077,7 +1077,7 @@
         .catch(() => {
           if (!silent) {
             spinner.classList.add('hidden');
-            setTimeout(() => { fab.style.opacity = '1'; }, 700);
+            setTimeout(() => { fab.style.opacity = '1'; }, 500);
           }
         });
     }
@@ -1243,9 +1243,11 @@
       await loadGames(true);
 
       backdrop.classList.remove('open');
-      confirmBtn.classList.remove('loading');
-      confirmBtn.disabled = false;
-      cancelBtn.disabled = false;
+      setTimeout(() => {
+        confirmBtn.classList.remove('loading');
+        confirmBtn.disabled = false;
+        cancelBtn.disabled = false;
+      }, 200);
     });
 
     let usersCache = null;
