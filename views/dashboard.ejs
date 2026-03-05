@@ -1593,39 +1593,6 @@
       });
       content.addEventListener('touchcancel', () => { mode = null; snapBack(); });
     })();
-
-    // Scroll active container to top when user taps the status bar area (top ~24px).
-    // Uses a rAF-based ease-out animation because iOS ignores scrollTo({behavior:'smooth'})
-    // on overflow elements during momentum scrolling (technique from ios-overflow-scroll-to-top).
-    (function() {
-      function scrollToTop(el) {
-        const start = el.scrollTop;
-        if (!start) return;
-        const startTime = performance.now();
-        const duration = Math.min(600, Math.max(200, start * 0.4));
-        function step(now) {
-          const elapsed = now - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          // ease-out cubic
-          const ease = 1 - Math.pow(1 - progress, 3);
-          el.scrollTop = start * (1 - ease);
-          if (progress < 1) requestAnimationFrame(step);
-        }
-        requestAnimationFrame(step);
-      }
-
-      document.addEventListener('touchend', e => {
-        if (e.changedTouches[0].clientY > 24) return;
-        const panelOpen = document.body.classList.contains('panel-open');
-        const target = panelOpen
-          ? document.getElementById('users-list-scroller')
-          : document.querySelector('.content');
-        if (target && target.scrollTop > 0) {
-          e.preventDefault();
-          scrollToTop(target);
-        }
-      }, { passive: false });
-    })();
   </script>
 </body>
 </html>
