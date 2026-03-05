@@ -189,7 +189,7 @@
         0 2px 6px rgba(0,0,0,0.3);
       overflow: hidden;
       transform: translateY(-100%);
-      transition: transform 0.28s ease;
+      transition: transform 0.38s ease;
       z-index: 9;
     }
     #progress-bar.visible { transform: translateY(0); }
@@ -241,8 +241,8 @@
       height: 36px;
       display: flex;
       align-items: center;
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: 1.1rem;
+      font-weight: 500;
       font-family: inherit;
       color: rgba(255,255,255,0.85);
       white-space: nowrap;
@@ -550,9 +550,9 @@
                 answerTextEl.textContent = currentAnswer;
                 answerTextEl.classList.add('visible');
                 headerCategoryEl.classList.remove('visible');
-                progressBar.style.transition = 'transform 0.4s ease 0.8s';
+                progressBar.style.transition = 'transform 0.4s ease 1.2s';
                 progressBar.classList.remove('visible');
-                setTimeout(() => progressBar.style.transition = '', 1300);
+                setTimeout(() => progressBar.style.transition = '', 1700);
                 timerCountEl.classList.remove('visible');
                 backBtn.classList.remove('disabled');
               }, 900);
