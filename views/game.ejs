@@ -53,9 +53,167 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
       color: #fff;
       padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+      position: relative;
     }
+
+    /* Back button */
+    #back-btn {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 14px);
+      left: calc(env(safe-area-inset-left, 0px) + 10px);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.85);
+      font-size: 1.05rem;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 10px;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 10;
+      transition: opacity 0.15s;
+    }
+    #back-btn:active { opacity: 0.55; }
+    #back-btn svg { flex-shrink: 0; }
+
+    /* Spinner */
+    @keyframes spin {
+      to { transform: translateX(-50%) rotate(360deg); }
+    }
+    #spinner {
+      position: absolute;
+      top: 175px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      border: 3.5px solid rgba(255,255,255,0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      transition: opacity 0.3s ease;
+    }
+    #spinner.hidden { opacity: 0; pointer-events: none; }
+
+    /* Category content */
+    #category-label {
+      position: absolute;
+      top: 190px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 0 24px rgba(255,255,255,0.15);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    #category-label.visible { opacity: 1; }
+
+    #category-text {
+      position: absolute;
+      top: 228px;
+      left: 24px; right: 24px;
+      text-align: center;
+      font-size: 1.55rem;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      line-height: 1.35;
+    }
+    #category-text.visible { opacity: 1; }
+
+    /* Answer button */
+    @keyframes answerPulse {
+      0%   { box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 0 0 0 rgba(255,215,0,0.55); }
+      100% { box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 0 0 16px rgba(255,215,0,0); }
+    }
+    #answer-btn {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 28px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #FFD700;
+      color: #07102e;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 52px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      animation: answerPulse 1.4s ease-out infinite alternate;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.12s ease;
+    }
+    #answer-btn.visible { opacity: 1; }
+    #answer-btn:active { transform: translateX(-50%) scale(0.96); }
   </style>
 </head>
 <body>
+
+  <button id="back-btn" onclick="window.location.href='/dashboard'">
+    <svg width="10" height="17" viewBox="0 0 10 17" fill="none">
+      <path d="M9 1L1.5 8.5L9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Back
+  </button>
+
+  <div id="spinner"></div>
+  <div id="category-label">Category</div>
+  <div id="category-text"></div>
+
+  <button id="answer-btn">Answer</button>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const gameId = params.get('id');
+    const userId = localStorage.getItem('userId');
+
+    const spinner     = document.getElementById('spinner');
+    const labelEl     = document.getElementById('category-label');
+    const categoryEl  = document.getElementById('category-text');
+    const answerBtn   = document.getElementById('answer-btn');
+
+    async function loadGame() {
+      try {
+        const url = `/api/games?gameId=${gameId}${userId ? '&userId=' + userId : ''}`;
+        const res  = await fetch(url);
+        const game = await res.json();
+        const category = game.current_question?.category || '—';
+
+        // Fade out spinner
+        spinner.classList.add('hidden');
+
+        // 200ms later: "Category" label
+        setTimeout(() => {
+          labelEl.classList.add('visible');
+
+          // 300ms later: category text
+          setTimeout(() => {
+            categoryEl.textContent = category;
+            categoryEl.classList.add('visible');
+
+            // 1000ms later: Answer button
+            setTimeout(() => answerBtn.classList.add('visible'), 1000);
+          }, 300);
+        }, 200);
+
+      } catch (err) {
+        console.error('Failed to load game:', err);
+      }
+    }
+
+    loadGame();
+  </script>
 </body>
 </html>

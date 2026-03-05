@@ -142,9 +142,56 @@ router.post('/api/games', async (req, res) => {
   }
 });
 
-// API: get all games for a user
+// API: get all games for a user, or a single game by gameId
 router.get('/api/games', async (req, res) => {
-  const { userId } = req.query;
+  const { userId, gameId } = req.query;
+
+  if (gameId) {
+    try {
+      const escapedUserId = userId ? db.escape(userId) : 'NULL';
+      const [[row]] = await db.query(
+        `SELECT
+           g.id,
+           g.created_at,
+           (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url))
+            FROM game_users gu2 JOIN users u ON gu2.user_id = u.id
+            WHERE gu2.game_id = g.id AND (${escapedUserId} IS NULL OR gu2.user_id != ${escapedUserId})) AS players,
+           (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_id,
+           (SELECT gq.asked_at FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_asked_at,
+           (SELECT q.id FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question_id,
+           (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question,
+           (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_answer,
+           (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_category,
+           (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'game_question_id', ga.game_question_id,
+                                             'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
+            FROM game_answers ga JOIN game_questions gq ON ga.game_question_id = gq.id
+            WHERE gq.game_id = g.id AND (${escapedUserId} IS NULL OR ga.user_id = ${escapedUserId})) AS my_answers
+         FROM games g
+         WHERE g.id = ?`,
+        [Number(gameId)]
+      );
+      if (!row) return res.status(404).json({ error: 'Game not found' });
+      const parse = v => typeof v === 'string' ? JSON.parse(v) : v;
+      return res.json({
+        id: row.id,
+        created_at: row.created_at,
+        players: parse(row.players) || [],
+        current_question: row.cq_id ? {
+          game_question_id: row.cq_id,
+          asked_at: row.cq_asked_at,
+          question_id: row.cq_question_id,
+          question: row.cq_question,
+          answer: row.cq_answer,
+          category: row.cq_category,
+        } : null,
+        my_answers: parse(row.my_answers) || [],
+      });
+    } catch (err) {
+      console.error('Get game error:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+  }
+
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
   try {
