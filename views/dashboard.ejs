@@ -18,7 +18,12 @@
   <script>
     // Must run before first paint so the class is set before CSS is applied.
     window.addEventListener('pagereveal', e => {
-      if (e.viewTransition) document.documentElement.classList.add('vt-entry');
+      if (e.viewTransition) {
+        document.documentElement.classList.add('vt-entry');
+        if (document.referrer && new URL(document.referrer).pathname.startsWith('/game')) {
+          document.documentElement.classList.add('vt-from-game');
+        }
+      }
     });
   </script>
   <style>
@@ -240,12 +245,31 @@
       to { transform: translateY(100dvh); opacity: 0.85; }
     }
 
+    /* login → dashboard */
     ::view-transition-old(root) {
       animation: slide-down 0.45s ease-in-out both;
-      z-index: 1; /* Must be above ::view-transition-new so the slide is visible */
+      z-index: 1;
     }
     ::view-transition-new(root) {
       animation: none;
+    }
+
+    /* game → dashboard (reverse: game slides out right, dashboard parallaxes in from left) */
+    @keyframes slide-out-to-right {
+      from { transform: translateX(0); }
+      to   { transform: translateX(100%); }
+    }
+    @keyframes parallax-in-from-left {
+      from { transform: translateX(-25%); opacity: 0.85; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+    :root.vt-from-game::view-transition-old(root) {
+      animation: slide-out-to-right 0.37s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      z-index: 2;
+    }
+    :root.vt-from-game::view-transition-new(root) {
+      animation: parallax-in-from-left 0.37s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      z-index: 1;
     }
 
     /* When arriving via a view transition, skip the topbar/fab fade-in so the
