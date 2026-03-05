@@ -1150,7 +1150,7 @@
       const staggerMs = games.length > 1 ? Math.max(30, Math.round(70 / Math.sqrt(games.length - 1))) : 0;
       list.innerHTML = games.map((game, idx) => {
         const rawCategory = game.current_question ? game.current_question.category : 'No question yet';
-        const category = `Category: ${toTitleCase(rawCategory)}`;
+        const category = toTitleCase(rawCategory);
         const cqId = game.current_question ? game.current_question.game_question_id : null;
         const iAnswered = cqId && game.my_answers && game.my_answers.some(a => a.game_question_id === cqId);
 
