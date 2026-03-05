@@ -164,8 +164,11 @@
     }
 
     .content {
-      flex: 1;
-      min-height: 0;
+      position: absolute;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      right: 0;
       overflow-y: auto;
       overflow-x: clip;
       overscroll-behavior-y: contain;
@@ -459,7 +462,7 @@
       font-size: 1.3rem;
       font-weight: 700;
       color: #222;
-      padding: 19px 4px 8px;
+      padding: 16px 4px 8px;
       text-shadow: 0px 1px 1px rgba(0,0,0,0.15);
     }
     #games-list {
