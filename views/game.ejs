@@ -229,7 +229,7 @@
 
         // Enforce minimum 500ms spinner
         const elapsed = Date.now() - loadStart;
-        await new Promise(r => setTimeout(r, Math.max(0, 500 - elapsed)));
+        await new Promise(r => setTimeout(r, Math.max(0, 1000 - elapsed)));
 
         // Fade out spinner
         spinner.classList.add('hidden');
