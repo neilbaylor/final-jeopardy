@@ -160,12 +160,11 @@
     /* Timer message */
     #timer-msg {
       position: absolute;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 120px);
       left: 30px; right: 30px;
       text-align: center;
       font-size: 1.1rem;
       font-weight: 500;
-      color: rgba(255,255,255,0.7);
+      color: rgba(255,255,255,0.82);
       letter-spacing: 0.02em;
       opacity: 0;
       transition: opacity 0.5s ease;
@@ -176,7 +175,7 @@
     #progress-bar {
       position: fixed;
       top: calc(env(safe-area-inset-top, 0px) + 28px);
-      left: 50px; right: 50px;
+      left: 60px; right: 40px;
       height: 10px;
       border-radius: 5px;
       background: rgba(0,0,0,0.45);
@@ -194,10 +193,11 @@
     #progress-bar-fill {
       height: 100%;
       width: 100%;
-      /* gradient spans full bar: yellow→orange→red, revealed via scaleX */
+      /* yellow for first 20s (~67%), then gradient to red for last 10s */
       background: linear-gradient(90deg,
         #FFD700 0%,
-        #FF8C00 60%,
+        #FFD700 62%,
+        #FF6600 82%,
         #CC0000 100%
       );
       border-radius: 5px;
@@ -250,7 +250,7 @@
       font-size: 1.5rem;
       font-weight: 500;
       letter-spacing: 1px;
-      color: #FFD700;
+      color: #fff;
       text-shadow: 0 2px 8px rgba(0,0,0,0.35);
       opacity: 0;
       transition: opacity 1.35s ease;
@@ -361,8 +361,8 @@
               categoryEl.style.fontSize = cs.fontSize;
               categoryEl.style.top = cs.top;
               categoryEl.classList.add('visible');
-              // 1300ms later: Answer button
-              setTimeout(() => answerBtn.classList.add('visible'), 1300);
+              // 1425ms later: Answer button
+              setTimeout(() => answerBtn.classList.add('visible'), 1425);
             }
           }, 345);
         }, 200);
@@ -407,11 +407,13 @@
       questionEl.textContent = currentQuestion;
       questionEl.classList.add('visible');
 
-      // After reading time, show timer message
+      // After reading time, show timer message just below the question
       setTimeout(() => {
+        const qRect = questionEl.getBoundingClientRect();
+        timerMsgEl.style.top = (qRect.bottom + 20) + 'px';
         timerMsgEl.classList.add('visible');
 
-        // 1.5s later: fade out message, fade in progress bar, start 30s timer
+        // 1.6s later: fade out message, fade in progress bar, start 30s timer
         setTimeout(() => {
           timerMsgEl.classList.remove('visible');
           progressBar.classList.add('visible');
@@ -420,10 +422,13 @@
           // When timer expires: question fades out, answer cross-fades in
           setTimeout(() => {
             questionEl.classList.remove('visible');
+            const as = categoryStyle(currentAnswer);
+            answerTextEl.style.fontSize = as.fontSize;
+            answerTextEl.style.top = as.top;
             answerTextEl.textContent = currentAnswer;
             answerTextEl.classList.add('visible');
           }, 30000);
-        }, 1500);
+        }, 1600);
       }, readingDelay(currentQuestion));
     }, { once: true });
   </script>
