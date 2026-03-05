@@ -184,24 +184,7 @@ router.get('/api/games', async (req, res) => {
 
 
 
-    const fakeNames = ['Alice','Bob','Carol','Dave','Eve','Frank','Grace','Hank'];
-    const fakeAvatars = ['🐶','🐱','🦊','🐻','🐼','🦁','🐯','🐨'];
-    const fakeGames = Array.from({ length: 50 }, (_, i) => ({
-      id: `fake-${i}`,
-      created_at: new Date(Date.now() - i * 3600000).toISOString(),
-      players: [{ id: `fake-user-${i}`, display_name: fakeNames[i % fakeNames.length], avatar_url: fakeAvatars[i % fakeAvatars.length] }],
-      current_question: i % 3 !== 0 ? {
-        game_question_id: `fake-gq-${i}`,
-        asked_at: new Date(Date.now() - i * 1800000).toISOString(),
-        question_id: `fake-q-${i}`,
-        question: `Fake question #${i + 1}`,
-        answer: `Fake answer #${i + 1}`,
-        category: ['History','Science','Sports','Music','Movies'][i % 5],
-      } : null,
-      my_answers: [],
-    }));
-
-    res.json([...real, ...fakeGames]);
+    res.json(real);
   } catch (err) {
     console.error('Get games error:', err);
     res.status(500).json({ error: 'Database error' });
