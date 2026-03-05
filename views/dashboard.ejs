@@ -430,6 +430,10 @@
       from { opacity: 0; }
       to   { opacity: 1; }
     }
+    @keyframes fadeInLogo {
+      from { opacity: 0; }
+      to   { opacity: 0.35; }
+    }
     .games-empty {
       font-size: 1.1rem;
       color: #999;
@@ -445,7 +449,7 @@
       width: 350px;
       opacity: 0.35;
       margin: 0 auto;
-      animation: fadeIn 250ms ease-in-out backwards;
+      animation: fadeInLogo 250ms ease-in-out backwards;
     }
     .games-title {
       font-size: 1.3rem;
