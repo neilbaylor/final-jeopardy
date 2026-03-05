@@ -1118,7 +1118,7 @@
           ? `<div class="game-player"><div class="player-overflow-circle">+${overflow}</div></div>`
           : '';
 
-        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="animation-delay:${idx * 0.05}s">
+        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="animation-delay:${idx * 0.06}s">
           <div class="game-row-delete-action">
             <button class="delete-game-btn" aria-label="Delete game">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1299,7 +1299,7 @@
             const selected = new Set([...scroller.querySelectorAll('.user-row input:checked')]
               .map(cb => cb.closest('.user-row').dataset.userId));
             scroller.innerHTML = users.map((u, i) => `
-              <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()" style="animation-delay:${i * 0.05}s">
+              <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()" style="animation-delay:${i * 0.06}s">
                 ${u.avatar_url
                   ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
                   : `<div class="user-avatar-placeholder">👤</div>`}
