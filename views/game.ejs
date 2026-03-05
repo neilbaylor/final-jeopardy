@@ -116,7 +116,7 @@
     #category-label .dots {
       display: inline-block;
       position: absolute;
-      margin-left: 0.04em;
+      margin-left: 0.01em;
     }
     #category-label.visible { opacity: 1; }
 
@@ -236,8 +236,8 @@
         setTimeout(() => {
           labelEl.classList.add('visible');
 
-          // Animate "" → . → .. → ... at 330ms/step, 2.25–3.75 random cycles
-          const cycles = 2.25 + Math.random() * 1.5;
+          // Animate "" → . → .. → ... at 350ms/step, 2.25–3.25 random cycles
+          const cycles = 2.25 + Math.random() * 1.0;
           const totalSteps = Math.round(cycles * 4);
           let step = 0;
           dotsEl.textContent = '';
@@ -253,7 +253,7 @@
               // 1500ms later: Answer button
               setTimeout(() => answerBtn.classList.add('visible'), 1500);
             }
-          }, 330);
+          }, 350);
         }, 200);
 
       } catch (err) {
