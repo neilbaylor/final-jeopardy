@@ -417,6 +417,11 @@
       display: flex;
       flex-direction: column;
     }
+    .games-empty {
+      font-size: 0.9rem;
+      color: #999;
+      padding: 8px 4px 0;
+    }
     .games-title {
       font-size: 1.3rem;
       font-weight: 700;
@@ -1062,7 +1067,7 @@
     function renderGames(games) {
       const list = document.getElementById('games-list');
       if (!Array.isArray(games) || games.length === 0) {
-        list.innerHTML = '';
+        list.innerHTML = '<p class="games-empty">You aren\'t in any games yet, create a new one below.</p>';
         return;
       }
 
