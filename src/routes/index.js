@@ -48,7 +48,7 @@ router.post('/api/games', async (req, res) => {
   if (!userId || !Array.isArray(friendIds) || friendIds.length === 0) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
-  if (friendIds.length > 9) {
+  if (friendIds.length >= 9) {
     return res.status(409).json({ error: 'There is a max of 10 players per game' });
   }
 
