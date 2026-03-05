@@ -157,6 +157,62 @@
     }
     #question-text.visible { opacity: 1; transform: translateY(0); }
 
+    /* Timer message */
+    #timer-msg {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 120px);
+      left: 30px; right: 30px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    #timer-msg.visible { opacity: 1; }
+
+    /* Progress bar */
+    #progress-bar {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 28px);
+      left: 50px; right: 50px;
+      height: 10px;
+      border-radius: 5px;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(0,0,0,0.5);
+      box-shadow:
+        inset 0 2px 5px rgba(0,0,0,0.7),
+        inset 0 -1px 2px rgba(0,0,0,0.4),
+        0 1px 0 rgba(255,255,255,0.08);
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 9;
+    }
+    #progress-bar.visible { opacity: 1; }
+    #progress-bar-fill {
+      height: 100%;
+      width: 100%;
+      /* gradient spans full bar: yellow→orange→red, revealed via scaleX */
+      background: linear-gradient(90deg,
+        #FFD700 0%,
+        #FF8C00 60%,
+        #CC0000 100%
+      );
+      border-radius: 5px;
+      transform-origin: left;
+      transform: scaleX(0);
+      box-shadow:
+        0 0 10px rgba(255,215,0,0.65),
+        0 0 3px rgba(255,215,0,0.9),
+        inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+    @keyframes progressFill {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
     /* Answer button */
     @keyframes answerPulse {
       0%   { box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 0 0 0 rgba(255,215,0,0.55); }
@@ -185,6 +241,22 @@
     }
     #answer-btn.visible { opacity: 1; }
     #answer-btn:active { transform: translateX(-50%) scale(0.96); }
+
+    #answer-text {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 68px);
+      left: 40px; right: 40px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: #FFD700;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      opacity: 0;
+      transition: opacity 1.35s ease;
+      line-height: 1.45;
+    }
+    #answer-text.visible { opacity: 1; }
   </style>
 </head>
 <body>
@@ -195,10 +267,13 @@
     </svg>
   </button>
 
+  <div id="progress-bar"><div id="progress-bar-fill"></div></div>
   <div id="spinner"></div>
   <div id="category-label">The Category is<span id="dots" class="dots"></span></div>
   <div id="category-text"></div>
   <div id="question-text"></div>
+  <div id="answer-text"></div>
+  <div id="timer-msg">You have 30 seconds, starting now</div>
 
   <button id="answer-btn">Answer</button>
 
@@ -207,14 +282,24 @@
     const gameId = params.get('id');
     const userId = localStorage.getItem('userId');
 
-    const spinner     = document.getElementById('spinner');
-    const labelEl     = document.getElementById('category-label');
-    const dotsEl      = document.getElementById('dots');
-    const categoryEl  = document.getElementById('category-text');
-    const questionEl  = document.getElementById('question-text');
-    const answerBtn   = document.getElementById('answer-btn');
+    const spinner       = document.getElementById('spinner');
+    const labelEl       = document.getElementById('category-label');
+    const dotsEl        = document.getElementById('dots');
+    const categoryEl    = document.getElementById('category-text');
+    const questionEl    = document.getElementById('question-text');
+    const answerTextEl  = document.getElementById('answer-text');
+    const timerMsgEl    = document.getElementById('timer-msg');
+    const progressBar   = document.getElementById('progress-bar');
+    const progressFill  = document.getElementById('progress-bar-fill');
+    const answerBtn     = document.getElementById('answer-btn');
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
+
+    // Reading delay: linear 4s (≤10 chars) → 11s (≥150 chars)
+    function readingDelay(str) {
+      const t = Math.min(Math.max((str.length - 10) / 140, 0), 1);
+      return (4 + t * 7) * 1000;
+    }
 
     // Scale category font: 2.7rem at ≤10 chars, drops quickly to 1.6rem min
     function categoryFontSize(str) {
@@ -226,6 +311,7 @@
     }
 
     let currentQuestion = '';
+    let currentAnswer   = '';
 
     async function loadGame() {
       const loadStart = Date.now();
@@ -235,6 +321,7 @@
         const game = await res.json();
         const category = toTitleCase(game.current_question?.category || '—');
         currentQuestion = game.current_question?.question || '';
+        currentAnswer   = game.current_question?.answer   || '';
 
         // Enforce minimum 500ms spinner
         const elapsed = Date.now() - loadStart;
@@ -280,9 +367,16 @@
       categoryEl.textContent = '';
       questionEl.classList.remove('visible');
       questionEl.textContent = '';
+      answerTextEl.classList.remove('visible');
+      answerTextEl.textContent = '';
+      timerMsgEl.classList.remove('visible');
+      progressBar.classList.remove('visible');
+      progressFill.style.animation = '';
+      progressFill.style.transform = 'scaleX(0)';
       answerBtn.classList.remove('visible');
       dotsEl.textContent = '';
       currentQuestion = '';
+      currentAnswer   = '';
     }
 
     loadGame();
@@ -300,6 +394,25 @@
       categoryEl.classList.add('dismissing');
       questionEl.textContent = currentQuestion;
       questionEl.classList.add('visible');
+
+      // After reading time, show timer message
+      setTimeout(() => {
+        timerMsgEl.classList.add('visible');
+
+        // 1.5s later: fade out message, fade in progress bar, start 30s timer
+        setTimeout(() => {
+          timerMsgEl.classList.remove('visible');
+          progressBar.classList.add('visible');
+          progressFill.style.animation = 'progressFill 30s linear forwards';
+
+          // When timer expires: question fades out, answer cross-fades in
+          setTimeout(() => {
+            questionEl.classList.remove('visible');
+            answerTextEl.textContent = currentAnswer;
+            answerTextEl.classList.add('visible');
+          }, 30000);
+        }, 1500);
+      }, readingDelay(currentQuestion));
     }, { once: true });
   </script>
 </body>
