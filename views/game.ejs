@@ -263,7 +263,27 @@
       }
     }
 
+    function resetUI() {
+      spinner.classList.remove('hidden');
+      labelEl.classList.remove('visible');
+      categoryEl.classList.remove('visible', 'dismissing');
+      categoryEl.textContent = '';
+      questionEl.classList.remove('visible');
+      questionEl.textContent = '';
+      answerBtn.classList.remove('visible');
+      dotsEl.textContent = '';
+      currentQuestion = '';
+    }
+
     loadGame();
+
+    // Re-run the full flow when restored from bfcache (back/forward navigation)
+    window.addEventListener('pageshow', e => {
+      if (e.persisted) {
+        resetUI();
+        loadGame();
+      }
+    });
 
     answerBtn.addEventListener('click', () => {
       answerBtn.classList.remove('visible');
