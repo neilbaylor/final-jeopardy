@@ -250,12 +250,12 @@
       font-family: inherit;
       cursor: pointer;
       letter-spacing: 0.03em;
-      animation: answerPulse 1.4s ease-out infinite alternate;
       -webkit-tap-highlight-color: transparent;
       opacity: 0;
       transition: opacity 0.4s ease, transform 0.12s ease;
     }
     #answer-btn.visible { opacity: 1; }
+    #answer-btn.pulse { animation: answerPulse 1.4s ease-out infinite alternate; }
     #answer-btn:active { transform: translateX(-50%) scale(0.96); }
 
     #answer-text {
@@ -297,6 +297,20 @@
     #game-players .player-status { font-size: 0.78rem; font-weight: 600; }
     #game-players .player-status.waiting  { color: rgba(255,255,255,0.4); }
     #game-players .player-status.answered { color: #81c784; }
+
+    #load-error {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 120px);
+      left: 32px; right: 32px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.5;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #load-error.visible { opacity: 1; }
   </style>
 </head>
 <body>
@@ -315,6 +329,7 @@
   <div id="question-text"></div>
   <div id="answer-text"></div>
   <div id="timer-msg">You have 30 seconds, starting now</div>
+  <div id="load-error"></div>
 
   <div id="game-players"></div>
   <button id="answer-btn">Answer</button>
@@ -335,6 +350,7 @@
     const progressFill  = document.getElementById('progress-bar-fill');
     const answerBtn     = document.getElementById('answer-btn');
     const backBtn       = document.getElementById('back-btn');
+    const loadErrorEl   = document.getElementById('load-error');
     const gamePlayersEl    = document.getElementById('game-players');
     const headerCategoryEl = document.getElementById('header-category');
     let gamePlayers = [];
@@ -376,15 +392,29 @@
     let currentQuestion = '';
     let currentAnswer   = '';
 
+    function showLoadError() {
+      spinner.classList.add('hidden');
+      loadErrorEl.textContent = 'Sorry, that game can\'t be loaded';
+      loadErrorEl.classList.add('visible');
+      // Delete cached games list so stale data doesn't persist
+      if (userId) {
+        try { localStorage.removeItem(`fjwf_games_${userId}`); } catch {}
+      }
+    }
+
     async function loadGame() {
       const loadStart = Date.now();
       try {
         const url = `/api/games?gameId=${gameId}${userId ? '&userId=' + userId : ''}`;
         const res  = await fetch(url);
+        if (!res.ok) { showLoadError(); return; }
         const game = await res.json();
-        const category = toTitleCase(game.current_question?.category || '—');
-        currentQuestion  = game.current_question?.question || '';
-        currentAnswer    = game.current_question?.answer   || '';
+        if (!game?.current_question?.category || !game?.current_question?.question || !game?.current_question?.answer) {
+          showLoadError(); return;
+        }
+        const category = toTitleCase(game.current_question.category);
+        currentQuestion  = game.current_question.question;
+        currentAnswer    = game.current_question.answer;
         currentCategory  = category;
         gamePlayers = (game.players || []).map(p => ({ ...p, _answered: false }));
 
@@ -419,6 +449,7 @@
               // 1825ms later: Answer button + player cards (max 4, 30px below category)
               setTimeout(() => {
                 answerBtn.classList.add('visible');
+                setTimeout(() => answerBtn.classList.add('pulse'), 500);
                 if (gamePlayers.length > 0) {
                   gamePlayersEl.innerHTML = gamePlayers.slice(0, 4).map(buildPlayerCardHtml).join('');
                   gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
@@ -431,6 +462,7 @@
 
       } catch (err) {
         console.error('Failed to load game:', err);
+        showLoadError();
       }
     }
 
@@ -447,11 +479,13 @@
       progressBar.classList.remove('visible');
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
-      answerBtn.classList.remove('visible');
+      answerBtn.classList.remove('visible', 'pulse');
       gamePlayersEl.style.transition = '';
       gamePlayersEl.classList.remove('visible');
       gamePlayersEl.innerHTML = '';
       backBtn.classList.remove('disabled');
+      loadErrorEl.classList.remove('visible');
+      loadErrorEl.textContent = '';
       dotsEl.textContent = '';
       headerCategoryEl.classList.remove('visible');
       headerCategoryEl.textContent = '';
