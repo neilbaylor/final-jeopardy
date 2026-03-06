@@ -589,6 +589,7 @@
       progressBar.classList.remove('visible');
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
+      progressFill.style.background = '';
       answerBtn.style.display = '';
       answerBtn.classList.remove('visible', 'pulse');
       answerInput.classList.remove('visible');
@@ -696,7 +697,17 @@
                 }, 1400); // 0.4s question translate + 1000ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
             };
-              if (earlySubmit) setTimeout(slideOut, 500); else slideOut();
+              if (earlySubmit) {
+                // Freeze fill immediately so it stops growing, then slide out after 500ms
+                const frozen = getComputedStyle(progressFill).transform;
+                const frozenBg = getComputedStyle(progressFill).backgroundColor;
+                progressFill.style.animation = 'none';
+                progressFill.style.transform = frozen;
+                progressFill.style.background = frozenBg;
+                setTimeout(slideOut, 500);
+              } else {
+                slideOut();
+              }
             };
 
             expiryTimerId = setTimeout(triggerExpiry, 30000);
