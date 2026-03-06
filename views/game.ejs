@@ -545,12 +545,6 @@
       if (e.persisted) loadGame();
     });
 
-    function focusTrapHandler(e) {
-      if (e.target !== answerInput) {
-        e.preventDefault();
-        answerInput.focus();
-      }
-    }
 
     answerBtn.addEventListener('click', () => {
       answerBtn.classList.remove('visible');
@@ -584,7 +578,6 @@
           setTimeout(() => {
             answerInput.classList.add('visible');
             answerInput.focus();
-            document.addEventListener('touchstart', focusTrapHandler, { passive: false });
           }, 150);
 
           {
@@ -609,7 +602,6 @@
                   answerTextEl.style.top = Math.round(qRect.bottom - 10 + 16) + 'px';
                   answerTextEl.textContent = toTitleCase(currentAnswer);
                   answerTextEl.classList.add('visible');
-                  document.removeEventListener('touchstart', focusTrapHandler);
                   answerInput.blur();
                   setTimeout(() => backBtn.classList.remove('disabled'), 400);
                 }, 750); // 0.4s question translate + 350ms delay
