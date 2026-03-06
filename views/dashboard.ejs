@@ -1061,12 +1061,17 @@
 
       const cachedGames = getCachedGames();
       if (cachedGames) {
-        // Wait for currentUser before rendering so "You" appears correctly
+        // If fresh data arrives before the cache delay fires, render it directly (no double flash).
+        // If it arrives after, re-render normally as a background refresh.
+        let cacheTimerFired = false;
+        let pendingGames = null;
+
         mePromise.then(() => {
           // Longer delay when transitioning from game (0.42s) vs direct load (100ms)
           const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 420 : 100;
           setTimeout(() => {
-            renderGames(cachedGames);
+            cacheTimerFired = true;
+            renderGames(pendingGames || cachedGames);
             const fab = document.getElementById('new-game');
             setTimeout(() => { fab.style.opacity = '1'; }, 200);
           }, cacheDelay);
@@ -1077,7 +1082,11 @@
           .then(games => {
             setCachedGames(games);
             document.getElementById('new-game').classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
-            renderGames(games);
+            if (cacheTimerFired) {
+              renderGames(games);
+            } else {
+              pendingGames = games;
+            }
           })
           .catch(() => {});
       } else {
