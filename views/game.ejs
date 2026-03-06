@@ -467,8 +467,8 @@
                 answerBtn.classList.add('visible');
                 setTimeout(() => answerBtn.classList.add('pulse'), 800);
                 if (gamePlayers.length > 0) {
-                  const visible = gamePlayers.slice(0, 4);
-                  const overflow = gamePlayers.length - 4;
+                  const visible = gamePlayers.slice(0, 3);
+                  const overflow = gamePlayers.length - 3;
                   const overflowHtml = overflow > 0
                     ? `<div class="game-player-overflow">+${overflow}</div>`
                     : '';
