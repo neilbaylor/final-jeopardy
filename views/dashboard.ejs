@@ -1063,9 +1063,12 @@
       if (cachedGames) {
         // Wait for currentUser before rendering so "You" appears correctly
         mePromise.then(() => {
-          renderGames(cachedGames);
-          const fab = document.getElementById('new-game');
-          setTimeout(() => { fab.style.opacity = '1'; }, 200);
+          // Small delay to let the page transition (0.42s) complete before fading games in
+          setTimeout(() => {
+            renderGames(cachedGames);
+            const fab = document.getElementById('new-game');
+            setTimeout(() => { fab.style.opacity = '1'; }, 200);
+          }, 420);
         });
         // Background refresh — new games get the green fade-in via new-row class
         fetch(`/api/games?userId=${encodeURIComponent(userId)}&test=1`)
