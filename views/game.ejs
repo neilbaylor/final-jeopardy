@@ -554,7 +554,7 @@
                   const as = categoryStyle(currentAnswer);
                   answerTextEl.style.fontSize = as.fontSize;
                   answerTextEl.style.top = Math.round(qRect.bottom - 10 + 16) + 'px';
-                  answerTextEl.textContent = currentAnswer;
+                  answerTextEl.textContent = toTitleCase(currentAnswer);
                   answerTextEl.classList.add('visible');
                   setTimeout(() => backBtn.classList.remove('disabled'), 400);
                 }, 500); // 0.4s question translate + 100ms delay
