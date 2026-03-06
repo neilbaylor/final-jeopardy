@@ -668,6 +668,10 @@
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
 
+            history.pushState({ timerRunning: true }, '');
+            const blockBack = () => history.pushState({ timerRunning: true }, '');
+            window.addEventListener('popstate', blockBack);
+
             let expiryFired = false;
             let expiryTimerId;
 
@@ -675,6 +679,7 @@
               if (expiryFired) return;
               expiryFired = true;
               clearTimeout(expiryTimerId);
+              window.removeEventListener('popstate', blockBack);
 
               answerInput.disabled = true;
               inputBadgeEl.classList.add('visible');
