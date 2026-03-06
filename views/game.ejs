@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -258,6 +258,30 @@
     #answer-btn.pulse { animation: answerPulse 1.4s ease-out infinite alternate; }
     #answer-btn:active { transform: translateX(-50%) scale(0.96); }
 
+    #answer-input {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      border-radius: 50px;
+      padding: 15px 24px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      font-family: inherit;
+      letter-spacing: 0.03em;
+      border: none;
+      background: #FFD700;
+      color: #07102e;
+      outline: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      text-align: center;
+    }
+    #answer-input::placeholder { color: rgba(7,16,46,0.4); }
+    #answer-input.visible { opacity: 1; pointer-events: auto; }
+
     #answer-text {
       position: absolute;
       top: calc(env(safe-area-inset-top, 0px) + 73px);
@@ -340,6 +364,7 @@
   <div id="load-error"></div>
 
   <div id="game-players"></div>
+  <input id="answer-input" type="text" placeholder="Your answer…" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" />
   <button id="answer-btn">Answer</button>
 
   <script>
@@ -359,6 +384,7 @@
     const progressBar   = document.getElementById('progress-bar');
     const progressFill  = document.getElementById('progress-bar-fill');
     const answerBtn     = document.getElementById('answer-btn');
+    const answerInput   = document.getElementById('answer-input');
     const backBtn       = document.getElementById('back-btn');
     const loadErrorEl   = document.getElementById('load-error');
     const gamePlayersEl    = document.getElementById('game-players');
@@ -491,6 +517,8 @@
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
       answerBtn.classList.remove('visible', 'pulse');
+      answerInput.classList.remove('visible');
+      answerInput.value = '';
       gamePlayersEl.style.transition = '';
       gamePlayersEl.classList.remove('visible');
       gamePlayersEl.innerHTML = '';
@@ -518,6 +546,8 @@
 
     answerBtn.addEventListener('click', () => {
       answerBtn.classList.remove('visible');
+      answerInput.classList.add('visible');
+      answerInput.focus();
       gamePlayersEl.style.transition = 'opacity 0.15s ease';
       gamePlayersEl.classList.remove('visible');
       categoryEl.classList.add('dismissing');
