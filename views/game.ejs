@@ -545,6 +545,13 @@
       if (e.persisted) loadGame();
     });
 
+    function focusTrapHandler(e) {
+      if (e.target !== answerInput) {
+        e.preventDefault();
+        answerInput.focus();
+      }
+    }
+
     answerBtn.addEventListener('click', () => {
       answerBtn.classList.remove('visible');
       answerBtn.addEventListener('transitionend', () => {
@@ -552,6 +559,7 @@
       }, { once: true });
       answerInput.classList.add('visible');
       answerInput.focus();
+      document.addEventListener('touchstart', focusTrapHandler, { passive: false });
       gamePlayersEl.style.transition = 'opacity 0.15s ease';
       gamePlayersEl.classList.remove('visible');
       categoryEl.classList.add('dismissing');
@@ -599,6 +607,8 @@
                   answerTextEl.style.top = Math.round(qRect.bottom - 10 + 16) + 'px';
                   answerTextEl.textContent = toTitleCase(currentAnswer);
                   answerTextEl.classList.add('visible');
+                  document.removeEventListener('touchstart', focusTrapHandler);
+                  answerInput.blur();
                   setTimeout(() => backBtn.classList.remove('disabled'), 400);
                 }, 750); // 0.4s question translate + 350ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
