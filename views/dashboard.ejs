@@ -1063,12 +1063,13 @@
       if (cachedGames) {
         // Wait for currentUser before rendering so "You" appears correctly
         mePromise.then(() => {
-          // Small delay to let the page transition (0.42s) complete before fading games in
+          // Longer delay when transitioning from game (0.42s) vs direct load (100ms)
+          const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 420 : 100;
           setTimeout(() => {
             renderGames(cachedGames);
             const fab = document.getElementById('new-game');
             setTimeout(() => { fab.style.opacity = '1'; }, 200);
-          }, 420);
+          }, cacheDelay);
         });
         // Background refresh — new games get the green fade-in via new-row class
         fetch(`/api/games?userId=${encodeURIComponent(userId)}&test=1`)
