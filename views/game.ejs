@@ -264,14 +264,14 @@
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 40px);
-      border-radius: 50px;
+      border-radius: 5px;
       padding: 15px 24px;
       font-size: 1.8rem;
       font-weight: 700;
       font-family: inherit;
       letter-spacing: 0.03em;
       border: none;
-      background: #FFD700;
+      background: #ffffff;
       color: #07102e;
       outline: none;
       opacity: 0;
@@ -516,6 +516,7 @@
       progressBar.classList.remove('visible');
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
+      answerBtn.style.display = '';
       answerBtn.classList.remove('visible', 'pulse');
       answerInput.classList.remove('visible');
       answerInput.value = '';
@@ -546,6 +547,9 @@
 
     answerBtn.addEventListener('click', () => {
       answerBtn.classList.remove('visible');
+      answerBtn.addEventListener('transitionend', () => {
+        answerBtn.style.display = 'none';
+      }, { once: true });
       answerInput.classList.add('visible');
       answerInput.focus();
       gamePlayersEl.style.transition = 'opacity 0.15s ease';
