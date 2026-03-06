@@ -652,9 +652,19 @@
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
 
-            // When timer expires: slide out progress bar + translate question up simultaneously,
-            // then fade answer in just below the translated question
-            setTimeout(() => {
+            let expiryFired = false;
+            let expiryTimerId;
+
+            const triggerExpiry = () => {
+              if (expiryFired) return;
+              expiryFired = true;
+              clearTimeout(expiryTimerId);
+              // Freeze fill at current visual position before sliding bar out
+              const cs = getComputedStyle(progressFill);
+              progressFill.style.animation = 'none';
+              progressFill.style.transform = cs.transform;
+              progressFill.style.background = cs.backgroundColor;
+
               answerInput.disabled = true;
               inputBadgeEl.classList.add('visible');
               progressBar.style.transition = 'transform 0.4s ease 0.6s';
@@ -677,7 +687,14 @@
                   setTimeout(() => backBtn.classList.remove('disabled'), 400);
                 }, 1400); // 0.4s question translate + 1000ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
-            }, 30000);
+            };
+
+            expiryTimerId = setTimeout(triggerExpiry, 30000);
+
+            // Early submit: Enter key with non-empty input stops timer and triggers expiry
+            answerInput.addEventListener('keydown', e => {
+              if (e.key === 'Enter' && answerInput.value.trim() !== '') triggerExpiry();
+            });
           }
         }, 3700);
         }, 600);
