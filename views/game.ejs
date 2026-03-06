@@ -428,13 +428,6 @@
         currentCategory  = category;
         gamePlayers = (game.players || []).map(p => ({ ...p, _answered: false }));
 
-        // --- 10-user simulation: pad to 10 fake players to preview layout ---
-        const fakeNames = ['Alex Johnson','Sam Lee','Jordan Kim','Taylor Swift','Morgan Chen','Riley Park','Casey Brown','Drew Wilson','Quinn Davis','Avery Martinez'];
-        while (gamePlayers.length < 10) {
-          const fake = fakeNames[gamePlayers.length % fakeNames.length];
-          gamePlayers.push({ display_name: fake, avatar_url: null, _answered: gamePlayers.length % 3 === 0 });
-        }
-        // --- end simulation ---
 
         // Enforce minimum 500ms spinner
         const elapsed = Date.now() - loadStart;
