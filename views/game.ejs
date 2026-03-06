@@ -629,12 +629,12 @@
                   answerTextEl.classList.add('visible');
                   answerInput.blur();
                   setTimeout(() => backBtn.classList.remove('disabled'), 400);
-                }, 900); // 0.4s question translate + 500ms delay
+                }, 1200); // 0.4s question translate + 800ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
             }, 30000);
           }
-        }, 3500);
-        }, 450);
+        }, 3800);
+        }, 600);
       }, readingDelay(currentQuestion));
     }, { once: true });
   </script>
