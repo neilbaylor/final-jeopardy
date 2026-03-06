@@ -1693,6 +1693,16 @@
       });
       content.addEventListener('touchcancel', () => { mode = null; snapBack(); });
     })();
+
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        document.querySelectorAll('.answer-btn.loading').forEach(btn => {
+          btn.classList.remove('loading');
+          btn.style.width = '';
+          btn.innerHTML = 'Answer';
+        });
+      }
+    });
   </script>
 </body>
 </html>
