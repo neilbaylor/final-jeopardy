@@ -1070,9 +1070,9 @@
         let pendingGames = null;
 
         mePromise.then(() => {
-          // Delay varies by source: game→dashboard 400ms, login→dashboard 310ms, direct load 100ms
-          const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 400
-                           : document.documentElement.classList.contains('vt-from-login') ? 310
+          // Delay varies by source: game→dashboard 380ms, login→dashboard 290ms, direct load 100ms
+          const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 380
+                           : document.documentElement.classList.contains('vt-from-login') ? 290
                            : 100;
           setTimeout(() => {
             cacheTimerFired = true;
