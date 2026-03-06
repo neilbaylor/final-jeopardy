@@ -514,11 +514,11 @@
       questionEl.classList.add('visible');
       backBtn.classList.add('disabled');
 
-      // Fade in header category just before the category slide-up animation finishes (650ms)
+      // Fade in header category just before the category slide-up animation finishes (530ms)
       setTimeout(() => {
         headerCategoryEl.textContent = currentCategory;
         headerCategoryEl.classList.add('visible');
-      }, 650);
+      }, 530);
 
       // After reading time, show timer message + slide in progress bar simultaneously
       setTimeout(() => {
