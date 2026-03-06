@@ -335,9 +335,11 @@
   <button id="answer-btn">Answer</button>
 
   <script>
+    const userId = localStorage.getItem('userId');
+    if (!userId) { location.replace('/'); }
+
     const params = new URLSearchParams(location.search);
     const gameId = params.get('id');
-    const userId = localStorage.getItem('userId');
 
     const spinner       = document.getElementById('spinner');
     const labelEl       = document.getElementById('category-label');
