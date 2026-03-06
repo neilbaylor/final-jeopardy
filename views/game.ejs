@@ -543,13 +543,14 @@
               const qRect = questionEl.getBoundingClientRect();
               // Translate question up in sync with progress bar slide (both start at 1.1s)
               setTimeout(() => {
-                questionEl.style.transition = 'transform 0.4s ease';
-                questionEl.style.transform = 'translateY(-23px)';
+                questionEl.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                questionEl.style.transform = 'translateY(-10px)';
+                questionEl.style.opacity = '0.8';
                 // Fade answer in below translated question
                 setTimeout(() => {
                   const as = categoryStyle(currentAnswer);
                   answerTextEl.style.fontSize = as.fontSize;
-                  answerTextEl.style.top = Math.round(qRect.bottom - 23 + 16) + 'px';
+                  answerTextEl.style.top = Math.round(qRect.bottom - 10 + 16) + 'px';
                   answerTextEl.textContent = currentAnswer;
                   answerTextEl.classList.add('visible');
                   setTimeout(() => backBtn.classList.remove('disabled'), 400);
