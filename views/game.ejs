@@ -277,7 +277,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.4s ease;
-      text-align: left;
+      text-align: center;
     }
     #answer-input::placeholder { color: rgba(7,16,46,0.4); }
     #answer-input.visible { opacity: 1; pointer-events: auto; }
@@ -572,11 +572,15 @@
         timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
         timerMsgEl.classList.add('visible');
 
-        // When message fades out: fade in input and start fill and countdown (bar is fully in by now)
+        // Fade in input 1s before message fades out
         setTimeout(() => {
-          timerMsgEl.classList.remove('visible');
           answerInput.classList.add('visible');
           answerInput.focus();
+        }, 2500);
+
+        // When message fades out: start fill and countdown (bar is fully in by now)
+        setTimeout(() => {
+          timerMsgEl.classList.remove('visible');
 
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
