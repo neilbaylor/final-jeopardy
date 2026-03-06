@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Final Jeopardy" />
+  <meta name="theme-color" content="#07102e" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/images/hone-screen-new.png" />
+  <script src="/js/player-cards.js"></script>
+  <title>Final Jeopardy With Friends</title>
+  <script>
+    // Signal to dashboard that we're coming back from game, for the reverse transition.
+    window.addEventListener('pageswap', e => {
+      if (e.viewTransition) sessionStorage.setItem('vt-from-game', '1');
+    });
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Slide in from right over dashboard; dashboard parallaxes left */
+    @view-transition { navigation: auto; }
+
+    @keyframes slide-in-from-right {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+    @keyframes parallax-out-left {
+      from { transform: translateX(0);    opacity: 1;    }
+      to   { transform: translateX(-20%); opacity: 0.85; }
+    }
+
+    ::view-transition-new(root) {
+      animation: slide-in-from-right 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      z-index: 2;
+    }
+    ::view-transition-old(root) {
+      animation: parallax-out-left 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      z-index: 1;
+    }
+
+    body {
+      touch-action: manipulation;
+      background: #07102e;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #fff;
+      padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+      position: relative;
+    }
+
+    /* Back button */
+    #back-btn {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 14px);
+      left: calc(env(safe-area-inset-left, 0px) + 10px);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.85);
+      font-size: 1.05rem;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 10px;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 10;
+      transition: opacity 0.15s;
+    }
+    #back-btn:active { opacity: 0.55; }
+    #back-btn.disabled { opacity: 0.25; pointer-events: none; }
+    #back-btn svg { flex-shrink: 0; }
+
+    /* Hide spinner + back btn until page transition completes */
+    #spinner.pre-enter, #back-btn.pre-enter { opacity: 0 !important; }
+
+    /* Spinner */
+    @keyframes spin {
+      to { transform: translateX(-50%) rotate(360deg); }
+    }
+    #spinner {
+      position: absolute;
+      top: 175px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      border: 3.5px solid rgba(255,255,255,0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      transition: opacity 0.3s ease;
+    }
+    #spinner.hidden { opacity: 0; pointer-events: none; }
+
+    /* Category content */
+    #category-label {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 68px);
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 0 24px rgba(255,255,255,0.15);
+      opacity: 0;
+      transition: opacity 1.35s ease;
+      padding-right: 1.8rem;
+    }
+    #category-label .dots {
+      display: inline-block;
+      position: absolute;
+      margin-left: 0.01em;
+    }
+    #category-label.visible { opacity: 1; }
+
+    #category-text {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 68px);
+      left: 40px; right: 40px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      opacity: 0;
+      transition: opacity 1.55s ease 200ms;
+      line-height: 1.35;
+    }
+    #category-text.visible { opacity: 1; }
+    #category-text.dismissing {
+      transition: opacity 0.83s ease-out 50ms, transform 0.98s cubic-bezier(0.4, 0, 0.2, 1) 50ms;
+      opacity: 0;
+      transform: translateY(-51px);
+    }
+
+    #question-text {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 68px);
+      left: 40px; right: 40px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.43s ease 215ms, transform 0.8s ease 215ms;
+      line-height: 1.45;
+    }
+    #question-text.visible { opacity: 1; transform: translateY(0); }
+
+    /* Timer message */
+    #timer-msg {
+      position: absolute;
+      left: 30px; right: 30px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.72);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    #timer-msg.visible { opacity: 1; }
+
+    /* Progress bar */
+    #progress-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10.5px;
+      background: rgba(0, 0, 0, 0.45);
+      border-bottom: 1px solid rgba(155, 155, 155, 0.23);
+      overflow: hidden;
+      transform: translateY(-125%);
+      transition: transform 0.505s ease;
+      z-index: 9;
+    }
+    #progress-bar.visible { transform: translateY(0); }
+    #progress-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: #FFD700;
+      transform-origin: left;
+      transform: scaleX(0);
+      box-shadow:
+        0 0 10px rgba(255,215,0,0.65),
+        0 0 3px rgba(255,215,0,0.9),
+        inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+    @keyframes progressFill {
+      0%      { transform: scaleX(0);     background: #FFD700; }
+      66.67%  { transform: scaleX(0.667); background: #FFD700; }
+      100%    { transform: scaleX(1);     background: #CC0000; }
+    }
+
+
+    /* Header category (fades in when timer starts) */
+    #header-category {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 23px);
+      left: calc(env(safe-area-inset-left, 0px) + 52px);
+      right: calc(env(safe-area-inset-left, 0px) + 42px);
+      height: 36px;
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 500;
+      font-family: inherit;
+      color: rgba(255,255,255,0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.7s ease 50ms;
+      z-index: 10;
+    }
+    #header-category.visible { opacity: 0.75; }
+
+    /* Answer button */
+    @keyframes answerPulse {
+      0%   { box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 0 0 0 rgba(255,215,0,0.55); }
+      100% { box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 0 0 16px rgba(255,215,0,0); }
+    }
+    #answer-btn {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      background: #FFD700;
+      color: #07102e;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.12s ease;
+    }
+    #answer-btn.visible { opacity: 1; }
+    #answer-btn.pulse { animation: answerPulse 1.4s ease-out infinite alternate; }
+    #answer-btn:active { transform: translateX(-50%) scale(0.96); }
+
+    #answer-text {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 73px);
+      left: 40px; right: 40px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      opacity: 0;
+      transition: opacity 1.38s ease 360ms;
+      line-height: 1.45;
+    }
+    #answer-text.visible { opacity: 1; }
+
+    /* Player cards below category */
+    #game-players {
+      position: absolute;
+      left: 50%;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #bbb;
+      box-shadow: 1px 1px 1px 1px #333;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      width: calc(100% - 40px);
+      transform: translateX(-50%);
+      overflow: hidden;
+    }
+    #game-players.visible { opacity: 0.96; }
+    #game-players .players-row { display: flex; flex-wrap: nowrap; gap: 7px; padding: 14px 6px; }
+    #game-players .game-row-summary { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px; font-size: 0.7rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.87; }
+    #game-players .game-player { display: flex; align-items: center; gap: 7px; min-width: 0; }
+    #game-players .player-avatar-wrap { position: relative; flex-shrink: 0; width: 34.2px; height: 34.2px; }
+    #game-players .player-avatar { width: 34.2px; height: 34.2px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
+    #game-players .player-avatar-placeholder { width: 34.2px; height: 34.2px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.91rem; }
+    #game-players .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 18.1px; height: 18.1px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
+    #game-players .player-answered-badge svg { display: block; width: 9.7px; height: 9.7px; }
+    #game-players .game-player-info { display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+    #game-players .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #game-players .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+    #game-players .player-status.waiting  { color: rgba(0,0,0,0.38); }
+    #game-players .player-status.answered { color: #2e7d32; }
+    #game-players .game-player-overflow { display: flex; align-items: center; justify-content: center; align-self: center; height: 34.2px; padding: 0 10px; border-radius: 50px; background: #f0f1f5; color: #555; font-size: 0.87rem; font-weight: 700; flex-shrink: 0; }
+
+    #load-error {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 120px);
+      left: 32px; right: 32px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.5;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #load-error.visible { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <button id="back-btn" class="pre-enter" onclick="window.location.href='/dashboard'">
+    <svg width="13" height="22" viewBox="0 0 10 17" fill="none">
+      <path d="M9 1L1.5 8.5L9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div id="header-category"></div>
+  <div id="progress-bar"><div id="progress-bar-fill"></div></div>
+  <div id="spinner" class="pre-enter"></div>
+  <div id="category-label">And the Category is<span id="dots" class="dots"></span></div>
+  <div id="category-text"></div>
+  <div id="question-text"></div>
+  <div id="answer-text"></div>
+  <div id="timer-msg">You have 30 seconds, starting now</div>
+  <div id="load-error"></div>
+
+  <div id="game-players"></div>
+  <button id="answer-btn">Answer</button>
+
+  <script>
+    const userId = localStorage.getItem('userId');
+    if (!userId) { location.replace('/'); }
+
+    const params = new URLSearchParams(location.search);
+    const gameId = params.get('id');
+
+    const spinner       = document.getElementById('spinner');
+    const labelEl       = document.getElementById('category-label');
+    const dotsEl        = document.getElementById('dots');
+    const categoryEl    = document.getElementById('category-text');
+    const questionEl    = document.getElementById('question-text');
+    const answerTextEl  = document.getElementById('answer-text');
+    const timerMsgEl    = document.getElementById('timer-msg');
+    const progressBar   = document.getElementById('progress-bar');
+    const progressFill  = document.getElementById('progress-bar-fill');
+    const answerBtn     = document.getElementById('answer-btn');
+    const backBtn       = document.getElementById('back-btn');
+    const loadErrorEl   = document.getElementById('load-error');
+    const gamePlayersEl    = document.getElementById('game-players');
+    const headerCategoryEl = document.getElementById('header-category');
+    let gamePlayers = [];
+    let currentCategory = '';
+
+    // Reveal spinner + back btn after page transition completes (0.42s)
+    setTimeout(() => {
+      spinner.classList.remove('pre-enter');
+      backBtn.classList.remove('pre-enter');
+    }, 420);
+
+    const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
+
+    // Reading delay: linear 4s (≤90 chars) → 7s (≥250 chars)
+    function readingDelay(str) {
+      const t = Math.min(Math.max((str.length - 90) / 160, 0), 1);
+      return (4 + t * 3) * 1000;
+    }
+
+    // Scale category font + top offset so the vertical center stays locked to the label
+    function categoryStyle(str) {
+      const len = str.length;
+      let f; // font size in rem
+      if (len <= 10) {
+        f = 2.7;
+      } else {
+        const t = Math.min((len - 10) / 18, 1);
+        f = Math.max(2.7 - Math.sqrt(t) * 1.1, 1.6);
+      }
+      // Center reference: label at top=68px, font≈1.6rem, line-height 1.35
+      const centerPx = 68 + (1.6 * 16 * 1.35) / 2; // ≈ 85.3px
+      const topPx = Math.round(centerPx - (f * 16 * 1.35) / 2);
+      return {
+        fontSize: f.toFixed(2) + 'rem',
+        top: `calc(env(safe-area-inset-top, 0px) + ${topPx}px)`,
+      };
+    }
+
+    let currentQuestion = '';
+    let currentAnswer   = '';
+
+    function showLoadError() {
+      spinner.classList.add('hidden');
+      loadErrorEl.textContent = 'Sorry, that game can\'t be loaded';
+      loadErrorEl.classList.add('visible');
+      // Delete cached games list so stale data doesn't persist
+      if (userId) {
+        try { localStorage.removeItem(`fjwf_games_${userId}`); } catch {}
+      }
+    }
+
+    async function loadGame() {
+      const loadStart = Date.now();
+      try {
+        const url = `/api/games?gameId=${gameId}${userId ? '&userId=' + userId : ''}`;
+        const res  = await fetch(url);
+        if (!res.ok) { showLoadError(); return; }
+        const game = await res.json();
+        if (!game?.current_question?.category || !game?.current_question?.question || !game?.current_question?.answer) {
+          showLoadError(); return;
+        }
+        const category = toTitleCase(game.current_question.category);
+        currentQuestion  = game.current_question.question;
+        currentAnswer    = game.current_question.answer;
+        currentCategory  = category;
+        gamePlayers = (game.players || []).map(p => ({ ...p, _answered: false }));
+
+
+        // Enforce minimum 500ms spinner
+        const elapsed = Date.now() - loadStart;
+        await new Promise(r => setTimeout(r, Math.max(0, 1000 - elapsed)));
+
+        // Fade out spinner
+        spinner.classList.add('hidden');
+
+        // 200ms later: "The Category is..." label with animated dots
+        setTimeout(() => {
+          labelEl.classList.add('visible');
+
+          // Animate "" → . → .. → ... at 345ms/step, 1.1–2.0 random cycles
+          const cycles = 1.8 + Math.random() * 0.8;
+          const totalSteps = Math.round(cycles * 4);
+          let step = 0;
+          dotsEl.textContent = '';
+          const dotsInterval = setInterval(() => {
+            step++;
+            dotsEl.textContent = '.'.repeat(step % 4);
+            if (step >= totalSteps - 1) {
+              clearInterval(dotsInterval);
+              // Cross-fade: label out, category in simultaneously
+              labelEl.classList.remove('visible');
+              const cs = categoryStyle(category);
+              categoryEl.textContent = category;
+              categoryEl.style.fontSize = cs.fontSize;
+              categoryEl.style.top = cs.top;
+              categoryEl.classList.add('visible');
+              // 1950ms later: Answer button + player cards (max 4, 30px below category)
+              setTimeout(() => {
+                answerBtn.classList.add('visible');
+                setTimeout(() => answerBtn.classList.add('pulse'), 800);
+                if (gamePlayers.length > 0) {
+                  gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, 'New question in <strong>3 hours</strong> or after everyone answers');
+                  gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
+                  gamePlayersEl.classList.add('visible');
+                }
+              }, 1800);
+            }
+          }, 345);
+        }, 200);
+
+      } catch (err) {
+        console.error('Failed to load game:', err);
+        showLoadError();
+      }
+    }
+
+    function resetUI() {
+      spinner.classList.remove('hidden');
+      labelEl.classList.remove('visible');
+      categoryEl.classList.remove('visible', 'dismissing');
+      categoryEl.textContent = '';
+      questionEl.classList.remove('visible');
+      questionEl.textContent = '';
+      answerTextEl.classList.remove('visible');
+      answerTextEl.textContent = '';
+      timerMsgEl.classList.remove('visible');
+      progressBar.classList.remove('visible');
+      progressFill.style.animation = '';
+      progressFill.style.transform = 'scaleX(0)';
+      answerBtn.classList.remove('visible', 'pulse');
+      gamePlayersEl.style.transition = '';
+      gamePlayersEl.classList.remove('visible');
+      gamePlayersEl.innerHTML = '';
+      backBtn.classList.remove('disabled');
+      loadErrorEl.classList.remove('visible');
+      loadErrorEl.textContent = '';
+      dotsEl.textContent = '';
+      headerCategoryEl.classList.remove('visible');
+      headerCategoryEl.textContent = '';
+      currentQuestion  = '';
+      currentAnswer    = '';
+      currentCategory  = '';
+      gamePlayers      = [];
+    }
+
+    loadGame();
+
+    // Reset UI before page enters bfcache so the snapshot shows the spinner
+    window.addEventListener('pagehide', () => resetUI());
+
+    // Re-run the full flow when restored from bfcache (back/forward navigation)
+    window.addEventListener('pageshow', e => {
+      if (e.persisted) loadGame();
+    });
+
+    answerBtn.addEventListener('click', () => {
+      answerBtn.classList.remove('visible');
+      gamePlayersEl.style.transition = 'opacity 0.15s ease';
+      gamePlayersEl.classList.remove('visible');
+      categoryEl.classList.add('dismissing');
+      questionEl.textContent = currentQuestion;
+      questionEl.classList.add('visible');
+      backBtn.classList.add('disabled');
+
+      // Fade in header category just before the category slide-up animation finishes (470ms)
+      setTimeout(() => {
+        headerCategoryEl.textContent = currentCategory;
+        headerCategoryEl.classList.add('visible');
+      }, 470);
+
+      // After reading time, slide in progress bar, then show timer message 400ms later
+      setTimeout(() => {
+        progressBar.classList.add('visible');
+        setTimeout(() => {
+        const qRect = questionEl.getBoundingClientRect();
+        timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
+        timerMsgEl.classList.add('visible');
+
+        // When message fades out: start fill and countdown (bar is fully in by now)
+        setTimeout(() => {
+          timerMsgEl.classList.remove('visible');
+
+          {
+            progressFill.style.animation = 'progressFill 30s linear forwards';
+
+            // When timer expires: slide out progress bar + translate question up simultaneously,
+            // then fade answer in just below the translated question
+            setTimeout(() => {
+              progressBar.style.transition = 'transform 0.4s ease 0.6s';
+              progressBar.classList.remove('visible');
+              setTimeout(() => progressBar.style.transition = '', 1600);
+              const qRect = questionEl.getBoundingClientRect();
+              // Translate question up in sync with progress bar slide (both start at 1.1s)
+              setTimeout(() => {
+                questionEl.style.transition = 'opacity 1.33s ease 215ms, transform 0.7s ease 215ms';
+                questionEl.style.transform = 'translateY(-10px)';
+                questionEl.style.opacity = '0.7';
+                // Fade answer in below translated question
+                setTimeout(() => {
+                  const as = categoryStyle(currentAnswer);
+                  answerTextEl.style.fontSize = as.fontSize;
+                  answerTextEl.style.top = Math.round(qRect.bottom - 10 + 16) + 'px';
+                  answerTextEl.textContent = toTitleCase(currentAnswer);
+                  answerTextEl.classList.add('visible');
+                  setTimeout(() => backBtn.classList.remove('disabled'), 400);
+                }, 750); // 0.4s question translate + 350ms delay
+              }, 500); // 600ms sooner than progress bar CSS delay
+            }, 30000);
+          }
+        }, 3500);
+        }, 650);
+      }, readingDelay(currentQuestion));
+    }, { once: true });
+  </script>
+</body>
+</html>
