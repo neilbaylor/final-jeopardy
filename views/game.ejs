@@ -176,6 +176,19 @@
     }
     #timer-msg.visible { opacity: 1; }
 
+    #good-luck {
+      position: absolute;
+      left: 30px; right: 30px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.72);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    #good-luck.visible { opacity: 1; }
+
     /* Progress bar */
     #progress-bar {
       position: absolute;
@@ -362,6 +375,7 @@
   <div id="question-text"></div>
   <div id="answer-text"></div>
   <div id="timer-msg">You have 30 seconds, starting now</div>
+  <div id="good-luck">Good luck.</div>
   <div id="load-error"></div>
 
   <div id="game-players"></div>
@@ -382,6 +396,7 @@
     const questionEl    = document.getElementById('question-text');
     const answerTextEl  = document.getElementById('answer-text');
     const timerMsgEl    = document.getElementById('timer-msg');
+    const goodLuckEl    = document.getElementById('good-luck');
     const progressBar   = document.getElementById('progress-bar');
     const progressFill  = document.getElementById('progress-bar-fill');
     const answerBtn     = document.getElementById('answer-btn');
@@ -514,6 +529,7 @@
       answerTextEl.classList.remove('visible');
       answerTextEl.textContent = '';
       timerMsgEl.classList.remove('visible');
+      goodLuckEl.classList.remove('visible');
       progressBar.classList.remove('visible');
       progressFill.style.animation = '';
       progressFill.style.transform = 'scaleX(0)';
@@ -574,15 +590,19 @@
         timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
         timerMsgEl.classList.add('visible');
 
-        // Fade in input 1.5s before message fades out
+        // 1500ms later: fade in "Good luck." below timer msg + show answer input
         setTimeout(() => {
+          const tRect = timerMsgEl.getBoundingClientRect();
+          goodLuckEl.style.top = (tRect.bottom + 18) + 'px';
+          goodLuckEl.classList.add('visible');
           answerInput.classList.add('visible');
           answerInput.focus();
-        }, 2000);
+        }, 1500);
 
         // When message fades out: start fill and countdown (bar is fully in by now)
         setTimeout(() => {
           timerMsgEl.classList.remove('visible');
+          goodLuckEl.classList.remove('visible');
 
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
