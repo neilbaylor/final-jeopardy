@@ -520,13 +520,13 @@
         headerCategoryEl.classList.add('visible');
       }, 470);
 
-      // After reading time, show timer message + slide in progress bar simultaneously
+      // After reading time, slide in progress bar, then show timer message 400ms later
       setTimeout(() => {
+        progressBar.classList.add('visible');
         setTimeout(() => {
         const qRect = questionEl.getBoundingClientRect();
         timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
         timerMsgEl.classList.add('visible');
-        progressBar.classList.add('visible');
 
         // When message fades out: start fill and countdown (bar is fully in by now)
         setTimeout(() => {
@@ -560,7 +560,7 @@
             }, 30000);
           }
         }, 2625);
-        }, 200);
+        }, 400);
       }, readingDelay(currentQuestion));
     }, { once: true });
   </script>
