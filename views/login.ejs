@@ -306,6 +306,12 @@
   </div>
 
   <script>
+    // Signal to dashboard that we're coming from login, for the entry transition.
+    window.addEventListener('pageswap', e => {
+      if (e.viewTransition) sessionStorage.setItem('vt-from-login', '1');
+    });
+  </script>
+  <script>
     document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
     // Reset Google button if user navigates back via browser back button

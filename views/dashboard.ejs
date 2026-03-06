@@ -24,6 +24,9 @@
         if (sessionStorage.getItem('vt-from-game')) {
           sessionStorage.removeItem('vt-from-game');
           document.documentElement.classList.add('vt-from-game');
+        } else if (sessionStorage.getItem('vt-from-login')) {
+          sessionStorage.removeItem('vt-from-login');
+          document.documentElement.classList.add('vt-from-login');
         }
       }
     });
@@ -1067,8 +1070,9 @@
         let pendingGames = null;
 
         mePromise.then(() => {
-          // Longer delay when transitioning from game (0.42s) vs direct load (100ms)
-          const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 420 : 100;
+          // Longer delay when transitioning from game/login (0.4s) vs direct load (100ms)
+          const isTransition = document.documentElement.classList.contains('vt-from-game') || document.documentElement.classList.contains('vt-from-login');
+          const cacheDelay = isTransition ? 400 : 100;
           setTimeout(() => {
             cacheTimerFired = true;
             renderGames(pendingGames || cachedGames);
