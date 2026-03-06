@@ -288,11 +288,10 @@
       opacity: 0;
       transition: opacity 0.4s ease;
       width: calc(100% - 40px);
-      max-width: 500px;
       transform: translateX(-50%);
     }
     #game-players.visible { opacity: 1; }
-    #game-players .game-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    #game-players .game-player { display: flex; align-items: center; gap: 7px; min-width: 0; }
     #game-players .player-avatar-wrap { position: relative; flex-shrink: 0; width: 32px; height: 32px; }
     #game-players .player-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
     #game-players .player-avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
