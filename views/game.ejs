@@ -514,11 +514,11 @@
       questionEl.classList.add('visible');
       backBtn.classList.add('disabled');
 
-      // Fade in header category just before the category slide-up animation finishes (850ms)
+      // Fade in header category just before the category slide-up animation finishes (650ms)
       setTimeout(() => {
         headerCategoryEl.textContent = currentCategory;
         headerCategoryEl.classList.add('visible');
-      }, 850);
+      }, 650);
 
       // After reading time, show timer message + slide in progress bar simultaneously
       setTimeout(() => {
@@ -554,7 +554,7 @@
                   answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
                   answerTextEl.textContent = currentAnswer;
                   answerTextEl.classList.add('visible');
-                  backBtn.classList.remove('disabled');
+                  setTimeout(() => backBtn.classList.remove('disabled'), 400);
                 }, 500); // 0.4s question fade + 100ms delay
               }, 1100); // match progress bar CSS delay
             }, 30000);
