@@ -278,19 +278,18 @@
     #game-players {
       position: absolute;
       left: 50%;
-      transform: translateX(-50%);
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px 14px;
-      justify-content: center;
-      max-width: calc(100% - 40px);
+      flex-wrap: nowrap;
+      gap: 4px;
+      justify-content: space-between;
       background: #fff;
-      border-radius: 16px;
-      padding: 14px 16px;
-      border: 1px solid rgba(0,0,0,0.08);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.22), 0 1px 4px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      padding: 14px 8px;
       opacity: 0;
       transition: opacity 0.4s ease;
+      width: calc(100% - 40px);
+      max-width: 500px;
+      transform: translateX(-50%);
     }
     #game-players.visible { opacity: 1; }
     #game-players .game-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
