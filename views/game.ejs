@@ -281,6 +281,7 @@
     }
     #answer-input::placeholder { color: rgba(7,16,46,0.4); }
     #answer-input.visible { opacity: 1; pointer-events: auto; }
+    #answer-input:disabled { background: #d0d0d0; color: rgba(7,16,46,0.4); cursor: not-allowed; }
 
     #answer-text {
       position: absolute;
@@ -519,6 +520,7 @@
       answerBtn.style.display = '';
       answerBtn.classList.remove('visible', 'pulse');
       answerInput.classList.remove('visible');
+      answerInput.disabled = false;
       answerInput.value = '';
       gamePlayersEl.style.transition = '';
       gamePlayersEl.classList.remove('visible');
@@ -588,6 +590,7 @@
             // When timer expires: slide out progress bar + translate question up simultaneously,
             // then fade answer in just below the translated question
             setTimeout(() => {
+              answerInput.disabled = true;
               progressBar.style.transition = 'transform 0.4s ease 0.6s';
               progressBar.classList.remove('visible');
               setTimeout(() => progressBar.style.transition = '', 1600);
