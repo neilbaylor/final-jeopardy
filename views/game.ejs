@@ -469,12 +469,7 @@
                 answerBtn.classList.add('visible');
                 setTimeout(() => answerBtn.classList.add('pulse'), 800);
                 if (gamePlayers.length > 0) {
-                  const visible = gamePlayers.slice(0, 3);
-                  const overflow = gamePlayers.length - 3;
-                  const overflowHtml = overflow > 0
-                    ? `<div class="game-player-overflow">+${overflow}</div>`
-                    : '';
-                  gamePlayersEl.innerHTML = `<div class="players-row">${visible.map(buildPlayerCardHtml).join('') + overflowHtml}</div><div class="game-row-summary">New question in <strong>3 hours</strong> or after everyone answers</div>`;
+                  gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, 'New question in <strong>3 hours</strong> or after everyone answers');
                   gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
                   gamePlayersEl.classList.add('visible');
                 }

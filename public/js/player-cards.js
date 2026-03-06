@@ -1,4 +1,16 @@
 // Shared player card HTML builder used by dashboard and game pages.
+function buildGamePlayersHtml(players, summaryText) {
+  const visible = players.slice(0, 3);
+  const overflow = players.length - 3;
+  const overflowHtml = overflow > 0
+    ? `<div class="game-player-overflow">+${overflow}</div>`
+    : '';
+  const summary = summaryText
+    ? `<div class="game-row-summary">${summaryText}</div>`
+    : '';
+  return `<div class="players-row">${visible.map(buildPlayerCardHtml).join('') + overflowHtml}</div>${summary}`;
+}
+
 function buildPlayerCardHtml(p) {
   const rawName = (p.display_name || '').trim();
   const parts = rawName.split(' ');
