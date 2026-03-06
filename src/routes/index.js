@@ -3,10 +3,25 @@ const db = require('../config/database');
 const natural = require('natural');
 const router = express.Router();
 
+const _ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+               'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
+               'seventeen', 'eighteen', 'nineteen'];
+const _tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+
+function numToWords(n) {
+  if (n === 0) return 'zero';
+  if (n < 20) return _ones[n];
+  if (n < 100) return _tens[Math.floor(n / 10)] + (n % 10 ? ' ' + _ones[n % 10] : '');
+  if (n < 1000) return _ones[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + numToWords(n % 100) : '');
+  if (n < 1000000) return numToWords(Math.floor(n / 1000)) + ' thousand' + (n % 1000 ? ' ' + numToWords(n % 1000) : '');
+  return String(n);
+}
+
 function normalizeAnswer(str) {
   return str
     .toLowerCase()
     .replace(/&/g, 'and')
+    .replace(/\b(\d+)\b/g, (_, n) => numToWords(parseInt(n, 10))) // 7 → seven
     .replace(/['']/g, '')          // strip apostrophes before removing punctuation
     .replace(/[^a-z0-9\s]/g, ' ') // non-alphanumeric → space
     .replace(/\b(the|a|an)\b/g, ' ')
