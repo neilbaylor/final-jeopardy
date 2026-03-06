@@ -193,7 +193,7 @@
     #progress-bar {
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 10.5px;
+      height: 10px;
       background: rgba(0, 0, 0, 0.45);
       border-bottom: 1px solid rgba(155, 155, 155, 0.23);
       overflow: hidden;
@@ -590,19 +590,19 @@
         timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
         timerMsgEl.classList.add('visible');
 
-        // 1800ms later: fade in "Good luck." below timer msg + show answer input
+        // 1800ms later: fade in "Good luck." below timer msg
         setTimeout(() => {
           const tRect = timerMsgEl.getBoundingClientRect();
           goodLuckEl.style.top = (tRect.bottom + 12) + 'px';
           goodLuckEl.classList.add('visible');
-          answerInput.classList.add('visible');
-          answerInput.focus();
         }, 1800);
 
-        // When message fades out: start fill and countdown (bar is fully in by now)
+        // 1700ms after good luck: fade both out and fade input in simultaneously
         setTimeout(() => {
           timerMsgEl.classList.remove('visible');
           goodLuckEl.classList.remove('visible');
+          answerInput.classList.add('visible');
+          answerInput.focus();
 
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
@@ -633,8 +633,8 @@
               }, 500); // 600ms sooner than progress bar CSS delay
             }, 30000);
           }
-        }, 3800);
-        }, 650);
+        }, 3500);
+        }, 450);
       }, readingDelay(currentQuestion));
     }, { once: true });
   </script>
