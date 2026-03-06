@@ -575,10 +575,8 @@
         // When message fades out: fade in input and start fill and countdown (bar is fully in by now)
         setTimeout(() => {
           timerMsgEl.classList.remove('visible');
-          setTimeout(() => {
-            answerInput.classList.add('visible');
-            answerInput.focus();
-          }, 150);
+          answerInput.classList.add('visible');
+          answerInput.focus();
 
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
@@ -604,7 +602,7 @@
                   answerTextEl.classList.add('visible');
                   answerInput.blur();
                   setTimeout(() => backBtn.classList.remove('disabled'), 400);
-                }, 750); // 0.4s question translate + 350ms delay
+                }, 900); // 0.4s question translate + 500ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
             }, 30000);
           }
