@@ -530,29 +530,30 @@
             headerCategoryEl.textContent = currentCategory;
             headerCategoryEl.classList.add('visible');
 
-            // When timer expires: slide out progress bar, then 1250ms later
-            // fade question out, then 850ms later fade answer in
+            // When timer expires: slide out progress bar + fade question simultaneously,
+            // then 400ms later fade answer in
             setTimeout(() => {
               headerCategoryEl.classList.remove('visible');
               progressBar.style.transition = 'transform 0.4s ease 1.1s';
               progressBar.classList.remove('visible');
               setTimeout(() => progressBar.style.transition = '', 1600);
-              // progress bar fully gone after 1100 + 400 = 1500ms; wait 600ms more
               const qRect = questionEl.getBoundingClientRect();
+              // Fade question in sync with progress bar slide (both start at 1.1s)
               setTimeout(() => {
+                questionEl.style.transition = 'opacity 0.4s ease';
                 questionEl.classList.remove('visible');
+                // Fade answer in 400ms after question finishes fading
                 setTimeout(() => {
                   const as = categoryStyle(currentAnswer);
                   answerTextEl.style.fontSize = as.fontSize;
-                  // Center answer text within the question's vertical span
                   const answerLineH = parseFloat(as.fontSize) * 16 * 1.45;
                   const qCenterY = (qRect.top + qRect.bottom) / 2;
                   answerTextEl.style.top = Math.round(qCenterY - answerLineH / 2) + 'px';
                   answerTextEl.textContent = currentAnswer;
                   answerTextEl.classList.add('visible');
                   backBtn.classList.remove('disabled');
-                }, 850);
-              }, 1250);
+                }, 800); // 0.4s question fade + 400ms delay
+              }, 1100); // match progress bar CSS delay
             }, 30000);
           }
         }, 2525);
