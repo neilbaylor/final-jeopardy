@@ -1,6 +1,25 @@
 const express = require('express');
 const db = require('../config/database');
+const natural = require('natural');
 const router = express.Router();
+
+function normalizeAnswer(str) {
+  return str
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/['']/g, '')          // strip apostrophes before removing punctuation
+    .replace(/[^a-z0-9\s]/g, ' ') // non-alphanumeric → space
+    .replace(/\b(the|a|an)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isAnswerCorrect(userAnswer, correctAnswer) {
+  const a = normalizeAnswer(userAnswer);
+  const b = normalizeAnswer(correctAnswer);
+  if (a === b) return true;
+  return natural.JaroWinklerDistance(a, b) >= 0.88;
+}
 
 // Login page
 router.get('/', (req, res) => {
@@ -247,6 +266,51 @@ router.get('/api/games', async (req, res) => {
   } catch (err) {
     console.error('Get games error:', err);
     res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// API: submit an answer for a game question
+router.post('/api/games/:gameId/answers', async (req, res) => {
+  const gameId = Number(req.params.gameId);
+  const { playerId, questionId, answer } = req.body;
+
+  if (!playerId || !questionId || answer === undefined) {
+    return res.status(400).json({ error: 'Missing required fields: playerId, questionId, answer' });
+  }
+
+  try {
+    // 1. Check player is in this game
+    const [[member]] = await db.execute(
+      'SELECT 1 FROM game_users WHERE game_id = ? AND user_id = ?',
+      [gameId, Number(playerId)]
+    );
+    if (!member) return res.status(403).json({ error: 'Player is not part of this game' });
+
+    // 2. Look up the game_questions row (errors if question not linked to game)
+    const [[gq]] = await db.execute(
+      `SELECT gq.id AS game_question_id, q.answer AS correct_answer
+       FROM game_questions gq
+       JOIN questions q ON gq.question_id = q.id
+       WHERE gq.game_id = ? AND gq.question_id = ?`,
+      [gameId, Number(questionId)]
+    );
+    if (!gq) return res.status(404).json({ error: 'Question is not part of this game' });
+
+    // 3. Determine correctness
+    const correct = isAnswerCorrect(String(answer), gq.correct_answer);
+
+    // 4. Insert into game_answers (ignore duplicate if already answered)
+    await db.execute(
+      `INSERT INTO game_answers (game_question_id, user_id, answer, is_correct)
+       VALUES (?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE answer = VALUES(answer), is_correct = VALUES(is_correct)`,
+      [gq.game_question_id, Number(playerId), String(answer), correct]
+    );
+
+    return res.json({ result: correct ? 'correct' : 'incorrect' });
+  } catch (err) {
+    console.error('Submit answer error:', err);
+    return res.status(500).json({ error: 'Database error' });
   }
 });
 
