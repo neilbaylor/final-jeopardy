@@ -680,7 +680,6 @@
               if (expiryFired) return;
               expiryFired = true;
               clearTimeout(expiryTimerId);
-              window.removeEventListener('popstate', blockBack);
 
               answerInput.disabled = true;
               inputBadgeEl.classList.add('visible');
@@ -702,7 +701,10 @@
                   answerTextEl.textContent = toTitleCase(currentAnswer);
                   answerTextEl.classList.add('visible');
                   answerInput.blur();
-                  setTimeout(() => backBtn.classList.remove('disabled'), 400);
+                  setTimeout(() => {
+                    window.removeEventListener('popstate', blockBack);
+                    backBtn.classList.remove('disabled');
+                  }, 400);
                 }, 1400); // 0.4s question translate + 1000ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
             };
