@@ -659,11 +659,6 @@
               if (expiryFired) return;
               expiryFired = true;
               clearTimeout(expiryTimerId);
-              // Freeze fill at current visual position before sliding bar out
-              const cs = getComputedStyle(progressFill);
-              progressFill.style.animation = 'none';
-              progressFill.style.transform = cs.transform;
-              progressFill.style.background = cs.backgroundColor;
 
               answerInput.disabled = true;
               inputBadgeEl.classList.add('visible');
