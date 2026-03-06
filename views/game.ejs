@@ -304,6 +304,7 @@
     #game-players .player-status { font-size: 0.78rem; font-weight: 600; }
     #game-players .player-status.waiting  { color: rgba(0,0,0,0.38); }
     #game-players .player-status.answered { color: #2e7d32; }
+    #game-players .game-player-overflow { display: flex; align-items: center; justify-content: center; align-self: center; height: 32px; padding: 0 10px; border-radius: 50px; background: #f0f1f5; color: #555; font-size: 0.82rem; font-weight: 700; flex-shrink: 0; }
 
     #load-error {
       position: absolute;
@@ -468,7 +469,12 @@
                 answerBtn.classList.add('visible');
                 setTimeout(() => answerBtn.classList.add('pulse'), 800);
                 if (gamePlayers.length > 0) {
-                  gamePlayersEl.innerHTML = gamePlayers.map(buildPlayerCardHtml).join('');
+                  const visible = gamePlayers.slice(0, 4);
+                  const overflow = gamePlayers.length - 4;
+                  const overflowHtml = overflow > 0
+                    ? `<div class="game-player-overflow">+${overflow}</div>`
+                    : '';
+                  gamePlayersEl.innerHTML = visible.map(buildPlayerCardHtml).join('') + overflowHtml;
                   gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 22) + 'px';
                   gamePlayersEl.classList.add('visible');
                 }
