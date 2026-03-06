@@ -590,14 +590,14 @@
         timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
         timerMsgEl.classList.add('visible');
 
-        // 1500ms later: fade in "Good luck." below timer msg + show answer input
+        // 1800ms later: fade in "Good luck." below timer msg + show answer input
         setTimeout(() => {
           const tRect = timerMsgEl.getBoundingClientRect();
-          goodLuckEl.style.top = (tRect.bottom + 18) + 'px';
+          goodLuckEl.style.top = (tRect.bottom + 12) + 'px';
           goodLuckEl.classList.add('visible');
           answerInput.classList.add('visible');
           answerInput.focus();
-        }, 1500);
+        }, 1800);
 
         // When message fades out: start fill and countdown (bar is fully in by now)
         setTimeout(() => {
@@ -633,7 +633,7 @@
               }, 500); // 600ms sooner than progress bar CSS delay
             }, 30000);
           }
-        }, 3500);
+        }, 3800);
         }, 650);
       }, readingDelay(currentQuestion));
     }, { once: true });
