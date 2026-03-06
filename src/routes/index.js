@@ -20,7 +20,8 @@ function numToWords(n) {
 function normalizeAnswer(str) {
   return str
     .toLowerCase()
-    .replace(/&/g, 'and')
+    .replace(/[&+,]/g, ' ')        // & + , → space
+    .replace(/\band\b/g, ' ')      // word "and" → space (so & / + / , / and all vanish equally)
     .replace(/\b(\d+)\b/g, (_, n) => numToWords(parseInt(n, 10))) // 7 → seven
     .replace(/['']/g, '')          // strip apostrophes before removing punctuation
     .replace(/[^a-z0-9\s]/g, ' ') // non-alphanumeric → space
