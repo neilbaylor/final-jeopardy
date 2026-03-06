@@ -279,20 +279,20 @@
       position: absolute;
       left: 50%;
       display: flex;
-      flex-wrap: nowrap;
-      gap: 4px;
-      justify-content: space-between;
+      flex-direction: column;
       background: #fff;
       border-radius: 8px;
       border: 1px solid #bbb;
       box-shadow: 1px 1px 1px 1px #333;
-      padding: 14px 8px;
       opacity: 0;
       transition: opacity 0.4s ease;
       width: calc(100% - 40px);
       transform: translateX(-50%);
+      overflow: hidden;
     }
     #game-players.visible { opacity: 0.9; }
+    #game-players .players-row { display: flex; flex-wrap: nowrap; gap: 4px; justify-content: space-between; padding: 14px 8px; }
+    #game-players .game-row-summary { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px; font-size: 0.7rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.87; }
     #game-players .game-player { display: flex; align-items: center; gap: 7px; min-width: 0; }
     #game-players .player-avatar-wrap { position: relative; flex-shrink: 0; width: 32px; height: 32px; }
     #game-players .player-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
@@ -474,7 +474,7 @@
                   const overflowHtml = overflow > 0
                     ? `<div class="game-player-overflow">+${overflow}</div>`
                     : '';
-                  gamePlayersEl.innerHTML = visible.map(buildPlayerCardHtml).join('') + overflowHtml;
+                  gamePlayersEl.innerHTML = `<div class="players-row">${visible.map(buildPlayerCardHtml).join('') + overflowHtml}</div><div class="game-row-summary">New question in <strong>3 hours</strong> or after everyone answers</div>`;
                   gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
                   gamePlayersEl.classList.add('visible');
                 }
