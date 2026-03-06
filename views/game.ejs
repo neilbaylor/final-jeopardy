@@ -210,12 +210,11 @@
     /* Header category (fades in when timer starts) */
     #header-category {
       position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 14px);
+      top: calc(env(safe-area-inset-top, 0px) + 23px);
       left: calc(env(safe-area-inset-left, 0px) + 52px);
-      right: calc(50% + 32px);
+      right: calc(env(safe-area-inset-left, 0px) + 20px);
       height: 36px;
-      display: flex;
-      align-items: center;
+      display: block;
       font-size: 1.1rem;
       font-weight: 500;
       font-family: inherit;
