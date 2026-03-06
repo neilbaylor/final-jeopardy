@@ -637,8 +637,9 @@
       questionEl.classList.add('visible');
       backBtn.classList.add('disabled');
 
-      history.pushState({ blockBack: true }, '');
-      const blockBack = () => history.go(1);
+      history.pushState(null, '');
+      history.pushState(null, ''); // second sentinel buffers rapid double-taps
+      const blockBack = () => history.pushState(null, '');
       window.addEventListener('popstate', blockBack);
 
       // Fade in header category just before the category slide-up animation finishes (470ms)
