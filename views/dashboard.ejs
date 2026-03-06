@@ -18,6 +18,9 @@
   <title>Final Jeopardy with Friends</title>
   <script>
     // Must run before first paint so the class is set before CSS is applied.
+    window.addEventListener('pageswap', e => {
+      if (e.viewTransition) sessionStorage.setItem('vt-from-dashboard', '1');
+    });
     window.addEventListener('pagereveal', e => {
       if (e.viewTransition) {
         document.documentElement.classList.add('vt-entry');
@@ -1382,7 +1385,6 @@
             btn.innerHTML = '<span class="btn-spinner"></span>';
             btn.classList.add('loading');
           }
-          sessionStorage.setItem('vt-from-dashboard', '1');
           window.location.href = `/game?id=${wrapper.dataset.gameId}`;
         });
       });
