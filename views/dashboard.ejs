@@ -266,15 +266,15 @@
       to   { transform: translateX(100%); }
     }
     @keyframes parallax-in-from-left {
-      from { transform: translateX(-20%); opacity: 0.85; }
+      from { transform: translateX(-12%); opacity: 0.85; }
       to   { transform: translateX(0);    opacity: 1; }
     }
     :root.vt-from-game::view-transition-old(root) {
-      animation: slide-out-to-right 0.42s cubic-bezier(0.37, 0, 0.63, 1) both;
+      animation: slide-out-to-right 0.52s cubic-bezier(0.37, 0, 0.63, 1) both;
       z-index: 2;
     }
     :root.vt-from-game::view-transition-new(root) {
-      animation: parallax-in-from-left 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      animation: parallax-in-from-left 0.52s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
       z-index: 1;
     }
 
