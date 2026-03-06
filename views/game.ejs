@@ -574,11 +574,11 @@
         timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
         timerMsgEl.classList.add('visible');
 
-        // Fade in input 1s before message fades out
+        // Fade in input 1.5s before message fades out
         setTimeout(() => {
           answerInput.classList.add('visible');
           answerInput.focus();
-        }, 2500);
+        }, 2000);
 
         // When message fades out: start fill and countdown (bar is fully in by now)
         setTimeout(() => {
