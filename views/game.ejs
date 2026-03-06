@@ -449,7 +449,7 @@
               // 1825ms later: Answer button + player cards (max 4, 30px below category)
               setTimeout(() => {
                 answerBtn.classList.add('visible');
-                setTimeout(() => answerBtn.classList.add('pulse'), 500);
+                setTimeout(() => answerBtn.classList.add('pulse'), 800);
                 if (gamePlayers.length > 0) {
                   gamePlayersEl.innerHTML = gamePlayers.slice(0, 4).map(buildPlayerCardHtml).join('');
                   gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
