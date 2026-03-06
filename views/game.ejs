@@ -364,25 +364,15 @@
     #game-players .player-status.answered { color: #2e7d32; }
     #game-players .game-player-overflow { display: flex; align-items: center; justify-content: center; align-self: center; height: 34.2px; padding: 0 10px; border-radius: 50px; background: #f0f1f5; color: #555; font-size: 0.87rem; font-weight: 700; flex-shrink: 0; }
 
-    /* 2 players: 20% larger */
-    #game-players.count-2 .game-player { gap: 8px; }
-    #game-players.count-2 .player-avatar-wrap { width: 41px; height: 41px; }
-    #game-players.count-2 .player-avatar { width: 41px; height: 41px; }
-    #game-players.count-2 .player-avatar-placeholder { width: 41px; height: 41px; font-size: 1.09rem; }
-    #game-players.count-2 .player-answered-badge { width: 21.7px; height: 21.7px; }
-    #game-players.count-2 .player-answered-badge svg { width: 11.6px; height: 11.6px; }
-    #game-players.count-2 .player-name { font-size: 1.08rem; max-width: 68px; }
-    #game-players.count-2 .player-status { font-size: 1.01rem; }
-
-    /* 1 player: 40% larger */
-    #game-players.count-1 .game-player { gap: 10px; }
-    #game-players.count-1 .player-avatar-wrap { width: 47.9px; height: 47.9px; }
-    #game-players.count-1 .player-avatar { width: 47.9px; height: 47.9px; }
-    #game-players.count-1 .player-avatar-placeholder { width: 47.9px; height: 47.9px; font-size: 1.27rem; }
-    #game-players.count-1 .player-answered-badge { width: 25.3px; height: 25.3px; }
-    #game-players.count-1 .player-answered-badge svg { width: 13.6px; height: 13.6px; }
-    #game-players.count-1 .player-name { font-size: 1.26rem; max-width: 80px; }
-    #game-players.count-1 .player-status { font-size: 1.18rem; }
+    /* 1–2 players: 20% larger */
+    #game-players.count-1 .game-player, #game-players.count-2 .game-player { gap: 8px; }
+    #game-players.count-1 .player-avatar-wrap, #game-players.count-2 .player-avatar-wrap { width: 41px; height: 41px; }
+    #game-players.count-1 .player-avatar, #game-players.count-2 .player-avatar { width: 41px; height: 41px; }
+    #game-players.count-1 .player-avatar-placeholder, #game-players.count-2 .player-avatar-placeholder { width: 41px; height: 41px; font-size: 1.09rem; }
+    #game-players.count-1 .player-answered-badge, #game-players.count-2 .player-answered-badge { width: 21.7px; height: 21.7px; }
+    #game-players.count-1 .player-answered-badge svg, #game-players.count-2 .player-answered-badge svg { width: 11.6px; height: 11.6px; }
+    #game-players.count-1 .player-name, #game-players.count-2 .player-name { font-size: 1.08rem; max-width: 68px; }
+    #game-players.count-1 .player-status, #game-players.count-2 .player-status { font-size: 1.01rem; }
 
     #load-error {
       position: absolute;
@@ -677,15 +667,16 @@
             let expiryFired = false;
             let expiryTimerId;
 
-            const triggerExpiry = () => {
+            const triggerExpiry = (earlySubmit = false) => {
               if (expiryFired) return;
               expiryFired = true;
               clearTimeout(expiryTimerId);
 
               answerInput.disabled = true;
               inputBadgeEl.classList.add('visible');
-              progressBar.style.transition = 'transform 0.4s ease 0.6s';
-              progressBar.classList.remove('visible');
+              const slideOut = () => {
+                progressBar.style.transition = 'transform 0.4s ease 0.6s';
+                progressBar.classList.remove('visible');
               setTimeout(() => progressBar.style.transition = '', 1600);
               const qRect = questionEl.getBoundingClientRect();
               // Translate question up in sync with progress bar slide (both start at 1.1s)
@@ -705,12 +696,14 @@
                 }, 1400); // 0.4s question translate + 1000ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
             };
+              if (earlySubmit) setTimeout(slideOut, 500); else slideOut();
+            };
 
             expiryTimerId = setTimeout(triggerExpiry, 30000);
 
             // Early submit: Enter key with non-empty input stops timer and triggers expiry
             answerInput.addEventListener('keydown', e => {
-              if (e.key === 'Enter' && answerInput.value.trim() !== '') triggerExpiry();
+              if (e.key === 'Enter' && answerInput.value.trim() !== '') triggerExpiry(true);
             });
           }
         }, 3700);
