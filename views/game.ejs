@@ -522,6 +522,7 @@
 
       // After reading time, show timer message + slide in progress bar simultaneously
       setTimeout(() => {
+        setTimeout(() => {
         const qRect = questionEl.getBoundingClientRect();
         timerMsgEl.style.top = (qRect.bottom + 50) + 'px';
         timerMsgEl.classList.add('visible');
@@ -558,7 +559,8 @@
               }, 500); // 600ms sooner than progress bar CSS delay
             }, 30000);
           }
-        }, 2525);
+        }, 2625);
+        }, 200);
       }, readingDelay(currentQuestion));
     }, { once: true });
   </script>
