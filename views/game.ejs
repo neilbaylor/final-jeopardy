@@ -637,6 +637,10 @@
       questionEl.classList.add('visible');
       backBtn.classList.add('disabled');
 
+      history.pushState({ blockBack: true }, '');
+      const blockBack = () => history.go(1);
+      window.addEventListener('popstate', blockBack);
+
       // Fade in header category just before the category slide-up animation finishes (470ms)
       setTimeout(() => {
         headerCategoryEl.textContent = currentCategory;
@@ -667,10 +671,6 @@
 
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
-
-            history.pushState({ timerRunning: true }, '');
-            const blockBack = () => history.pushState({ timerRunning: true }, '');
-            window.addEventListener('popstate', blockBack);
 
             let expiryFired = false;
             let expiryTimerId;
