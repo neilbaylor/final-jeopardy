@@ -1382,6 +1382,7 @@
             btn.innerHTML = '<span class="btn-spinner"></span>';
             btn.classList.add('loading');
           }
+          sessionStorage.setItem('vt-from-dashboard', '1');
           window.location.href = `/game?id=${wrapper.dataset.gameId}`;
         });
       });

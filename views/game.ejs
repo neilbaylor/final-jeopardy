@@ -296,6 +296,26 @@
     #answer-input.visible { opacity: 1; pointer-events: auto; }
     #answer-input:disabled { background: #d0d0d0; color: rgba(7,16,46,0.4); cursor: not-allowed; }
 
+    #input-badge {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 54px);
+      right: 30px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #43a047;
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 5;
+    }
+    #input-badge.visible { opacity: 1; transform: scale(1); }
+
     #answer-text {
       position: absolute;
       top: calc(env(safe-area-inset-top, 0px) + 73px);
@@ -380,6 +400,7 @@
 
   <div id="game-players"></div>
   <input id="answer-input" type="text" placeholder="Add your Answer" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" />
+  <div id="input-badge" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <button id="answer-btn">Answer</button>
 
   <script>
@@ -405,6 +426,9 @@
     const loadErrorEl   = document.getElementById('load-error');
     const gamePlayersEl    = document.getElementById('game-players');
     const headerCategoryEl = document.getElementById('header-category');
+    const inputBadgeEl     = document.getElementById('input-badge');
+    const fromDashboard    = sessionStorage.getItem('vt-from-dashboard') === '1';
+    sessionStorage.removeItem('vt-from-dashboard');
     let gamePlayers = [];
     let currentCategory = '';
 
@@ -478,40 +502,60 @@
         // Fade out spinner
         spinner.classList.add('hidden');
 
-        // 200ms later: "The Category is..." label with animated dots
-        setTimeout(() => {
-          labelEl.classList.add('visible');
+        if (fromDashboard) {
+          // Skip "And the Category is..." animation — show category directly
+          const cs = categoryStyle(category);
+          categoryEl.textContent = category;
+          categoryEl.style.fontSize = cs.fontSize;
+          categoryEl.style.top = cs.top;
+          setTimeout(() => {
+            categoryEl.classList.add('visible');
+            setTimeout(() => {
+              answerBtn.classList.add('visible');
+              setTimeout(() => answerBtn.classList.add('pulse'), 800);
+              if (gamePlayers.length > 0) {
+                gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, 'New question in <strong>3 hours</strong> or after everyone answers');
+                gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
+                gamePlayersEl.classList.add('visible');
+              }
+            }, 1800);
+          }, 200);
+        } else {
+          // 200ms later: "The Category is..." label with animated dots
+          setTimeout(() => {
+            labelEl.classList.add('visible');
 
-          // Animate "" → . → .. → ... at 345ms/step, 1.1–2.0 random cycles
-          const cycles = 1.8 + Math.random() * 0.8;
-          const totalSteps = Math.round(cycles * 4);
-          let step = 0;
-          dotsEl.textContent = '';
-          const dotsInterval = setInterval(() => {
-            step++;
-            dotsEl.textContent = '.'.repeat(step % 4);
-            if (step >= totalSteps - 1) {
-              clearInterval(dotsInterval);
-              // Cross-fade: label out, category in simultaneously
-              labelEl.classList.remove('visible');
-              const cs = categoryStyle(category);
-              categoryEl.textContent = category;
-              categoryEl.style.fontSize = cs.fontSize;
-              categoryEl.style.top = cs.top;
-              categoryEl.classList.add('visible');
-              // 1950ms later: Answer button + player cards (max 4, 30px below category)
-              setTimeout(() => {
-                answerBtn.classList.add('visible');
-                setTimeout(() => answerBtn.classList.add('pulse'), 800);
-                if (gamePlayers.length > 0) {
-                  gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, 'New question in <strong>3 hours</strong> or after everyone answers');
-                  gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
-                  gamePlayersEl.classList.add('visible');
-                }
-              }, 1800);
-            }
-          }, 345);
-        }, 200);
+            // Animate "" → . → .. → ... at 345ms/step, 1.1–2.0 random cycles
+            const cycles = 1.8 + Math.random() * 0.8;
+            const totalSteps = Math.round(cycles * 4);
+            let step = 0;
+            dotsEl.textContent = '';
+            const dotsInterval = setInterval(() => {
+              step++;
+              dotsEl.textContent = '.'.repeat(step % 4);
+              if (step >= totalSteps - 1) {
+                clearInterval(dotsInterval);
+                // Cross-fade: label out, category in simultaneously
+                labelEl.classList.remove('visible');
+                const cs = categoryStyle(category);
+                categoryEl.textContent = category;
+                categoryEl.style.fontSize = cs.fontSize;
+                categoryEl.style.top = cs.top;
+                categoryEl.classList.add('visible');
+                // 1800ms later: Answer button + player cards (max 4, 30px below category)
+                setTimeout(() => {
+                  answerBtn.classList.add('visible');
+                  setTimeout(() => answerBtn.classList.add('pulse'), 800);
+                  if (gamePlayers.length > 0) {
+                    gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, 'New question in <strong>3 hours</strong> or after everyone answers');
+                    gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
+                    gamePlayersEl.classList.add('visible');
+                  }
+                }, 1800);
+              }
+            }, 345);
+          }, 200);
+        }
 
       } catch (err) {
         console.error('Failed to load game:', err);
@@ -538,6 +582,7 @@
       answerInput.classList.remove('visible');
       answerInput.disabled = false;
       answerInput.value = '';
+      inputBadgeEl.classList.remove('visible');
       gamePlayersEl.style.transition = '';
       gamePlayersEl.classList.remove('visible');
       gamePlayersEl.innerHTML = '';
@@ -593,7 +638,7 @@
         // 1800ms later: fade in "Good luck." below timer msg
         setTimeout(() => {
           const tRect = timerMsgEl.getBoundingClientRect();
-          goodLuckEl.style.top = (tRect.bottom + 9) + 'px';
+          goodLuckEl.style.top = (tRect.bottom + 6) + 'px';
           goodLuckEl.classList.add('visible');
         }, 1800);
 
@@ -611,6 +656,7 @@
             // then fade answer in just below the translated question
             setTimeout(() => {
               answerInput.disabled = true;
+              inputBadgeEl.classList.add('visible');
               progressBar.style.transition = 'transform 0.4s ease 0.6s';
               progressBar.classList.remove('visible');
               setTimeout(() => progressBar.style.transition = '', 1600);
