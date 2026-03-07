@@ -1,7 +1,15 @@
 // Shared player card HTML builder used by dashboard and game pages.
+
+// MySQL dateStrings:true returns "YYYY-MM-DD HH:MM:SS" with no timezone — treat as UTC.
+function parseDbDate(str) {
+  if (!str) return new Date(0);
+  if (typeof str !== 'string') return new Date(str);
+  return new Date(str.includes('Z') || str.includes('+') ? str : str.replace(' ', 'T') + 'Z');
+}
+
 function relativeAnswerTime(ts) {
   if (!ts) return 'Waiting';
-  const diffMs = Date.now() - new Date(ts).getTime();
+  const diffMs = Date.now() - parseDbDate(ts).getTime();
   const diffHrs = diffMs / (1000 * 60 * 60);
   if (diffHrs < 1) return 'Recently';
   if (diffHrs >= 24) return '1+ day ago';
@@ -10,9 +18,10 @@ function relativeAnswerTime(ts) {
 }
 
 function nextQuestionIn(createdAt) {
-  const msRemaining = 24 * 60 * 60 * 1000 - (Date.now() - new Date(createdAt).getTime());
+  const msRemaining = 24 * 60 * 60 * 1000 - (Date.now() - parseDbDate(createdAt).getTime());
   if (msRemaining <= 0) return null;
   const hrs = Math.round(msRemaining / (1000 * 60 * 60));
+  if (hrs >= 24) return '1+ day';
   return hrs === 1 ? '1 hour' : `${hrs} hours`;
 }
 
