@@ -18,7 +18,7 @@ function nextQuestionIn(createdAt) {
 
 function nextQuestionSummary(createdAt) {
   const t = nextQuestionIn(createdAt);
-  return t ? `<strong>New question in ${t}</strong> or after everyone answers` : 'New game coming soon';
+  return t ? `<strong>New question in ${t}</strong> or after everyone answers` : '<strong>New question coming soon</strong> or after everyone answers';
 }
 
 function buildGamePlayersHtml(players, summaryText) {
