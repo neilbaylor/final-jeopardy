@@ -557,7 +557,7 @@
     function buildAnswerResponsesHtml(players, myAnswer) {
       const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       const sorted = [...players].sort((a, b) => (b._isMe ? 1 : 0) - (a._isMe ? 1 : 0));
-      return sorted.slice(0, 6).map(p => {
+      return sorted.slice(0, 5).map(p => {
         const rawName = (p.display_name || '').trim();
         const parts = rawName.split(' ');
         const fn = parts[0] || '';
