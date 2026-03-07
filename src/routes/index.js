@@ -197,10 +197,10 @@ router.get('/api/games', async (req, res) => {
            (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question,
            (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_answer,
            (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_category,
-           (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'game_question_id', ga.game_question_id,
+           (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'user_id', ga.user_id, 'game_question_id', ga.game_question_id,
                                              'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
             FROM game_answers ga JOIN game_questions gq ON ga.game_question_id = gq.id
-            WHERE gq.game_id = g.id AND (${escapedUserId} IS NULL OR ga.user_id = ${escapedUserId})) AS my_answers
+            WHERE gq.game_id = g.id) AS answers
          FROM games g
          WHERE g.id = ?`,
         [Number(gameId)]
@@ -226,7 +226,7 @@ router.get('/api/games', async (req, res) => {
           answer: row.cq_answer,
           category: row.cq_category,
         } : null,
-        my_answers: parse(row.my_answers) || [],
+        answers: parse(row.answers) || [],
       });
     } catch (err) {
       console.error('Get game error:', err);
@@ -250,10 +250,10 @@ router.get('/api/games', async (req, res) => {
          (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question,
          (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_answer,
          (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_category,
-         (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'game_question_id', ga.game_question_id,
+         (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'user_id', ga.user_id, 'game_question_id', ga.game_question_id,
                                            'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
           FROM game_answers ga JOIN game_questions gq ON ga.game_question_id = gq.id
-          WHERE gq.game_id = g.id AND ga.user_id = ${db.escape(userId)}) AS my_answers
+          WHERE gq.game_id = g.id) AS answers
        FROM games g
        JOIN game_users gu ON g.id = gu.game_id
        WHERE gu.user_id = ${db.escape(userId)}
@@ -273,7 +273,7 @@ router.get('/api/games', async (req, res) => {
         answer: row.cq_answer,
         category: row.cq_category,
       } : null,
-      my_answers: parse(row.my_answers) || [],
+      answers: parse(row.answers) || [],
     }));
 
 

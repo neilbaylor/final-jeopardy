@@ -1265,7 +1265,7 @@
         const rawCategory = game.current_question ? game.current_question.category : 'No question yet';
         const category = toTitleCase(rawCategory);
         const cqId = game.current_question ? game.current_question.game_question_id : null;
-        const iAnswered = cqId && game.my_answers && game.my_answers.some(a => a.game_question_id === cqId);
+        const iAnswered = cqId && game.answers && game.answers.some(a => a.game_question_id === cqId && a.user_id === (currentUser && currentUser.id));
 
         // Build combined player list: others first, current user last
         const others = game.players || [];
