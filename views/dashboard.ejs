@@ -58,7 +58,6 @@
       display: flex;
       flex-direction: column;
       background: #f9f9f9;
-      will-change: transform;
       transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -190,6 +189,7 @@
       overscroll-behavior-y: contain;
       padding: 0;
       box-shadow: 0 1px 0 #f0f0f0;
+      will-change: transform;
     }
 
 .fab {
@@ -227,7 +227,6 @@
     }
     .fab.fab-pulse {
       animation: fabPulse 1.4s ease-out infinite;
-      will-change: box-shadow;
     }
 
     .fab svg {
@@ -564,7 +563,6 @@
       overflow: hidden;
       position: relative;
       z-index: 1;
-      will-change: transform;
       transition: transform 0.25s ease;
     }
     .game-row-header {
@@ -704,7 +702,6 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       animation: answerPulse 1.4s ease-out infinite;
-      will-change: box-shadow;
     }
     .answer-btn:active { transform: scale(0.93); }
     @keyframes btn-spin { to { transform: rotate(360deg); } }
