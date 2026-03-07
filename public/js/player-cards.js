@@ -47,7 +47,7 @@ function buildGamePlayersHtml(players, summaryText) {
   const summary = summaryText
     ? `<div class="game-row-summary">${summaryText}</div>`
     : '';
-  const gapPx = players.length === 2 ? 17 : players.length === 3 ? 12 : 7;
+  const gapPx = players.length === 2 ? 20 : players.length === 3 ? 11 : 7;
   const rowStyle = gapPx !== 7 ? ` style="gap: ${gapPx}px"` : '';
   return `<div class="players-row"${rowStyle}>${visible.map(buildPlayerCardHtml).join('') + overflowHtml}</div>${summary}`;
 }
