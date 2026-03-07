@@ -206,17 +206,20 @@ router.get('/api/games', async (req, res) => {
         [Number(gameId)]
       );
       if (!row) return res.status(404).json({ error: 'Game not found' });
+      let currentUser = null;
       if (userId) {
         const [[member]] = await db.query(
-          'SELECT 1 FROM game_users WHERE game_id = ? AND user_id = ?',
-          [Number(gameId), Number(userId)]
+          'SELECT avatar_url FROM users WHERE id = ? AND EXISTS (SELECT 1 FROM game_users WHERE game_id = ? AND user_id = ?)',
+          [Number(userId), Number(gameId), Number(userId)]
         );
         if (!member) return res.status(403).json({ error: 'You are not a participant in this game' });
+        currentUser = { avatar_url: member.avatar_url || null };
       }
       const parse = v => typeof v === 'string' ? JSON.parse(v) : v;
       return res.json({
         id: row.id,
         created_at: row.created_at,
+        current_user: currentUser,
         players: parse(row.players) || [],
         current_question: row.cq_id ? {
           game_question_id: row.cq_id,

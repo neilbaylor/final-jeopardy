@@ -825,7 +825,7 @@
                   answerTextEl.classList.add('visible');
                   // Position and show answer-responses 1s after the answer fades in
                   setTimeout(() => {
-                    const meEntry = { _isMe: true, _answered: true, _isCorrect: null, _answeredAt: null, display_name: '', avatar_url: null };
+                    const meEntry = { _isMe: true, _answered: true, _isCorrect: null, _answeredAt: null, display_name: '', avatar_url: game.current_user?.avatar_url || null };
                     const arPlayers = [meEntry, ...gamePlayers];
                     const atRect = answerTextEl.getBoundingClientRect();
                     answerResponsesEl.style.top = (atRect.bottom + 75) + 'px';
