@@ -1270,7 +1270,8 @@
         // Build combined player list: others first, current user last
         const others = game.players || [];
         const meEntry = currentUser ? { ...currentUser, _isMe: true, _answered: iAnswered } : null;
-        const combined = meEntry ? [...others.map(p => ({ ...p, _answered: false })), meEntry] : others.map(p => ({ ...p, _answered: false }));
+        const answeredIds = new Set((game.answers || []).filter(a => a.game_question_id === cqId).map(a => a.user_id));
+        const combined = meEntry ? [...others.map(p => ({ ...p, _answered: answeredIds.has(p.id) })), meEntry] : others.map(p => ({ ...p, _answered: answeredIds.has(p.id) }));
 
         const overflow = combined.length > MAX_VISIBLE ? combined.length - MAX_VISIBLE : 0;
         const visible = overflow > 0 ? combined.slice(0, MAX_VISIBLE) : combined;
