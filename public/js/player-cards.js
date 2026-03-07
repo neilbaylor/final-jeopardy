@@ -38,7 +38,9 @@ function buildGamePlayersHtml(players, summaryText) {
   const summary = summaryText
     ? `<div class="game-row-summary">${summaryText}</div>`
     : '';
-  return `<div class="players-row">${visible.map(buildPlayerCardHtml).join('') + overflowHtml}</div>${summary}`;
+  const gapExtra = players.length === 2 ? 5 : players.length === 3 ? 2 : 0;
+  const rowStyle = gapExtra ? ` style="gap: ${7 + gapExtra}px"` : '';
+  return `<div class="players-row"${rowStyle}>${visible.map(buildPlayerCardHtml).join('') + overflowHtml}</div>${summary}`;
 }
 
 function buildPlayerCardHtml(p) {
