@@ -323,7 +323,15 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
       [gq.game_question_id, Number(playerId), String(answer), correct]
     );
 
-    return res.json({ result: correct ? 'correct' : 'incorrect' });
+    // 5. Return all answers for this question in this game
+    const [answers] = await db.execute(
+      `SELECT ga.id, ga.user_id, ga.game_question_id, ga.answer, ga.is_correct, ga.answered_at
+       FROM game_answers ga
+       WHERE ga.game_question_id = ?`,
+      [gq.game_question_id]
+    );
+
+    return res.json(answers);
   } catch (err) {
     console.error('Submit answer error:', err);
     return res.status(500).json({ error: 'Database error' });
