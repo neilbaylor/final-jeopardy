@@ -1307,7 +1307,7 @@
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               <button class="answer-btn" style="animation-delay: -${(idx * 0.3) % 1.4}s">Answer</button>
             </div>
-            <div class="game-row-summary">${nextQuestionSummary(game.created_at)}</div>
+            <div class="game-row-summary">${nextQuestionSummary(game.created_at, combined)}</div>
           </div>
         </div>`;
       }).join('');

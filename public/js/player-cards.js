@@ -16,9 +16,17 @@ function nextQuestionIn(createdAt) {
   return hrs === 1 ? '1 hour' : `${hrs} hours`;
 }
 
-function nextQuestionSummary(createdAt) {
+function nextQuestionSummary(createdAt, players) {
   const t = nextQuestionIn(createdAt);
-  return t ? `<strong>New question in ${t}</strong> or after everyone answers` : '<strong>New question coming soon</strong> or after everyone answers';
+  const unanswered = (players || []).filter(p => !p._answered);
+  let suffix;
+  if (unanswered.length === 1) {
+    const p = unanswered[0];
+    suffix = p._isMe ? 'or after you answer' : `or after ${(p.display_name || '').trim().split(' ')[0]} answers`;
+  } else {
+    suffix = 'or after everyone answers';
+  }
+  return t ? `<strong>New question in ${t}</strong> ${suffix}` : `<strong>New question coming soon</strong> ${suffix}`;
 }
 
 function buildGamePlayersHtml(players, summaryText) {
