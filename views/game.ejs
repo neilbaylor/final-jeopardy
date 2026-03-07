@@ -275,28 +275,31 @@
 
     #answer-input {
       position: absolute;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 40px);
-      border-radius: 5px;
-      padding: 11px 14px;
-      font-size: 1.8rem;
-      font-weight: 500;
-      font-family: inherit;
-      letter-spacing: 0.03em;
-      border: 1px inset #999;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 17px;
+      font-weight: 400;
+      font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
+      letter-spacing: -0.022em;
+      border: 1px solid rgba(0,0,0,0.18);
       background: #ffffff;
-      color: #333;
+      color: #000;
       outline: none;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.4s ease, border-color 0.2s ease;
       text-align: left;
+      -webkit-appearance: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    #answer-input::placeholder { color: #82848d; }
+    #answer-input:focus { border-color: #007aff; }
+    #answer-input::placeholder { color: #3c3c4399; }
     #answer-input.visible { opacity: 1; pointer-events: auto; }
-    #answer-input:disabled { background: #d0d0d0; color: rgba(7,16,46,0.4); cursor: not-allowed; }
+    #answer-input:disabled { background: #f2f2f7; color: rgba(0,0,0,0.3); cursor: not-allowed; }
 
     #input-badge {
       position: absolute;
