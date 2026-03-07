@@ -21,7 +21,7 @@ function nextQuestionIn(createdAt) {
   const msRemaining = 24 * 60 * 60 * 1000 - (Date.now() - parseDbDate(createdAt).getTime());
   if (msRemaining <= 0) return null;
   const hrs = Math.round(msRemaining / (1000 * 60 * 60));
-  if (hrs >= 24) return '1+ day';
+  if (hrs >= 24) return '1 day+';
   return hrs === 1 ? '1 hour' : `${hrs} hours`;
 }
 
