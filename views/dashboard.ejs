@@ -1310,7 +1310,7 @@
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               <button class="answer-btn" style="animation-delay: -${(idx * 0.3) % 1.4}s">Answer</button>
             </div>
-            <div class="game-row-summary"><strong>New question in 3 hours</strong> or after everyone answers</div>
+            <div class="game-row-summary"><strong>New question in ${nextQuestionIn(game.created_at)}</strong> or after everyone answers</div>
           </div>
         </div>`;
       }).join('');

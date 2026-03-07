@@ -9,6 +9,13 @@ function relativeAnswerTime(ts) {
   return hrs + ' hr ago';
 }
 
+function nextQuestionIn(createdAt) {
+  const msRemaining = 24 * 60 * 60 * 1000 - (Date.now() - new Date(createdAt).getTime());
+  if (msRemaining <= 0) return 'soon';
+  const hrs = Math.round(msRemaining / (1000 * 60 * 60));
+  return hrs === 1 ? '1 hour' : `${hrs} hours`;
+}
+
 function buildGamePlayersHtml(players, summaryText) {
   const visible = players.slice(0, 3);
   const overflow = players.length - 3;
