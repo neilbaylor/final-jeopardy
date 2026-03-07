@@ -1237,7 +1237,7 @@
           fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
           if (silent && gamesList.querySelector('.game-row-wrapper')) {
             gamesList.style.opacity = '0';
-            return new Promise(res => setTimeout(() => { renderGames(games); gamesList.style.opacity = '1'; res(); }, 360));
+            setTimeout(() => { renderGames(games); gamesList.style.opacity = '1'; }, 360);
           } else if (!silent || (Array.isArray(games) && games.length > 0)) {
             renderGames(games);
           }
