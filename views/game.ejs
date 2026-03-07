@@ -825,7 +825,7 @@
                   if (gamePlayers.length > 0) {
                     requestAnimationFrame(() => requestAnimationFrame(() => {
                       const atRect = answerTextEl.getBoundingClientRect();
-                      answerResponsesEl.style.top = (atRect.bottom + 60) + 'px';
+                      answerResponsesEl.style.top = (atRect.bottom + 84) + 'px';
                       answerResponsesEl.innerHTML = buildAnswerResponsesHtml(gamePlayers, submittedAnswer);
                       answerResponsesEl.classList.remove('count-1', 'count-2');
                       if (gamePlayers.length === 1) answerResponsesEl.classList.add('count-1');
