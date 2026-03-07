@@ -637,18 +637,6 @@
       questionEl.classList.add('visible');
       backBtn.classList.add('disabled');
 
-      for (let i = 0; i < 5; i++) history.pushState(null, '', location.href);
-      const blockBack = () => {
-        history.pushState(null, '', location.href);
-        history.pushState(null, '', location.href);
-      };
-      window.addEventListener('popstate', blockBack);
-      // Safari iOS: block left-edge swipe-back gesture
-      const blockSwipe = e => { if (e.touches[0].pageX < 20) e.preventDefault(); };
-      document.addEventListener('touchstart', blockSwipe, { passive: false });
-      // Keep sentinel buffer topped up so batched back clicks can't burn through it
-      const sentinelInterval = setInterval(() => history.pushState(null, '', location.href), 500);
-
       // Fade in header category just before the category slide-up animation finishes (470ms)
       setTimeout(() => {
         headerCategoryEl.textContent = currentCategory;
@@ -708,12 +696,7 @@
                   answerTextEl.textContent = toTitleCase(currentAnswer);
                   answerTextEl.classList.add('visible');
                   answerInput.blur();
-                  setTimeout(() => {
-                    clearInterval(sentinelInterval);
-                    window.removeEventListener('popstate', blockBack);
-                    document.removeEventListener('touchstart', blockSwipe);
-                    backBtn.classList.remove('disabled');
-                  }, 400);
+                  setTimeout(() => backBtn.classList.remove('disabled'), 400);
                 }, 1400); // 0.4s question translate + 1000ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
             };
