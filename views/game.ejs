@@ -416,7 +416,7 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      width: calc(100% - 40px);
+      width: calc(100% - 55px);
       background: #fff;
       border-radius: 8px;
       border: 1px solid #bbb;
@@ -828,7 +828,7 @@
                     const meEntry = { _isMe: true, _answered: true, _isCorrect: null, _answeredAt: null, display_name: '', avatar_url: game.current_user?.avatar_url || null };
                     const arPlayers = [meEntry, ...gamePlayers];
                     const atRect = answerTextEl.getBoundingClientRect();
-                    answerResponsesEl.style.top = (atRect.bottom + 75) + 'px';
+                    answerResponsesEl.style.top = (atRect.bottom + window.scrollY + 40) + 'px';
                     answerResponsesEl.innerHTML = buildAnswerResponsesHtml(arPlayers, submittedAnswer);
                     answerResponsesEl.classList.remove('count-1', 'count-2');
                     if (arPlayers.length === 1) answerResponsesEl.classList.add('count-1');
