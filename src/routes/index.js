@@ -200,7 +200,9 @@ router.get('/api/games', async (req, res) => {
            (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'user_id', ga.user_id, 'game_question_id', ga.game_question_id,
                                              'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
             FROM game_answers ga JOIN game_questions gq ON ga.game_question_id = gq.id
-            WHERE gq.game_id = g.id) AS answers
+            WHERE gq.game_id = g.id) AS answers,
+           (SELECT JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url)
+            FROM users u WHERE u.id = ${escapedUserId}) AS me
          FROM games g
          WHERE g.id = ?`,
         [Number(gameId)]
@@ -218,6 +220,7 @@ router.get('/api/games', async (req, res) => {
         id: row.id,
         created_at: row.created_at,
         players: parse(row.players) || [],
+        me: parse(row.me) || null,
         current_question: row.cq_id ? {
           game_question_id: row.cq_id,
           asked_at: row.cq_asked_at,
