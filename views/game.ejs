@@ -357,6 +357,7 @@
     #game-players .player-avatar { width: 34.2px; height: 34.2px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
     #game-players .player-avatar-placeholder { width: 34.2px; height: 34.2px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.91rem; }
     #game-players .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 18.1px; height: 18.1px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
+    #game-players .player-answered-badge.incorrect { background: #e53935; }
     #game-players .player-answered-badge svg { display: block; width: 9.7px; height: 9.7px; }
     #game-players .game-player-info { display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
     #game-players .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -503,7 +504,12 @@
         currentQuestion  = game.current_question.question;
         currentAnswer    = game.current_question.answer;
         currentCategory  = category;
-        gamePlayers = (game.players || []).map(p => ({ ...p, _answered: false }));
+        const cqId = game.current_question ? game.current_question.game_question_id : null;
+        const answerByUser = new Map((cqId ? (game.answers || []).filter(a => a.game_question_id === cqId) : []).map(a => [a.user_id, a]));
+        gamePlayers = (game.players || []).map(p => {
+          const ans = answerByUser.get(p.id);
+          return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null };
+        });
 
 
         // Enforce minimum 500ms spinner

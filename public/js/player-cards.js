@@ -1,4 +1,14 @@
 // Shared player card HTML builder used by dashboard and game pages.
+function relativeAnswerTime(ts) {
+  if (!ts) return 'Waiting';
+  const diffMs = Date.now() - new Date(ts).getTime();
+  const diffHrs = diffMs / (1000 * 60 * 60);
+  if (diffHrs < 1) return 'Recently';
+  if (diffHrs >= 24) return '1+ day ago';
+  const hrs = Math.floor(diffHrs);
+  return hrs + ' hr ago';
+}
+
 function buildGamePlayersHtml(players, summaryText) {
   const visible = players.slice(0, 3);
   const overflow = players.length - 3;
@@ -23,10 +33,17 @@ function buildPlayerCardHtml(p) {
   const avatarInner = p.avatar_url
     ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${displayName}" />`
     : `<div class="player-avatar-placeholder">👤</div>`;
-  const badge = `<div class="player-answered-badge"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+  const hasAnswer = p._answered;
+  const isCorrect = p._isCorrect;
+  let badge = '';
+  if (hasAnswer && isCorrect) {
+    badge = `<div class="player-answered-badge"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+  } else if (hasAnswer && isCorrect === false) {
+    badge = `<div class="player-answered-badge incorrect"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><line x1="1.5" y1="1.5" x2="4.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><line x1="4.5" y1="1.5" x2="1.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg></div>`;
+  }
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}</div>`;
-  const statusClass = p._answered ? 'answered' : 'waiting';
-  const statusText = p._answered ? 'Answered' : 'Waiting';
+  const statusClass = hasAnswer ? 'answered' : 'waiting';
+  const statusText = relativeAnswerTime(p._answeredAt);
   return `<div class="game-player">
     ${avatarHtml}
     <div class="game-player-info">
