@@ -306,6 +306,10 @@
       transition: transform 0.35s cubic-bezier(0.4, 0, 1, 1), opacity 0.25s ease;
       pointer-events: none;
     }
+    @media (display-mode: standalone) {
+      #answer-input  { bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); }
+      #input-spinner { bottom: calc(env(safe-area-inset-bottom, 0px) + 35px); }
+    }
 
     #input-spinner {
       position: absolute;
