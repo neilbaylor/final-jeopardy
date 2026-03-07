@@ -569,7 +569,7 @@
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${displayName}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
         const statusClass = p._answered ? 'answered' : 'waiting';
-        const statusText  = p._answered ? 'Answered' : 'Waiting';
+        const statusText  = relativeAnswerTime(p._answeredAt);
         return `<div class="answer-response-row">
           <div class="ar-player">
             <div class="player-avatar-wrap">${avatarInner}</div>
