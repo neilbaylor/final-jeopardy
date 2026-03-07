@@ -11,9 +11,14 @@ function relativeAnswerTime(ts) {
 
 function nextQuestionIn(createdAt) {
   const msRemaining = 24 * 60 * 60 * 1000 - (Date.now() - new Date(createdAt).getTime());
-  if (msRemaining <= 0) return 'soon';
+  if (msRemaining <= 0) return null;
   const hrs = Math.round(msRemaining / (1000 * 60 * 60));
   return hrs === 1 ? '1 hour' : `${hrs} hours`;
+}
+
+function nextQuestionSummary(createdAt) {
+  const t = nextQuestionIn(createdAt);
+  return t ? `<strong>New question in ${t}</strong> or after everyone answers` : 'New game coming soon';
 }
 
 function buildGamePlayersHtml(players, summaryText) {

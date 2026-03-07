@@ -532,7 +532,7 @@
               answerBtn.classList.add('visible');
               setTimeout(() => answerBtn.classList.add('pulse'), 800);
               if (gamePlayers.length > 0) {
-                gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, `<strong>New question in ${nextQuestionIn(game.created_at)}</strong> or after everyone answers`);
+                gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, nextQuestionSummary(game.created_at));
                 if (gamePlayers.length === 1) gamePlayersEl.classList.add('count-1');
                 else if (gamePlayers.length === 2) gamePlayersEl.classList.add('count-2');
                 gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
@@ -567,7 +567,7 @@
                   answerBtn.classList.add('visible');
                   setTimeout(() => answerBtn.classList.add('pulse'), 800);
                   if (gamePlayers.length > 0) {
-                    gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, `<strong>New question in ${nextQuestionIn(game.created_at)}</strong> or after everyone answers`);
+                    gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, nextQuestionSummary(game.created_at));
                     if (gamePlayers.length === 1) gamePlayersEl.classList.add('count-1');
                     else if (gamePlayers.length === 2) gamePlayersEl.classList.add('count-2');
                     gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
