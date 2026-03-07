@@ -610,16 +610,10 @@
         currentGameCreatedAt = game.created_at || '';
         const cqId = game.current_question ? game.current_question.game_question_id : null;
         const answerByUser = new Map((cqId ? (game.answers || []).filter(a => a.game_question_id === cqId) : []).map(a => [a.user_id, a]));
-        const others = (game.players || []).map(p => {
+        gamePlayers = (game.players || []).map(p => {
           const ans = answerByUser.get(p.id);
-          return { ...p, _isMe: false, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null };
+          return { ...p, _isMe: String(p.id) === String(userId), _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null };
         });
-        if (game.me) {
-          const myAns = answerByUser.get(game.me.id);
-          gamePlayers = [{ ...game.me, _isMe: true, _answered: !!myAns, _isCorrect: myAns ? !!myAns.is_correct : null, _answeredAt: myAns ? myAns.answered_at : null }, ...others];
-        } else {
-          gamePlayers = others;
-        }
 
 
         // Enforce minimum 500ms spinner
