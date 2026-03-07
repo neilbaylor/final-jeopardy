@@ -518,6 +518,7 @@
     sessionStorage.removeItem('vt-from-dashboard');
     let gamePlayers = [];
     let currentCategory = '';
+    let currentUserAvatarUrl = null;
 
     // Reveal spinner + back btn after page transition completes (0.42s)
     setTimeout(() => {
@@ -610,6 +611,7 @@
         currentAnswer        = game.current_question.answer;
         currentCategory      = category;
         currentGameCreatedAt = game.created_at || '';
+        currentUserAvatarUrl = game.current_user?.avatar_url || null;
         const cqId = game.current_question ? game.current_question.game_question_id : null;
         const answerByUser = new Map((cqId ? (game.answers || []).filter(a => a.game_question_id === cqId) : []).map(a => [a.user_id, a]));
         gamePlayers = (game.players || []).map(p => {
@@ -825,7 +827,7 @@
                   answerTextEl.classList.add('visible');
                   // Position and show answer-responses 1s after the answer fades in
                   setTimeout(() => {
-                    const meEntry = { _isMe: true, _answered: true, _isCorrect: null, _answeredAt: null, display_name: '', avatar_url: game.current_user?.avatar_url || null };
+                    const meEntry = { _isMe: true, _answered: true, _isCorrect: null, _answeredAt: null, display_name: '', avatar_url: currentUserAvatarUrl };
                     const arPlayers = [meEntry, ...gamePlayers];
                     const atRect = answerTextEl.getBoundingClientRect();
                     answerResponsesEl.style.top = (atRect.bottom + 40) + 'px';
