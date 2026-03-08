@@ -775,15 +775,15 @@
       overflow: hidden;
     }
     #view-modal .vm-header {
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid #eee;
+      padding: 14px 16px 4px;
     }
     #view-modal .vm-title {
       font-size: 0.92rem;
-      font-weight: 700;
+      font-weight: 600;
       color: #1a1a2e;
     }
-    #view-modal-answer { padding: 8px 16px 9px; font-size: 0.88rem; font-weight: 600; color: #1a1a2e; border-bottom: 1px solid #f0f0f0; }
+    #view-modal-question { padding: 2px 16px 6px; font-size: 0.88rem; font-weight: 600; color: #1a1a2e; }
+    #view-modal-answer { padding: 6px 16px 12px; font-size: 1rem; font-weight: 700; color: #1a1a2e; border-bottom: 1px solid #f0f0f0; }
     #view-modal .answer-response-row { display: flex; align-items: center; padding: 9.5px 14px; gap: 13px; border-top: 1px solid #f0f0f0; }
     #view-modal .answer-response-row:first-child { border-top: none; }
     #view-modal .ar-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
@@ -1114,6 +1114,7 @@
       <div class="vm-header">
         <span class="vm-title"></span>
       </div>
+      <div id="view-modal-question"></div>
       <div id="view-modal-answer"></div>
       <div id="view-modal-content"></div>
       <div id="view-modal-footer"></div>
@@ -1430,7 +1431,7 @@
             <div class="game-row-body">
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               ${iAnswered
-                ? (() => { gameViewData.set(String(game.id), { players: combined, myAnswer: myAnswer ? myAnswer.answer : '', createdAt: game.created_at, category, correctAnswer: game.current_question ? game.current_question.answer : '' }); return `<button class="view-btn">Answers</button>`; })()
+                ? (() => { gameViewData.set(String(game.id), { players: combined, myAnswer: myAnswer ? myAnswer.answer : '', createdAt: game.created_at, category, question: game.current_question ? game.current_question.question : '', correctAnswer: game.current_question ? game.current_question.answer : '' }); return `<button class="view-btn">Answers</button>`; })()
                 : `<button class="answer-btn" style="animation-delay: -${(idx * 0.3) % 1.4}s">Answer</button>`
               }
             </div>
@@ -1553,12 +1554,13 @@
           btn.innerHTML = '<span class="btn-spinner"></span>';
           btn.classList.add('loading');
           const gameId = btn.closest('.game-row-wrapper').dataset.gameId;
-          const { players, myAnswer, createdAt, category, correctAnswer } = gameViewData.get(gameId) || {};
+          const { players, myAnswer, createdAt, category, question, correctAnswer } = gameViewData.get(gameId) || {};
           setTimeout(() => {
             btn.innerHTML = 'Answers';
             btn.classList.remove('loading');
             btn.style.width = '';
             document.querySelector('#view-modal .vm-title').textContent = category || 'Answers';
+            document.getElementById('view-modal-question').textContent = question || '';
             document.getElementById('view-modal-answer').textContent = correctAnswer || '';
             document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
             document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(createdAt, players);
