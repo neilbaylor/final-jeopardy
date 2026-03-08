@@ -1194,7 +1194,7 @@
         });
 
         if (res.ok) {
-          await loadGames(true);
+          await loadGames(true, true);
           closePanel();
           btn.style.width = '';
           btn.classList.remove('loading');
@@ -1218,7 +1218,7 @@
       try { localStorage.setItem(GAMES_CACHE_KEY, JSON.stringify({ games, savedAt: Date.now() })); } catch {}
     }
 
-    function loadGames(silent = false) {
+    function loadGames(silent = false, noFade = false) {
       const fab = document.getElementById('new-game');
       const spinner = document.getElementById('games-spinner');
       const gamesList = document.getElementById('games-list');
@@ -1235,10 +1235,11 @@
             setTimeout(() => { fab.style.opacity = '1'; }, 575);
           }
           fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
-          if (silent && gamesList.querySelector('.game-row-wrapper')) {
+          if (silent && !noFade && gamesList.querySelector('.game-row-wrapper')) {
             gamesList.style.opacity = '0';
             setTimeout(() => { renderGames(games); gamesList.style.opacity = '1'; }, 360);
           } else if (!silent || (Array.isArray(games) && games.length > 0)) {
+            gamesList.style.opacity = '';
             renderGames(games);
           }
         })
