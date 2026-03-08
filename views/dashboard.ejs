@@ -1238,7 +1238,14 @@
           if (silent && gamesList.querySelector('.game-row-wrapper')) {
             gamesList.style.transition = 'opacity 0.22s ease';
             gamesList.style.opacity = '0';
-            setTimeout(() => { renderGames(games); gamesList.style.opacity = '1'; setTimeout(() => { gamesList.style.transition = ''; }, 250); }, 240);
+            gamesList.addEventListener('transitionend', function onFadeOut() {
+              gamesList.removeEventListener('transitionend', onFadeOut);
+              renderGames(games);
+              requestAnimationFrame(() => {
+                gamesList.style.opacity = '1';
+                setTimeout(() => { gamesList.style.transition = ''; }, 250);
+              });
+            }, { once: true });
           } else if (!silent || (Array.isArray(games) && games.length > 0)) {
             renderGames(games);
           }
