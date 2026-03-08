@@ -1441,7 +1441,7 @@
             <div class="game-row-body">
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               ${iAnswered
-                ? (() => { gameViewData.set(game.id, { players: combined, myAnswer: myAnswer ? myAnswer.answer : '' }); return `<button class="view-btn">Answers</button>`; })()
+                ? (() => { gameViewData.set(String(game.id), { players: combined, myAnswer: myAnswer ? myAnswer.answer : '' }); return `<button class="view-btn">Answers</button>`; })()
                 : `<button class="answer-btn" style="animation-delay: -${(idx * 0.3) % 1.4}s">Answer</button>`
               }
             </div>
