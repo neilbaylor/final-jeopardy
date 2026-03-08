@@ -726,7 +726,7 @@
       right: 8px;
       position: absolute;
       top: 31px;
-      background: linear-gradient(to top, rgba(155, 155, 155, 0.88), rgba(185, 185, 185, 0.88));
+      background: linear-gradient(to top, rgba(200, 200, 200, 0.75), rgba(220, 220, 220, 0.75));
       border: none;
       border-radius: 999px;
       padding: 0 15px;
@@ -1366,7 +1366,7 @@
           : `<div class="player-avatar-placeholder">👤</div>`;
         const statusClass = (p._answered && p._answeredAt) ? 'answered' : 'waiting';
         const statusText = relativeAnswerTime(p._answeredAt);
-        const answerText = p._isMe && myAnswer ? esc(myAnswer) : (p._answered ? '···' : '');
+        const answerText = p._isMe && myAnswer ? esc(myAnswer) : (p._answered ? 'Dummy answer' : '');
         return `<div class="answer-response-row">
           <div class="ar-player">
             <div class="player-avatar-wrap">${avatarInner}</div>
