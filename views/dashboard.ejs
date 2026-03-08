@@ -1523,7 +1523,7 @@
           }
           const viewBtn = wrapper.querySelector('.view-btn');
           if (viewBtn) {
-            viewBtn.click();
+            if (!viewBtn.classList.contains('loading')) viewBtn.click();
             return;
           }
           const btn = wrapper.querySelector('.answer-btn');
