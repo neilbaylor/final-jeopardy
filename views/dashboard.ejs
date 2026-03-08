@@ -1256,6 +1256,9 @@
       if (!Array.isArray(games) || games.length === 0) {
         list.innerHTML = '<p class="games-empty">You aren\'t a member of any games</p><picture><source srcset="/images/fjwf_logo.webp" type="image/webp"><img src="/images/fjwf_logo_compressed.png" class="games-empty-logo" alt="Final Jeopardy logo"></picture>';
         prevGameIds = new Set();
+        // Force a repaint to clear stale GPU layer tiles in Mobile Safari
+        list.style.webkitTransform = 'translateZ(0)';
+        requestAnimationFrame(() => { list.style.webkitTransform = ''; });
         return;
       }
 
