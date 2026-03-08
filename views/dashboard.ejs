@@ -1531,6 +1531,11 @@
             closeAllSwipes();
             return;
           }
+          const viewBtn = wrapper.querySelector('.view-btn');
+          if (viewBtn) {
+            viewBtn.click();
+            return;
+          }
           const btn = wrapper.querySelector('.answer-btn');
           if (btn) {
             btn.style.width = btn.offsetWidth + 'px';
