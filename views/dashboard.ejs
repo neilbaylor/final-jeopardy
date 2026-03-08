@@ -1321,6 +1321,12 @@
         list.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
           if (!prevGameIds.has(wrapper.dataset.gameId)) {
             wrapper.classList.add('new-row');
+            const btn = wrapper.querySelector('.answer-btn');
+            if (btn) {
+              const originalDelay = btn.style.animationDelay;
+              btn.style.animationDelay = '5600ms';
+              setTimeout(() => { btn.style.animationDelay = originalDelay; }, 5600);
+            }
           }
         });
       }
