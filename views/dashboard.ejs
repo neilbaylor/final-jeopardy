@@ -1380,6 +1380,7 @@
       }).join('');
     }
 
+    let gameViewData = new Map();
     function renderGames(games) {
       const list = document.getElementById('games-list');
       if (!Array.isArray(games) || games.length === 0) {
@@ -1440,7 +1441,7 @@
             <div class="game-row-body">
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               ${iAnswered
-                ? `<button class="view-btn" data-players="${escHtml(JSON.stringify(combined))}" data-my-answer="${escHtml(myAnswer ? myAnswer.answer : '')}">View</button>`
+                ? (() => { gameViewData.set(game.id, { players: combined, myAnswer: myAnswer ? myAnswer.answer : '' }); return `<button class="view-btn">Answers</button>`; })()
                 : `<button class="answer-btn" style="animation-delay: -${(idx * 0.3) % 1.4}s">Answer</button>`
               }
             </div>
@@ -1562,10 +1563,10 @@
           btn.style.width = origWidth + 'px';
           btn.innerHTML = '<span class="btn-spinner"></span>';
           btn.classList.add('loading');
-          const players = JSON.parse(btn.dataset.players);
-          const myAnswer = btn.dataset.myAnswer;
+          const gameId = btn.closest('.game-row-wrapper').dataset.gameId;
+          const { players, myAnswer } = gameViewData.get(gameId) || {};
           setTimeout(() => {
-            btn.innerHTML = 'View';
+            btn.innerHTML = 'Answers';
             btn.classList.remove('loading');
             btn.style.width = '';
             document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
