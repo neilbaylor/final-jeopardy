@@ -297,16 +297,17 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields: playerId, questionId, answer' });
   }
 
+  const conn = await db.getConnection();
   try {
     // 1. Check player is in this game
-    const [[member]] = await db.execute(
+    const [[member]] = await conn.execute(
       'SELECT 1 FROM game_users WHERE game_id = ? AND user_id = ?',
       [gameId, Number(playerId)]
     );
     if (!member) return res.status(403).json({ error: 'Player is not part of this game' });
 
     // 2. Look up the game_questions row (errors if question not linked to game)
-    const [[gq]] = await db.execute(
+    const [[gq]] = await conn.execute(
       `SELECT gq.id AS game_question_id, q.answer AS correct_answer
        FROM game_questions gq
        JOIN questions q ON gq.question_id = q.id
@@ -318,16 +319,44 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
     // 3. Determine correctness
     const correct = isAnswerCorrect(String(answer), gq.correct_answer);
 
+    await conn.beginTransaction();
+
     // 4. Insert into game_answers (ignore duplicate if already answered)
-    await db.execute(
+    await conn.execute(
       `INSERT INTO game_answers (game_question_id, user_id, answer, is_correct)
        VALUES (?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE answer = VALUES(answer), is_correct = VALUES(is_correct)`,
       [gq.game_question_id, Number(playerId), String(answer), correct]
     );
 
-    // 5. Return all answers for this question in this game
-    const [answers] = await db.execute(
+    // 5. If all players have answered, queue a new random unseen question
+    const [[{ total }]] = await conn.execute(
+      'SELECT COUNT(*) AS total FROM game_users WHERE game_id = ?',
+      [gameId]
+    );
+    const [[{ answered }]] = await conn.execute(
+      'SELECT COUNT(*) AS answered FROM game_answers WHERE game_question_id = ?',
+      [gq.game_question_id]
+    );
+    if (answered >= total) {
+      const [[nextQuestion]] = await conn.execute(
+        `SELECT id FROM questions
+         WHERE id NOT IN (SELECT question_id FROM game_questions WHERE game_id = ?)
+         ORDER BY RAND() LIMIT 1`,
+        [gameId]
+      );
+      if (nextQuestion) {
+        await conn.execute(
+          'INSERT INTO game_questions (game_id, question_id, asked_at) VALUES (?, ?, NOW())',
+          [gameId, nextQuestion.id]
+        );
+      }
+    }
+
+    await conn.commit();
+
+    // 6. Return all answers for this question in this game
+    const [answers] = await conn.execute(
       `SELECT ga.id, ga.user_id, ga.game_question_id, ga.answer, ga.is_correct, ga.answered_at
        FROM game_answers ga
        WHERE ga.game_question_id = ?`,
@@ -336,8 +365,11 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
 
     return res.json(answers);
   } catch (err) {
+    await conn.rollback();
     console.error('Submit answer error:', err);
     return res.status(500).json({ error: 'Database error' });
+  } finally {
+    conn.release();
   }
 });
 
