@@ -744,11 +744,6 @@
       width: 81.8px;
     }
     .view-btn:active { transform: scale(0.93); }
-    .view-btn.loading { pointer-events: none; }
-    .view-btn .btn-spinner {
-      border-color: rgba(7, 16, 46, 0.2);
-      border-top-color: #07102e;
-    }
     #view-modal-backdrop {
       display: flex;
       position: absolute;
@@ -1538,22 +1533,13 @@
       document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           e.stopPropagation();
-          const origWidth = btn.offsetWidth;
-          btn.style.width = origWidth + 'px';
-          btn.innerHTML = '<span class="btn-spinner"></span>';
-          btn.classList.add('loading');
           const gameId = btn.closest('.game-row-wrapper').dataset.gameId;
           const { players, myAnswer, createdAt, category, question, correctAnswer } = gameViewData.get(gameId) || {};
-          setTimeout(() => {
-            btn.innerHTML = 'Answers';
-            btn.classList.remove('loading');
-            btn.style.width = '';
-            document.getElementById('view-modal-question').textContent = question || '';
-            document.getElementById('view-modal-answer').textContent = correctAnswer || '';
-            document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
-            document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(createdAt, players);
-            document.getElementById('view-modal-backdrop').classList.add('open');
-          }, 500);
+          document.getElementById('view-modal-question').textContent = question || '';
+          document.getElementById('view-modal-answer').textContent = correctAnswer || '';
+          document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
+          document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(createdAt, players);
+          document.getElementById('view-modal-backdrop').classList.add('open');
         });
       });
     }
