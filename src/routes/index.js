@@ -329,16 +329,18 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
       [gq.game_question_id, Number(playerId), String(answer), correct]
     );
 
-    // 5. If all players have answered, queue a new random unseen question
+    // 5. Fetch answers and total players to check if everyone has answered
+    const [answers] = await conn.execute(
+      `SELECT ga.id, ga.user_id, ga.game_question_id, ga.answer, ga.is_correct, ga.answered_at
+       FROM game_answers ga
+       WHERE ga.game_question_id = ?`,
+      [gq.game_question_id]
+    );
     const [[{ total }]] = await conn.execute(
       'SELECT COUNT(*) AS total FROM game_users WHERE game_id = ?',
       [gameId]
     );
-    const [[{ answered }]] = await conn.execute(
-      'SELECT COUNT(*) AS answered FROM game_answers WHERE game_question_id = ?',
-      [gq.game_question_id]
-    );
-    if (answered >= total) {
+    if (answers.length >= total) {
       const [[nextQuestion]] = await conn.execute(
         `SELECT id FROM questions
          WHERE id NOT IN (SELECT question_id FROM game_questions WHERE game_id = ?)
@@ -354,14 +356,6 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
     }
 
     await conn.commit();
-
-    // 6. Return all answers for this question in this game
-    const [answers] = await conn.execute(
-      `SELECT ga.id, ga.user_id, ga.game_question_id, ga.answer, ga.is_correct, ga.answered_at
-       FROM game_answers ga
-       WHERE ga.game_question_id = ?`,
-      [gq.game_question_id]
-    );
 
     return res.json(answers);
   } catch (err) {
