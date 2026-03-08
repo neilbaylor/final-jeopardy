@@ -1422,9 +1422,18 @@
       confirmBtn.disabled = true;
       cancelBtn.disabled = true;
 
+      let ok = false;
       try {
-        await fetch(`/api/games/${encodeURIComponent(gameId)}`, { method: 'DELETE' });
-      } catch (e) { /* continue regardless */ }
+        const res = await fetch(`/api/games/${encodeURIComponent(gameId)}`, { method: 'DELETE' });
+        ok = res.ok;
+      } catch (e) {}
+
+      if (!ok) {
+        confirmBtn.classList.remove('loading');
+        confirmBtn.disabled = false;
+        cancelBtn.disabled = false;
+        return;
+      }
 
       await loadGames(true);
 
