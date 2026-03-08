@@ -807,6 +807,7 @@
     #view-modal .player-status.waiting  { color: rgba(0,0,0,0.38); font-weight: 500; }
     #view-modal .player-status.answered { color: #2e7d32; }
     #view-modal .ar-answer { font-size: 1rem; font-weight: 500; color: #333; opacity: 0.9; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; }
+    #view-modal-footer { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px; font-size: 0.7rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 16px 16px; }
 
     /* Summary bar */
     .game-row-summary {
@@ -1128,6 +1129,7 @@
         </button>
       </div>
       <div id="view-modal-content"></div>
+      <div id="view-modal-footer"></div>
     </div>
   </div>
 
@@ -1441,7 +1443,7 @@
             <div class="game-row-body">
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               ${iAnswered
-                ? (() => { gameViewData.set(String(game.id), { players: combined, myAnswer: myAnswer ? myAnswer.answer : '' }); return `<button class="view-btn">Answers</button>`; })()
+                ? (() => { gameViewData.set(String(game.id), { players: combined, myAnswer: myAnswer ? myAnswer.answer : '', createdAt: game.created_at, category }); return `<button class="view-btn">Answers</button>`; })()
                 : `<button class="answer-btn" style="animation-delay: -${(idx * 0.3) % 1.4}s">Answer</button>`
               }
             </div>
@@ -1564,12 +1566,14 @@
           btn.innerHTML = '<span class="btn-spinner"></span>';
           btn.classList.add('loading');
           const gameId = btn.closest('.game-row-wrapper').dataset.gameId;
-          const { players, myAnswer } = gameViewData.get(gameId) || {};
+          const { players, myAnswer, createdAt, category } = gameViewData.get(gameId) || {};
           setTimeout(() => {
             btn.innerHTML = 'Answers';
             btn.classList.remove('loading');
             btn.style.width = '';
+            document.querySelector('#view-modal .vm-title').textContent = category || 'Answers';
             document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
+            document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(createdAt, players);
             document.getElementById('view-modal-backdrop').classList.add('open');
           }, 500);
         });
