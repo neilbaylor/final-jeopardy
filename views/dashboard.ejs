@@ -774,16 +774,8 @@
       box-shadow: 0 8px 32px rgba(0,0,0,0.22);
       overflow: hidden;
     }
-    #view-modal .vm-header {
-      padding: 14px 16px 4px;
-    }
-    #view-modal .vm-title {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #1a1a2e;
-    }
-    #view-modal-question { padding: 2px 16px 6px; font-size: 0.88rem; font-weight: 600; color: #1a1a2e; }
-    #view-modal-answer { padding: 6px 16px 12px; font-size: 1rem; font-weight: 700; color: #1a1a2e; border-bottom: 1px solid #f0f0f0; }
+    #view-modal-question { padding: 14px 16px 6px; font-size: 0.92rem; font-weight: 600; color: #1a1a2e; line-height: 1.45; }
+    #view-modal-answer { padding: 6px 16px 12px; font-size: 1.05rem; font-weight: 700; color: #1a1a2e; border-bottom: 1px solid #f0f0f0; }
     #view-modal .answer-response-row { display: flex; align-items: center; padding: 9.5px 14px; gap: 13px; border-top: 1px solid #f0f0f0; }
     #view-modal .answer-response-row:first-child { border-top: none; }
     #view-modal .ar-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
@@ -1111,9 +1103,6 @@
 
   <div id="view-modal-backdrop">
     <div id="view-modal">
-      <div class="vm-header">
-        <span class="vm-title"></span>
-      </div>
       <div id="view-modal-question"></div>
       <div id="view-modal-answer"></div>
       <div id="view-modal-content"></div>
@@ -1559,7 +1548,6 @@
             btn.innerHTML = 'Answers';
             btn.classList.remove('loading');
             btn.style.width = '';
-            document.querySelector('#view-modal .vm-title').textContent = category || 'Answers';
             document.getElementById('view-modal-question').textContent = question || '';
             document.getElementById('view-modal-answer').textContent = correctAnswer || '';
             document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
