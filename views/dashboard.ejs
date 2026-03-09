@@ -1911,8 +1911,13 @@
                 ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
                 ptrSpinner.classList.remove('ptr-spinning');
                 ptrSpinner.style.animationDelay = '';
-                ptr.style.height = '0';
-                setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 180);
+                requestAnimationFrame(() => {
+                  ptr.style.opacity = '0';
+                  setTimeout(() => {
+                    ptr.style.height = '0';
+                    setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 180);
+                  }, 275);
+                });
               }, 640);
             });
           } else {
