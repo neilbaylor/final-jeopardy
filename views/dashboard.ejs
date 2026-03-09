@@ -1900,7 +1900,6 @@
             requestAnimationFrame(() => {
               ptrSpinner.classList.add('ptr-spinning');
             });
-            prevGameIds = null;
             loadGames(true).finally(() => {
               setTimeout(() => {
                 ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
