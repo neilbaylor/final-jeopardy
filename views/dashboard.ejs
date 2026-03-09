@@ -965,7 +965,6 @@
     }
     #users-list {
       padding: 0;
-      transition: opacity 0.36s ease;
       will-change: transform;
       height: 100%;
       background: #fff;
@@ -1704,14 +1703,8 @@
               if (selected.has(row.dataset.userId)) row.querySelector('input').checked = true;
             });
             updateCreateBtn();
-            list.style.opacity = '1';
           };
-          if (silent && scroller.querySelector('.user-row')) {
-            list.style.opacity = '0';
-            setTimeout(applyUsers, 360);
-          } else {
-            applyUsers();
-          }
+          applyUsers();
         })
         .catch(() => {
           if (!silent) spinner.classList.add('hidden');
