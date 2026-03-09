@@ -177,6 +177,18 @@
     /* Opt in to MPA view transitions (destination controls the animation) */
     @view-transition { navigation: auto; }
 
+    /* Slide-down exit animation — mirrors dashboard so it fires from this side too */
+    @keyframes slide-down {
+      to { transform: translateY(100dvh); opacity: 0.85; }
+    }
+    ::view-transition-old(root) {
+      animation: slide-down 0.45s ease-in-out both;
+      z-index: 1;
+    }
+    ::view-transition-new(root) {
+      animation: none;
+    }
+
     #welcome-overlay {
       position: fixed;
       inset: 0;
@@ -364,7 +376,13 @@
             document.getElementById('welcome-avatar').style.opacity = '1';
             document.getElementById('welcome-name').style.opacity = '1';
           }, 250);
-          setTimeout(() => location.replace('/dashboard'), 2500);
+          setTimeout(() => {
+            if (document.startViewTransition) {
+              document.startViewTransition(() => location.replace('/dashboard'));
+            } else {
+              location.replace('/dashboard');
+            }
+          }, 2200);
         })
         .catch(() => location.replace('/dashboard'));
     }
