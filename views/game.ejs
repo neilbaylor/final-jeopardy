@@ -585,7 +585,9 @@
       }).join('') + `<div class="game-row-summary">${nextQuestionSummary(currentGameCreatedAt, players)}</div>`;
     }
 
-    function showLoadError() {
+    async function showLoadError(loadStart) {
+      const elapsed = Date.now() - loadStart;
+      await new Promise(r => setTimeout(r, Math.max(0, 1000 - elapsed)));
       spinner.classList.add('hidden');
       loadErrorEl.textContent = 'Sorry, that game can\'t be loaded';
       loadErrorEl.classList.add('visible');
@@ -600,10 +602,10 @@
       try {
         const url = `/api/games?gameId=${gameId}${userId ? '&userId=' + userId : ''}`;
         const res  = await fetch(url);
-        if (!res.ok) { showLoadError(); return; }
+        if (!res.ok) { await showLoadError(loadStart); return; }
         const game = await res.json();
         if (!game?.current_question?.category || !game?.current_question?.question || !game?.current_question?.answer) {
-          showLoadError(); return;
+          await showLoadError(loadStart); return;
         }
         const category = toTitleCase(game.current_question.category);
         currentQuestion      = game.current_question.question;
@@ -697,7 +699,7 @@
 
       } catch (err) {
         console.error('Failed to load game:', err);
-        showLoadError();
+        await showLoadError(loadStart);
       }
     }
 
