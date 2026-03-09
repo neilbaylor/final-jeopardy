@@ -186,7 +186,7 @@
       justify-content: center;
       gap: 28px;
       opacity: 0;
-      transition: opacity 0.22s ease;
+      transition: opacity 0.22s ease, transform 0.45s ease-in-out;
       pointer-events: none;
       z-index: 10;
       padding-bottom: 260px;
@@ -364,6 +364,9 @@
             document.getElementById('welcome-avatar').style.opacity = '1';
             document.getElementById('welcome-name').style.opacity = '1';
           }, 250);
+          setTimeout(() => {
+            document.getElementById('welcome-overlay').style.transform = 'translateY(100dvh)';
+          }, 1750);
           setTimeout(() => location.replace('/dashboard'), 2200);
         })
         .catch(() => location.replace('/dashboard'));
