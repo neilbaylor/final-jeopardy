@@ -627,6 +627,15 @@
         // Fade out spinner
         spinner.classList.add('hidden');
 
+        if (meAnswered) {
+          if (userId) {
+            try { localStorage.removeItem(`fjwf_games_${userId}`); } catch {}
+          }
+          loadErrorEl.textContent = 'You have already answered this question';
+          loadErrorEl.classList.add('visible');
+          return;
+        }
+
         if (fromDashboard) {
           // Skip "And the Category is..." animation — show category directly
           const cs = categoryStyle(category);
