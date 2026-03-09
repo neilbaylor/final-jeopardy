@@ -34,7 +34,17 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;
-  return natural.JaroWinklerDistance(a, b) >= 0.88;
+  if (natural.JaroWinklerDistance(a, b) >= 0.88) return true;
+
+  // If the correct answer has parenthetical words, they are optional.
+  // e.g. "(Randolph) Caldecott" accepts both "Caldecott" and "Randolph Caldecott".
+  if (/\(/.test(correctAnswer)) {
+    const withoutOptional = normalizeAnswer(correctAnswer.replace(/\([^)]*\)/g, ''));
+    if (a === withoutOptional) return true;
+    if (natural.JaroWinklerDistance(a, withoutOptional) >= 0.88) return true;
+  }
+
+  return false;
 }
 
 // Login page
