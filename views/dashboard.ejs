@@ -1383,7 +1383,7 @@
       const MAX_VISIBLE = 3;
       const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
-      const staggerMs = games.length > 1 ? Math.max(28, Math.round(70 / Math.sqrt(games.length - 1))) : 0;
+      const staggerMs = games.length > 1 ? Math.max(55, Math.round(70 / Math.sqrt(games.length - 1))) : 0;
       list.innerHTML = games.map((game, idx) => {
         const rawCategory = game.current_question ? game.current_question.category : 'No question yet';
         const category = toTitleCase(rawCategory);
