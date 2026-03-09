@@ -1642,14 +1642,18 @@
         return;
       }
 
-      await loadGames(true, true);
-
+      const gamesList = document.getElementById('games-list');
+      gamesList.style.transition = 'opacity 0.18s ease';
+      gamesList.style.opacity = '0';
       backdrop.classList.remove('open');
-      setTimeout(() => {
-        confirmBtn.classList.remove('loading');
-        confirmBtn.disabled = false;
-        cancelBtn.disabled = false;
-      }, 200);
+
+      await Promise.all([loadGames(true, true), new Promise(r => setTimeout(r, 220))]);
+
+      gamesList.style.opacity = '1';
+      setTimeout(() => { gamesList.style.transition = ''; }, 200);
+      confirmBtn.classList.remove('loading');
+      confirmBtn.disabled = false;
+      cancelBtn.disabled = false;
     });
 
     let usersCache = null;
