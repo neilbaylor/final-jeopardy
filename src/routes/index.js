@@ -17,6 +17,10 @@ function numToWords(n) {
   return String(n);
 }
 
+function stripOneOf(str) {
+  return str.replace(/^\(\d+\s+of\s+\d+\)\s*/i, '');
+}
+
 function normalizeAnswer(str) {
   return str
     .toLowerCase()
@@ -247,7 +251,7 @@ router.get('/api/games', async (req, res) => {
           asked_at: row.cq_asked_at,
           question_id: row.cq_question_id,
           question: row.cq_question,
-          answer: row.cq_answer,
+          answer: stripOneOf(row.cq_answer),
           category: row.cq_category,
         } : null,
         answers: parse(row.answers) || [],
@@ -294,7 +298,7 @@ router.get('/api/games', async (req, res) => {
         asked_at: row.cq_asked_at,
         question_id: row.cq_question_id,
         question: row.cq_question,
-        answer: row.cq_answer,
+        answer: stripOneOf(row.cq_answer),
         category: row.cq_category,
       } : null,
       answers: parse(row.answers) || [],
