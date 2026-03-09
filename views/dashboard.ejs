@@ -1027,10 +1027,12 @@
       flex-shrink: 0;
       border: 1px solid transparent;
       box-sizing: border-box;
+      opacity: 0.93;
     }
     .user-row:has(input:checked) img,
     .user-row:has(input:checked) .user-avatar-placeholder {
       border-color: #888;
+      opacity: 1;
     }
     .user-avatar-placeholder {
       background: #e8eaf0;
@@ -1222,6 +1224,7 @@
 
     document.getElementById('new-game').addEventListener('click', () => {
       openPanel();
+      document.getElementById('users-list-scroller').scrollTop = 0;
       loadUsers();
     });
     const closePanelBtn = document.getElementById('close-panel');
