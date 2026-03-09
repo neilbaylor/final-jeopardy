@@ -1901,7 +1901,7 @@
               ptrSpinner.classList.add('ptr-spinning');
             });
             prevGameIds = null;
-            loadGames(true, true).finally(() => {
+            loadGames(true).finally(() => {
               setTimeout(() => {
                 ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
                 ptrSpinner.classList.remove('ptr-spinning');
