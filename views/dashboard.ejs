@@ -1683,7 +1683,7 @@
           const applyUsers = () => {
             const selected = new Set([...scroller.querySelectorAll('.user-row input:checked')]
               .map(cb => cb.closest('.user-row').dataset.userId));
-            const userStaggerMs = (!cached && users.length > 1) ? Math.max(28, Math.round(70 / Math.sqrt(users.length - 1))) : 0;
+            const userStaggerMs = (!cached && users.length > 1) ? Math.max(22, Math.round(55 / Math.sqrt(users.length - 1))) : 0;
             scroller.innerHTML = users.map((u, i) => `
               <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()" style="animation-delay:${(i * userStaggerMs / 1000).toFixed(3)}s">
                 ${u.avatar_url
