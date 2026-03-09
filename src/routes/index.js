@@ -36,6 +36,17 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   if (a === b) return true;
   if (natural.JaroWinklerDistance(a, b) >= 0.88) return true;
 
+  // "(1 Of) X & Y" — user only needs to name one of the listed answers.
+  const oneOfMatch = correctAnswer.match(/^\(\d+\s+of\)\s*/i);
+  if (oneOfMatch) {
+    const candidates = correctAnswer.slice(oneOfMatch[0].length).split('&').map(s => normalizeAnswer(s));
+    for (const c of candidates) {
+      if (a === c) return true;
+      if (natural.JaroWinklerDistance(a, c) >= 0.88) return true;
+    }
+    return false;
+  }
+
   // If the correct answer has parenthetical words, they are optional.
   // e.g. "(Randolph) Caldecott" accepts both "Caldecott" and "Randolph Caldecott".
   if (/\(/.test(correctAnswer)) {
