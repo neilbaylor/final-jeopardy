@@ -364,7 +364,14 @@
             document.getElementById('welcome-avatar').style.opacity = '1';
             document.getElementById('welcome-name').style.opacity = '1';
           }, 250);
-          setTimeout(() => location.replace('/dashboard'), 1825);
+          setTimeout(() => {
+            // Fade out the overlay explicitly before navigating so the exit
+            // animation always completes — Chrome sometimes skips the MPA
+            // view-transition slide-down, causing an abrupt jump to dashboard.
+            const overlay = document.getElementById('welcome-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => location.replace('/dashboard'), 250);
+          }, 1575);
         })
         .catch(() => location.replace('/dashboard'));
     }
