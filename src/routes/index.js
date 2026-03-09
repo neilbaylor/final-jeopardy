@@ -101,7 +101,12 @@ router.get('/api/users', async (req, res) => {
       'SELECT id, display_name, avatar_url FROM users WHERE id != ?',
       [userId]
     );
-    return res.json(rows);
+    const fakeUsers = Array.from({ length: 50 }, (_, i) => ({
+      id: 90000 + i,
+      display_name: `Fake User ${i + 1}`,
+      avatar_url: i % 3 === 0 ? `https://i.pravatar.cc/40?img=${i + 1}` : null,
+    }));
+    return res.json([...rows, ...fakeUsers]);
   } catch (err) {
     return res.status(500).json({ error: 'Database error' });
   }
@@ -306,7 +311,33 @@ router.get('/api/games', async (req, res) => {
 
 
 
-    res.json(real);
+    const fakeCategories = ['Science', 'History', 'Geography', 'Sports', 'Movies', 'Music', 'Literature', 'Technology', 'Food & Drink', 'Art'];
+    const fakeQuestions = ['What is the capital of France?', 'Who wrote Hamlet?', 'What year did WWII end?', 'What is the speed of light?', 'Who painted the Mona Lisa?'];
+    const fakeAnswers = ['Paris', 'Shakespeare', '1945', '299,792 km/s', 'Leonardo da Vinci'];
+    const fakeAvatars = ['https://i.pravatar.cc/40?img=', null];
+    const fakeGames = Array.from({ length: 50 }, (_, i) => ({
+      id: 90000 + i,
+      created_at: new Date(Date.now() - i * 3600000).toISOString(),
+      players: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, (_, j) => ({
+        id: 80000 + j,
+        display_name: `Player ${j + 1}`,
+        avatar_url: j % 2 === 0 ? `https://i.pravatar.cc/40?img=${j + 1}` : null,
+        _answered: Math.random() > 0.5,
+        _isCorrect: Math.random() > 0.5 ? true : false,
+        _answeredAt: new Date().toISOString(),
+      })),
+      current_question: {
+        game_question_id: 70000 + i,
+        asked_at: new Date().toISOString(),
+        question_id: 60000 + i,
+        question: fakeQuestions[i % fakeQuestions.length],
+        answer: fakeAnswers[i % fakeAnswers.length],
+        category: fakeCategories[i % fakeCategories.length],
+      },
+      answers: [],
+    }));
+
+    res.json([...real, ...fakeGames]);
   } catch (err) {
     console.error('Get games error:', err);
     res.status(500).json({ error: 'Database error' });
