@@ -399,6 +399,9 @@
     #game-players .player-status.answered { color: #2e7d32; }
     #game-players .game-player-overflow { display: flex; align-items: center; justify-content: center; align-self: center; height: 34.2px; padding: 0 10px; border-radius: 50px; background: #f0f1f5; color: #555; font-size: 0.87rem; font-weight: 700; flex-shrink: 0; }
 
+    /* 2–3 players: reduced row gap */
+    #game-players.count-2 .players-row, #game-players.count-3 .players-row { gap: 4px; }
+
     /* 1–2 players: 20% larger */
     #game-players.count-1 .game-player, #game-players.count-2 .game-player { gap: 8px; }
     #game-players.count-1 .player-avatar-wrap, #game-players.count-2 .player-avatar-wrap { width: 41px; height: 41px; }
