@@ -309,7 +309,15 @@
   <script>
     // Signal to dashboard that we're coming from login, for the entry transition.
     window.addEventListener('pageswap', e => {
-      if (e.viewTransition) sessionStorage.setItem('vt-from-login', '1');
+      if (e.viewTransition) {
+        sessionStorage.setItem('vt-from-login', '1');
+        // Ensure the welcome overlay stays at full opacity for the view transition snapshot
+        const overlay = document.getElementById('welcome-overlay');
+        if (overlay) {
+          overlay.style.transition = 'none';
+          overlay.style.opacity = '1';
+        }
+      }
     });
   </script>
   <script>

@@ -1428,7 +1428,9 @@
               <div class="game-players">${playerHtml}${overflowHtml}</div>
               ${iAnswered
                 ? (() => { gameViewData.set(String(game.id), { players: combined, myAnswer: myAnswer ? myAnswer.answer : '', createdAt: game.created_at, category, question: game.current_question ? game.current_question.question : '', correctAnswer: game.current_question ? game.current_question.answer : '' }); return `<button class="view-btn">Answers</button>`; })()
-                : `<button class="answer-btn" style="animation-delay: -${(idx * 0.3) % 1.4}s">Answer</button>`
+                : idx === 0
+                  ? (() => { gameViewData.set(String(game.id), { players: combined, myAnswer: '', createdAt: game.created_at, category, question: game.current_question ? game.current_question.question : '', correctAnswer: game.current_question ? game.current_question.answer : '' }); return `<button class="view-btn">View</button>`; })()
+                  : `<button class="answer-btn" style="animation-delay: -${(idx * 0.3) % 1.4}s">Answer</button>`
               }
             </div>
             <div class="game-row-summary">${nextQuestionSummary(game.created_at, combined)}</div>
