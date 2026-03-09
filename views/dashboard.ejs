@@ -1437,9 +1437,7 @@
 
       if (prevGameIds !== null) {
         list.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
-          if (prevGameIds.has(wrapper.dataset.gameId)) {
-            wrapper.style.animation = 'none';
-          } else {
+          if (!prevGameIds.has(wrapper.dataset.gameId)) {
             wrapper.classList.add('new-row');
             const btn = wrapper.querySelector('.answer-btn');
             if (btn) {
