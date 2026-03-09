@@ -852,7 +852,7 @@
       color: #333;
       line-height: 1.45;
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 33px;
     }
     .delete-modal-buttons {
       display: flex;
@@ -1453,6 +1453,10 @@
         });
       }
       prevGameIds = new Set(games.map(g => String(g.id)));
+      // Force a reflow to clear stale box-shadow compositor layers in Mobile Safari
+      list.style.display = 'none';
+      list.offsetHeight; // eslint-disable-line no-unused-expressions
+      list.style.display = '';
 
       const DELETE_REVEAL = 70;
 
