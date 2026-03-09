@@ -974,6 +974,7 @@
       overflow-y: auto;
       overscroll-behavior-y: contain;
       height: 100%;
+      transition: opacity 0.36s ease;
     }
     @media (display-mode: standalone) {
       body {
@@ -1709,7 +1710,13 @@
             });
             updateCreateBtn();
           };
-          applyUsers();
+          if (silent && scroller.querySelector('.user-row')) {
+            scroller.style.opacity = '0';
+            setTimeout(() => { applyUsers(); scroller.style.opacity = '1'; }, 360);
+          } else {
+            scroller.style.opacity = '';
+            applyUsers();
+          }
         })
         .catch(() => {
           if (!silent) spinner.classList.add('hidden');
