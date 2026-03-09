@@ -451,8 +451,14 @@
       display: flex;
       justify-content: center;
       padding-top: 20px;
+      opacity: 0;
+      transition: opacity 200ms ease 100ms;
+      pointer-events: none;
     }
-    #games-spinner.hidden { display: none; }
+    #games-spinner.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
     #games-spinner .panel-spin {
       width: 32px;
       height: 32px;
@@ -1075,7 +1081,7 @@
       <div id="games-ptr-indicator"><div id="games-ptr-spinner"></div></div>
       <div id="games-container">
         <h2 class="games-title">Your Games</h2>
-        <div id="games-spinner" class="hidden"><div class="panel-spin"></div></div>
+        <div id="games-spinner"><div class="panel-spin"></div></div>
         <div id="games-list"></div>
       </div>
     </div>
@@ -1317,7 +1323,7 @@
       const fab = document.getElementById('new-game');
       const spinner = document.getElementById('games-spinner');
       const gamesList = document.getElementById('games-list');
-      if (!silent) spinner.classList.remove('hidden');
+      if (!silent) spinner.classList.add('visible');
       const delay = silent ? Promise.resolve() : new Promise(res => setTimeout(res, 1000));
       const fetch$ = fetch(`/api/games?userId=${encodeURIComponent(userId)}&test=1`)
         .then(r => r.ok ? r.json() : Promise.reject());
@@ -1326,7 +1332,7 @@
         .then(([games]) => {
           setCachedGames(games);
           if (!silent) {
-            spinner.classList.add('hidden');
+            spinner.classList.remove('visible');
             setTimeout(() => { fab.style.opacity = '1'; }, 575);
           }
           fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
@@ -1340,7 +1346,7 @@
         })
         .catch(() => {
           if (!silent) {
-            spinner.classList.add('hidden');
+            spinner.classList.remove('visible');
             setTimeout(() => { fab.style.opacity = '1'; }, 575);
           }
         });
@@ -1675,7 +1681,7 @@
       const list = document.getElementById('users-list');
       const scroller = document.getElementById('users-list-scroller');
       if (!silent) {
-        spinner.classList.remove('hidden');
+        spinner.classList.add('visible');
         scroller.innerHTML = '';
       }
 
@@ -1687,11 +1693,11 @@
         : fetch(`/api/users?userId=${encodeURIComponent(userId)}`)
             .then(r => r.ok ? r.json() : Promise.reject())
             .then(data => { usersCache = data; usersCacheAt = Date.now(); return data; });
-      if (cached && !silent) spinner.classList.add('hidden');
+      if (cached && !silent) spinner.classList.remove('visible');
 
       return Promise.all([fetchUsers, delay])
         .then(([users]) => {
-          if (!silent) spinner.classList.add('hidden');
+          if (!silent) spinner.classList.remove('visible');
           const applyUsers = () => {
             const selected = new Set([...scroller.querySelectorAll('.user-row input:checked')]
               .map(cb => cb.closest('.user-row').dataset.userId));
@@ -1719,7 +1725,7 @@
           }
         })
         .catch(() => {
-          if (!silent) spinner.classList.add('hidden');
+          if (!silent) spinner.classList.remove('visible');
           scroller.innerHTML = '<p style="padding:16px;color:#888;">Could not load users.</p>';
         });
     }
