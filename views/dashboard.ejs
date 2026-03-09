@@ -1598,8 +1598,8 @@
         if (!dragging) return;
         dragging = false;
         const velocity = currentY / (Date.now() - startTime); // px/ms
-        const isFlick  = Math.abs(velocity) > 0.3;
-        const isDrag   = Math.abs(currentY) > 80;
+        const isFlick  = Math.abs(velocity) > 0.5;
+        const isDrag   = Math.abs(currentY) > 120;
         if (isFlick || isDrag) {
           const throwY = currentY < 0 ? -220 : 220;
           closeModal(throwY);
