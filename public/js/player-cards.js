@@ -74,7 +74,7 @@ function buildPlayerCardHtml(p) {
     badge = `<div class="player-answered-badge incorrect"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><line x1="1.5" y1="1.5" x2="4.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><line x1="4.5" y1="1.5" x2="1.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg></div>`;
   }
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}</div>`;
-  const statusClass = (hasAnswer && p._answeredAt) ? 'answered' : 'waiting';
+  const statusClass = hasAnswer ? 'answered' : 'waiting';
   const statusText = relativeAnswerTime(p._answeredAt);
   return `<div class="game-player">
     ${avatarHtml}

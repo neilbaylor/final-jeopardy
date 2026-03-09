@@ -1386,7 +1386,7 @@
         const cqAnswers = cqId ? (game.answers || []).filter(a => a.game_question_id === cqId) : [];
         const answerByUser = new Map(cqAnswers.map(a => [a.user_id, a]));
         const myAnswer = currentUser ? answerByUser.get(currentUser.id) : null;
-        const iAnswered = idx === 0 || !!myAnswer; // TODO: remove idx===0 test
+        const iAnswered = !!myAnswer;
 
         const playerWithAnswer = p => {
           const ans = answerByUser.get(p.id);
