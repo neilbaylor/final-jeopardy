@@ -1581,8 +1581,10 @@
         modal.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
         modal.style.transform  = `translateY(${throwY}px)`;
         modal.style.opacity    = '0';
+        backdrop.style.transition = 'background 0.15s ease';
         setTimeout(() => {
           backdrop.classList.remove('open');
+          backdrop.style.transition = '';
           modal.style.transition = '';
           modal.style.transform  = '';
           modal.style.opacity    = '';
