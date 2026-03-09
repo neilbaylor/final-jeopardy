@@ -937,7 +937,7 @@
     }
     #ptr-indicator.ptr-snap,
     #games-ptr-indicator.ptr-snap {
-      transition: height 0.18s ease, opacity 0.275s ease;
+      transition: height 0.18s ease;
     }
     #ptr-spinner,
     #games-ptr-spinner {
@@ -1910,13 +1910,8 @@
                 ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
                 ptrSpinner.classList.remove('ptr-spinning');
                 ptrSpinner.style.animationDelay = '';
-                requestAnimationFrame(() => {
-                  ptr.style.opacity = '0';
-                  setTimeout(() => {
-                    ptr.style.height = '0';
-                    setTimeout(() => { ptr.classList.remove('ptr-snap'); ptr.style.opacity = ''; }, 180);
-                  }, 275);
-                });
+                ptr.style.height = '0';
+                setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 180);
               }, 640);
             });
           } else {
