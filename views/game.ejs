@@ -291,9 +291,10 @@
       letter-spacing: 0.03em;
       -webkit-tap-highlight-color: transparent;
       opacity: 0;
+      pointer-events: none;
       transition: opacity 0.4s ease, transform 0.12s ease;
     }
-    #your-games-btn.visible { opacity: 1; }
+    #your-games-btn.visible { opacity: 1; pointer-events: auto; }
     #your-games-btn:active { transform: translateX(-50%) scale(0.96); }
 
     #answer-input {
