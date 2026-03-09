@@ -18,7 +18,7 @@ function numToWords(n) {
 }
 
 function stripOneOf(str) {
-  return str.replace(/^\(\d+\s+of\s+\d+\)\s*/i, '');
+  return str.replace(/^\(\d+\s+of(?:\s+\d+)?\)\s*/i, '');
 }
 
 function normalizeAnswer(str) {
