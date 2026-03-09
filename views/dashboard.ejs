@@ -950,7 +950,6 @@
       flex-shrink: 0;
       will-change: transform;
       margin-top: 17.5px;
-      transition: opacity 0.22s ease;
     }
     #ptr-spinner { margin-top: 13.5px; }
     #ptr-spinner.ptr-spinning,
@@ -1803,11 +1802,12 @@
                 ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
                 ptrSpinner.classList.remove('ptr-spinning');
                 ptrSpinner.style.animationDelay = '';
-                ptrSpinner.style.opacity = '0';
-                setTimeout(() => {
-                  ptr.style.height = '0';
-                  setTimeout(() => { ptr.classList.remove('ptr-snap'); ptrSpinner.style.opacity = ''; }, 180);
-                }, 220);
+                requestAnimationFrame(() => {
+                  setTimeout(() => {
+                    ptr.style.height = '0';
+                    setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 180);
+                  }, 275);
+                });
               }, 640);
             });
           } else {
@@ -1904,11 +1904,12 @@
                 ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
                 ptrSpinner.classList.remove('ptr-spinning');
                 ptrSpinner.style.animationDelay = '';
-                ptrSpinner.style.opacity = '0';
-                setTimeout(() => {
-                  ptr.style.height = '0';
-                  setTimeout(() => { ptr.classList.remove('ptr-snap'); ptrSpinner.style.opacity = ''; }, 180);
-                }, 220);
+                requestAnimationFrame(() => {
+                  setTimeout(() => {
+                    ptr.style.height = '0';
+                    setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 180);
+                  }, 275);
+                });
               }, 640);
             });
           } else {
