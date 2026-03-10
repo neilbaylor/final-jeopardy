@@ -23,6 +23,7 @@ function nextQuestionIn(createdAt) {
   const hrs = Math.round(msRemaining / (1000 * 60 * 60));
   if (msRemaining >= 24.5 * 60 * 60 * 1000) return '1 day+';
   if (hrs >= 24) return '1 day';
+  if (hrs === 0) return null;
   return hrs === 1 ? '1 hour' : `${hrs} hours`;
 }
 
