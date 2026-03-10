@@ -515,7 +515,7 @@
   <div id="load-error"></div>
 
   <div id="game-players"></div>
-  <input id="answer-input" type="text" placeholder="Add your Answer" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" />
+  <input id="answer-input" type="text" placeholder="Add your Answer" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" style="display:none" />
   <div id="input-spinner" aria-hidden="true"></div>
   <div id="input-badge" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <div id="answer-responses"></div>
@@ -775,7 +775,8 @@
       progressFill.style.background = '';
       answerBtn.style.display = '';
       answerBtn.classList.remove('visible', 'pulse');
-      answerInput.classList.remove('visible');
+      answerInput.classList.remove('visible', 'sliding-out');
+      answerInput.style.display = 'none';
       answerInput.disabled = false;
       answerInput.value = '';
       inputBadgeEl.classList.remove('visible');
@@ -857,6 +858,8 @@
         _setTimeout(() => {
           timerMsgEl.classList.remove('visible');
           goodLuckEl.classList.remove('visible');
+          answerInput.style.display = '';
+          answerInput.offsetHeight; // reflow so transition fires
           answerInput.classList.add('visible');
           answerInput.focus({ preventScroll: true });
 
@@ -882,6 +885,7 @@
                 answerInput.classList.add('sliding-out');
                 _setTimeout(() => {
                   answerInput.classList.remove('visible', 'sliding-out');
+                  answerInput.style.display = 'none';
                 }, 350);
               }, 500);
 
