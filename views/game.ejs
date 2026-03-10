@@ -791,7 +791,6 @@
     // Re-run the full flow when restored from bfcache (back/forward navigation)
     window.addEventListener('pageshow', e => {
       if (e.persisted) {
-        resetUI();
         // Re-enable CSS transitions after the instant-hidden state has painted
         requestAnimationFrame(() => requestAnimationFrame(() => {
           categoryEl.style.transition = '';
