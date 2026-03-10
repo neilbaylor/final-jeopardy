@@ -557,6 +557,10 @@
     _setTimeout(() => {
       spinner.classList.remove('pre-enter');
       backBtn.classList.remove('pre-enter');
+      // Safari doesn't restart CSS animations on reused elements — force a reflow
+      spinner.style.animation = 'none';
+      spinner.offsetHeight; // eslint-disable-line no-unused-expressions
+      spinner.style.animation = '';
     }, 420);
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
