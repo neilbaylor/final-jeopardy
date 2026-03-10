@@ -1942,8 +1942,10 @@
 
     // Clear stale game list before bfcache snapshot so it isn't shown on restore
     window.addEventListener('pagehide', function() {
-      document.getElementById('games-list').innerHTML = '';
-      document.getElementById('games-spinner').classList.remove('hidden');
+      document.getElementById('games-container').innerHTML =
+        '<h2 class="games-title">Your Games</h2>' +
+        '<div id="games-spinner"><div class="panel-spin"></div></div>' +
+        '<div id="games-list"></div>';
     });
 
     window.addEventListener('pageshow', function(e) {
