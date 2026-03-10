@@ -3,7 +3,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('./database');
 require('dotenv').config();
 
-passport.use(
+if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+  console.warn('WARNING: GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set — Google OAuth will be unavailable.');
+} else passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
@@ -23,7 +25,7 @@ passport.use(
             'UPDATE users SET display_name = ?, avatar_url = ? WHERE google_id = ?',
             [profile.displayName, profile.photos?.[0]?.value || null, profile.id]
           );
-          return done(null, rows[0]);
+          return done(null, { ...rows[0], isNew: false });
         }
 
         // Create new user
@@ -38,7 +40,7 @@ passport.use(
         );
 
         const [newUser] = await db.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
-        return done(null, newUser[0]);
+        return done(null, { ...newUser[0], isNew: true });
       } catch (err) {
         return done(err, null);
       }

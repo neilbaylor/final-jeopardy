@@ -10,7 +10,13 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/?error=auth_failed' }),
   (req, res) => {
-    res.redirect('/dashboard');
+    const userId = req.user.id;
+    const isNew = req.user.isNew;
+    req.logout((err) => {
+      req.session.destroy(() => {
+        res.redirect(`/?uid=${userId}${isNew ? '&new=1' : ''}`);
+      });
+    });
   }
 );
 
