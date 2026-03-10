@@ -21,11 +21,17 @@
     window.addEventListener('pageswap', e => {
       if (e.viewTransition) sessionStorage.setItem('vt-from-game', '1');
     });
-    // When arriving from another game page, apply slide-from-bottom transition.
+    // When arriving from another game page, apply cross-fade transition.
     window.addEventListener('pagereveal', e => {
       if (e.viewTransition && sessionStorage.getItem('vt-from-game') === '1') {
         sessionStorage.removeItem('vt-from-game');
         document.documentElement.classList.add('vt-from-game');
+        e.viewTransition.ready.then(() => {
+          document.documentElement.animate(
+            [{ opacity: 0 }, { opacity: 1 }],
+            { duration: 1000, easing: 'ease', fill: 'both', pseudoElement: '::view-transition-new(root)' }
+          );
+        });
       }
     });
   </script>
