@@ -867,9 +867,9 @@
 
             expiryTimerId = setTimeout(triggerExpiry, 30000);
 
-            // Early submit: Enter key with non-empty input stops timer and triggers expiry
+            // Early submit: Enter key stops timer and triggers expiry
             answerInput.addEventListener('keydown', e => {
-              if (e.key === 'Enter' && answerInput.value.trim() !== '') triggerExpiry(true);
+              if (e.key === 'Enter') triggerExpiry(true);
             });
           }
         }, 3700);
