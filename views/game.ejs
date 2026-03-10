@@ -533,10 +533,6 @@
     const nextQuestionBtn = document.getElementById('next-question-btn');
     const backBtn         = document.getElementById('back-btn');
 
-    // When restored from bfcache (browser back), hide the next question button.
-    window.addEventListener('pageshow', e => {
-      if (e.persisted) nextQuestionBtn.classList.remove('visible');
-    });
     const loadErrorEl   = document.getElementById('load-error');
     const gamePlayersEl    = document.getElementById('game-players');
     const headerCategoryEl = document.getElementById('header-category');
@@ -760,6 +756,7 @@
       gamePlayersEl.style.transition = '';
       gamePlayersEl.classList.remove('visible', 'count-1', 'count-2');
       gamePlayersEl.innerHTML = '';
+      nextQuestionBtn.classList.remove('visible');
       backBtn.classList.remove('disabled');
       loadErrorEl.classList.remove('visible');
       loadErrorEl.textContent = '';
@@ -780,7 +777,7 @@
 
     // Re-run the full flow when restored from bfcache (back/forward navigation)
     window.addEventListener('pageshow', e => {
-      if (e.persisted) loadGame();
+      if (e.persisted) { resetUI(); loadGame(); }
     });
 
 
