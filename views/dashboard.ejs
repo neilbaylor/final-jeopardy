@@ -1249,6 +1249,7 @@
     document.getElementById('error-modal-ok').addEventListener('click', () => {
       document.getElementById('error-modal-backdrop').classList.remove('open');
     });
+    document.getElementById('error-modal-backdrop').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
 
     function updateCreateBtn() {
       const anyChecked = document.querySelector('#users-list input:checked');
@@ -1581,6 +1582,7 @@
         document.getElementById('view-modal-backdrop').classList.remove('open');
       }
     });
+    document.getElementById('view-modal-backdrop').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
 
     // iOS-style flick gesture to dismiss modal
     (function() {
@@ -1636,6 +1638,7 @@
     })();
 
     // Delete modal close handlers
+    document.getElementById('delete-modal-backdrop').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
     document.getElementById('delete-modal-cancel').addEventListener('click', () => {
       document.getElementById('delete-modal-backdrop').classList.remove('open');
     });
