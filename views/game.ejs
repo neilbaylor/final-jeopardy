@@ -21,6 +21,13 @@
     window.addEventListener('pageswap', e => {
       if (e.viewTransition) sessionStorage.setItem('vt-from-game', '1');
     });
+    // When arriving from another game page, apply slide-from-bottom transition.
+    window.addEventListener('pagereveal', e => {
+      if (e.viewTransition && sessionStorage.getItem('vt-from-game') === '1') {
+        sessionStorage.removeItem('vt-from-game');
+        document.documentElement.classList.add('vt-from-game');
+      }
+    });
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,6 +50,24 @@
     }
     ::view-transition-old(root) {
       animation: parallax-out-left 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      z-index: 1;
+    }
+
+    /* Game → game: slide in from bottom */
+    @keyframes slide-in-from-bottom {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+    @keyframes parallax-out-up {
+      from { transform: translateY(0);    opacity: 1;    }
+      to   { transform: translateY(-20%); opacity: 0.85; }
+    }
+    :root.vt-from-game::view-transition-new(root) {
+      animation: slide-in-from-bottom 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      z-index: 2;
+    }
+    :root.vt-from-game::view-transition-old(root) {
+      animation: parallax-out-up 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
       z-index: 1;
     }
 
