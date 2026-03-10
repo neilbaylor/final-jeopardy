@@ -1337,12 +1337,8 @@
           }
           fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
           if (silent && !noFade && gamesList.querySelector('.game-row-wrapper')) {
-            gamesList.style.transition = 'none';
             gamesList.style.opacity = '0';
-            gamesList.offsetHeight; // force reflow so Safari commits the hide
-            gamesList.style.transition = '';
-            renderGames(games);
-            requestAnimationFrame(() => { gamesList.style.opacity = '1'; });
+            setTimeout(() => { renderGames(games); gamesList.style.opacity = '1'; }, 360);
           } else if (!silent || noFade || (Array.isArray(games) && games.length > 0)) {
             gamesList.style.opacity = '';
             renderGames(games);
