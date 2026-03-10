@@ -544,6 +544,7 @@
     let gamePlayers = [];
     let currentCategory = '';
     let currentUserAvatarUrl = null;
+    let answerBtnClickHandled = false;
 
     // Tracked timers — cleared on resetUI()
     const _timerIds = new Set();
@@ -737,6 +738,10 @@
 
     function resetUI() {
       _clearAllTimers();
+      answerBtnClickHandled = false;
+      // Disable transitions for instant DOM reset (prevents bfcache snapshot flicker)
+      categoryEl.style.transition = 'none';
+      labelEl.style.transition = 'none';
       spinner.classList.remove('hidden');
       labelEl.classList.remove('visible');
       categoryEl.classList.remove('visible', 'dismissing');
@@ -760,7 +765,7 @@
       inputSpinnerEl.classList.remove('visible');
       answerResponsesEl.classList.remove('visible', 'count-1', 'count-2');
       answerResponsesEl.innerHTML = '';
-      gamePlayersEl.style.transition = '';
+      gamePlayersEl.style.transition = 'none';
       gamePlayersEl.classList.remove('visible', 'count-1', 'count-2');
       gamePlayersEl.innerHTML = '';
       nextQuestionBtn.classList.remove('visible');
@@ -784,11 +789,22 @@
 
     // Re-run the full flow when restored from bfcache (back/forward navigation)
     window.addEventListener('pageshow', e => {
-      if (e.persisted) { resetUI(); loadGame(); }
+      if (e.persisted) {
+        resetUI();
+        // Re-enable CSS transitions after the instant-hidden state has painted
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          categoryEl.style.transition = '';
+          labelEl.style.transition = '';
+          gamePlayersEl.style.transition = '';
+        }));
+        loadGame();
+      }
     });
 
 
     answerBtn.addEventListener('click', () => {
+      if (answerBtnClickHandled) return;
+      answerBtnClickHandled = true;
       answerBtn.classList.remove('visible');
       answerBtn.addEventListener('transitionend', () => {
         answerBtn.style.display = 'none';
@@ -910,7 +926,7 @@
         }, 3700);
         }, 600);
       }, readingDelay(currentQuestion));
-    }, { once: true });
+    });
   </script>
 </body>
 </html>

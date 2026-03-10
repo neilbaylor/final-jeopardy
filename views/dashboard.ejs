@@ -1940,6 +1940,12 @@
       content.addEventListener('touchcancel', () => { mode = null; snapBack(); });
     })();
 
+    // Clear stale game list before bfcache snapshot so it isn't shown on restore
+    window.addEventListener('pagehide', function() {
+      document.getElementById('games-list').innerHTML = '';
+      document.getElementById('games-spinner').classList.remove('hidden');
+    });
+
     window.addEventListener('pageshow', function(e) {
       if (e.persisted) {
         document.querySelectorAll('.answer-btn.loading').forEach(btn => {
