@@ -270,7 +270,7 @@
     }
     #answer-btn, #next-question-btn {
       position: absolute;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 40px);
@@ -348,6 +348,7 @@
     @keyframes inputSpin { to { transform: rotate(360deg); } }
     @supports (-webkit-touch-callout: none) {
       @media (display-mode: standalone) {
+        #answer-btn, #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px); }
         #answer-input  { bottom: calc(env(safe-area-inset-bottom, 0px) + 9px); }
         #input-spinner { bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); }
       }
