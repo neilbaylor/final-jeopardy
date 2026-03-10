@@ -28,6 +28,12 @@
         if (sessionStorage.getItem('vt-from-game')) {
           sessionStorage.removeItem('vt-from-game');
           document.documentElement.classList.add('vt-from-game');
+          // pagereveal fires before the ::view-transition-new snapshot is taken.
+          // Clear stale bfcache content so the snapshot shows a clean dashboard,
+          // preventing the old game-list from bleeding through next to the spinner.
+          const list = document.getElementById('games-list');
+          if (list) list.innerHTML = '';
+          document.getElementById('games-spinner')?.classList.add('hidden');
         } else if (sessionStorage.getItem('vt-from-login')) {
           sessionStorage.removeItem('vt-from-login');
           document.documentElement.classList.add('vt-from-login');

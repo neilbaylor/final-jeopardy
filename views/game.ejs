@@ -65,6 +65,15 @@
       animation: fade-out 1s ease both;
       z-index: 1;
     }
+    /* iOS Safari: shorter cross-fade, no delay — avoids rough compositing */
+    @supports (-webkit-touch-callout: none) {
+      :root.vt-from-game::view-transition-new(root) {
+        animation: fade-in 0.32s ease both;
+      }
+      :root.vt-from-game::view-transition-old(root) {
+        animation: fade-out 0.32s ease both;
+      }
+    }
 
     body {
       touch-action: manipulation;
@@ -557,10 +566,12 @@
     _setTimeout(() => {
       spinner.classList.remove('pre-enter');
       backBtn.classList.remove('pre-enter');
-      // Safari doesn't restart CSS animations on reused elements — force a reflow
-      spinner.style.animation = 'none';
-      spinner.offsetHeight; // eslint-disable-line no-unused-expressions
-      spinner.style.animation = '';
+      // Safari freezes CSS animations in view-transition snapshots; remove/reinsert
+      // the element to force a fresh animation (reflow trick is not reliable enough).
+      const spinnerParent = spinner.parentNode;
+      const spinnerNext = spinner.nextSibling;
+      spinnerParent.removeChild(spinner);
+      spinnerParent.insertBefore(spinner, spinnerNext);
     }, 420);
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
