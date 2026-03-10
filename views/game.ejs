@@ -303,7 +303,8 @@
     #answer-btn:active, #next-question-btn:active { transform: translateX(-50%) scale(0.96); }
 
     #next-question-btn { pointer-events: none; }
-    #next-question-btn.visible { opacity: 1; pointer-events: auto; animation: answerPulse 1.4s ease-out infinite; }
+    #next-question-btn.visible { opacity: 1; pointer-events: auto; }
+    #next-question-btn.pulse { animation: answerPulse 1.4s ease-out infinite; }
 
     #answer-input {
       position: absolute;
@@ -784,7 +785,7 @@
       gamePlayersEl.style.transition = 'none';
       gamePlayersEl.classList.remove('visible', 'count-1', 'count-2');
       gamePlayersEl.innerHTML = '';
-      nextQuestionBtn.classList.remove('visible');
+      nextQuestionBtn.classList.remove('visible', 'pulse');
       backBtn.classList.remove('disabled');
       loadErrorEl.classList.remove('visible');
       loadErrorEl.textContent = '';
@@ -912,7 +913,10 @@
                     if (arPlayers.length === 1) answerResponsesEl.classList.add('count-1');
                     else if (arPlayers.length === 2) answerResponsesEl.classList.add('count-2');
                     answerResponsesEl.classList.add('visible');
-                    _setTimeout(() => nextQuestionBtn.classList.add('visible'), 1175);
+                    _setTimeout(() => {
+                      nextQuestionBtn.classList.add('visible');
+                      _setTimeout(() => nextQuestionBtn.classList.add('pulse'), 1400);
+                    }, 1175);
                   }, 1700);
                   _setTimeout(() => backBtn.classList.remove('disabled'), 400);
                 }, 1400); // 0.4s question translate + 1000ms delay
