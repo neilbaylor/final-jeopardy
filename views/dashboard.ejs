@@ -1326,7 +1326,7 @@
       const fab = document.getElementById('new-game');
       const spinner = document.getElementById('games-spinner');
       const gamesList = document.getElementById('games-list');
-      if (!silent) { spinner.style.display = ''; spinner.classList.add('visible'); }
+      if (!silent) spinner.classList.add('visible');
       const delay = silent ? Promise.resolve() : new Promise(res => setTimeout(res, 1000));
       const fetch$ = fetch(`/api/games?userId=${encodeURIComponent(userId)}&test=1`)
         .then(r => r.ok ? r.json() : Promise.reject());
@@ -1336,7 +1336,6 @@
           setCachedGames(games);
           if (!silent) {
             spinner.classList.remove('visible');
-            setTimeout(() => { spinner.style.display = 'none'; }, 300);
             setTimeout(() => { fab.style.opacity = '1'; }, 575);
           }
           fab.classList.toggle('fab-pulse', Array.isArray(games) && games.length === 0);
@@ -1351,7 +1350,6 @@
         .catch(() => {
           if (!silent) {
             spinner.classList.remove('visible');
-            setTimeout(() => { spinner.style.display = 'none'; }, 300);
             setTimeout(() => { fab.style.opacity = '1'; }, 575);
           }
         });
