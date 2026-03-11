@@ -928,7 +928,7 @@
                   // Show answer-responses (top already pre-calculated at load time)
                   _setTimeout(() => {
                     const meEntry = { _isMe: true, _answered: true, _isCorrect: null, _answeredAt: null, display_name: '', avatar_url: currentUserAvatarUrl };
-                    const arPlayers = [meEntry, ...gamePlayers].slice(0, 3);
+                    const arPlayers = [meEntry, ...gamePlayers].slice(0, 4);
                     answerResponsesEl.innerHTML = buildAnswerResponsesHtml(arPlayers, submittedAnswer);
                     answerResponsesEl.classList.remove('count-1', 'count-2');
                     if (arPlayers.length === 1) answerResponsesEl.classList.add('count-1');
