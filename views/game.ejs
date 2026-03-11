@@ -963,12 +963,17 @@
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseVVH = window.visualViewport.height;
       let kbOffset = 0;
+      const blockScroll = e => e.preventDefault();
       window.visualViewport.addEventListener('resize', () => {
         const newOffset = Math.max(0, baseVVH - window.visualViewport.height);
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
-        document.body.style.overflow = kbOffset > 0 ? 'hidden' : '';
+        if (kbOffset > 0) {
+          document.addEventListener('touchmove', blockScroll, { passive: false });
+        } else {
+          document.removeEventListener('touchmove', blockScroll);
+        }
         progressBar.style.transform = shift;
         headerCategoryEl.style.transform = shift;
         questionEl.style.transform = shift;
