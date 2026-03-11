@@ -987,6 +987,7 @@
           document.removeEventListener('touchmove', blockScroll);
         }
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
+          el.style.transition = 'none';
           el.style.transform = shift;
         });
       });
