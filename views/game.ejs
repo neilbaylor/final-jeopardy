@@ -995,12 +995,13 @@
         } else {
           document.removeEventListener('touchmove', blockScroll);
         }
+        const fadeDuration = kbOffset > 0 ? '250ms' : '335ms';
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
           el.style.transition = 'none';
           el.style.opacity = '0';
           el.offsetHeight; // reflow so opacity snaps instantly
           el.style.transform = shift;
-          el.style.transition = 'opacity 250ms';
+          el.style.transition = `opacity ${fadeDuration}`;
           el.style.opacity = '1';
           el.addEventListener('transitionend', function onFadeIn(e) {
             if (e.propertyName !== 'opacity') return;
