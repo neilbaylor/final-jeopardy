@@ -968,6 +968,7 @@
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
+        document.body.style.overflow = kbOffset > 0 ? 'hidden' : '';
         progressBar.style.transform = shift;
         questionEl.style.transform = shift;
         // Always shift categoryEl; if mid-dismiss, stack on top of the -54px dismiss transform
