@@ -971,10 +971,10 @@
         document.body.style.overflow = kbOffset > 0 ? 'hidden' : '';
         progressBar.style.transform = shift;
         questionEl.style.transform = shift;
-        // Always shift categoryEl; if mid-dismiss, stack on top of the -54px dismiss transform
-        categoryEl.style.transform = categoryEl.classList.contains('dismissing') && kbOffset > 0
-          ? `translateY(-54px) translateY(${kbOffset}px)`
-          : shift;
+        // Only shift categoryEl if it isn't mid-dismiss (opacity 0 + translate animation)
+        if (!categoryEl.classList.contains('dismissing')) {
+          categoryEl.style.transform = shift;
+        }
       });
     }
   </script>
