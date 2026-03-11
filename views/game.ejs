@@ -974,9 +974,18 @@
         } else {
           document.removeEventListener('touchmove', blockScroll);
         }
+        const kbEls = [progressBar, headerCategoryEl, questionEl];
+        kbEls.forEach(el => { el.style.transition = 'none'; el.style.opacity = '0'; });
         progressBar.style.transform = shift;
         headerCategoryEl.style.transform = shift;
         questionEl.style.transform = shift;
+        requestAnimationFrame(() => {
+          kbEls.forEach(el => {
+            el.style.transition = 'opacity 150ms ease 100ms';
+            el.style.opacity = '';
+            el.addEventListener('transitionend', () => { el.style.transition = ''; }, { once: true });
+          });
+        });
       });
     }
   </script>
