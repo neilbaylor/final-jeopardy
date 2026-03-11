@@ -563,10 +563,7 @@
     function _setInterval(fn, ms) { const id = setInterval(fn, ms); _timerIds.add(id); return id; }
     function _clearAllTimers()    { _timerIds.forEach(id => { clearTimeout(id); clearInterval(id); }); _timerIds.clear(); }
 
-    // Reveal spinner + back btn after page transition completes.
-    // Add 200ms extra delay when arriving via back/forward button.
-    const _navType = performance.getEntriesByType('navigation')[0]?.type;
-    const _spinnerDelay = _navType === 'back_forward' ? 620 : 420;
+    // Reveal spinner + back btn after page transition completes (0.42s)
     _setTimeout(() => {
       spinner.classList.remove('pre-enter');
       backBtn.classList.remove('pre-enter');
@@ -576,7 +573,7 @@
       const spinnerNext = spinner.nextSibling;
       spinnerParent.removeChild(spinner);
       spinnerParent.insertBefore(spinner, spinnerNext);
-    }, _spinnerDelay);
+    }, 420);
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
