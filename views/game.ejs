@@ -329,7 +329,8 @@
       -webkit-appearance: none;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    #answer-input:focus { border-color: #007aff; }
+    @keyframes safariResizeHack { from { opacity: 0.9999; } to { opacity: 1; } }
+    #answer-input:focus { border-color: #007aff; animation: safariResizeHack 0.1s forwards; }
     #answer-input::placeholder { color: #3c3c4399; }
     #answer-input.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
     #answer-input:disabled { background: #f2f2f7; color: rgba(0,0,0,0.3); cursor: not-allowed; }
