@@ -984,7 +984,7 @@
         questionEl.style.transform = shift;
         requestAnimationFrame(() => {
           kbEls.forEach(el => {
-            el.style.transition = 'opacity 150ms ease 100ms';
+            el.style.transition = 'opacity 225ms ease 200ms';
             el.style.opacity = '';
             el.addEventListener('transitionend', () => { el.style.transition = ''; }, { once: true });
           });
