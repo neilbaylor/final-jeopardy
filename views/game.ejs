@@ -228,10 +228,10 @@
       border-bottom: 1px solid rgba(155, 155, 155, 0.23);
       overflow: hidden;
       transform: translateY(-125%);
-      transition: transform 0.605s ease 0.1s;
+      transition: transform 0.505s ease;
       z-index: 9;
     }
-    #progress-bar.visible { transform: translateY(0); }
+    #progress-bar.visible { transform: translateY(0); transition: transform 0.605s ease 0.1s; }
     #progress-bar-fill {
       height: 100%;
       width: 100%;
