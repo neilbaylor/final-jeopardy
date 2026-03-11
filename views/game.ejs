@@ -562,6 +562,9 @@
     const answerResponsesEl  = document.getElementById('answer-responses');
     const fromDashboard      = sessionStorage.getItem('vt-from-dashboard') === '1';
     sessionStorage.removeItem('vt-from-dashboard');
+    const isMobileSafari = /iP(hone|ad|od)/.test(navigator.userAgent) &&
+      (/Safari/.test(navigator.userAgent) || window.navigator.standalone);
+    const inputSpinnerDuration = isMobileSafari ? 900 : 600;
     let gamePlayers = [];
     let currentCategory = '';
     let currentUserAvatarUrl = null;
@@ -892,7 +895,7 @@
               answerInput.disabled = true;
               const submittedAnswer = answerInput.value.trim();
 
-              // Show spinner for 500ms, then blur + slide input out
+              // Show spinner, then blur + slide input out
               inputSpinnerEl.classList.add('visible');
               _setTimeout(() => {
                 inputSpinnerEl.classList.remove('visible');
@@ -902,7 +905,7 @@
                   answerInput.classList.remove('visible', 'sliding-out');
                   answerInput.style.display = 'none';
                 }, 350);
-              }, 500);
+              }, inputSpinnerDuration);
 
               const slideOut = () => {
                 progressBar.style.transition = 'transform 0.4s ease 0.6s';
