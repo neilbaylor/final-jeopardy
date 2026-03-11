@@ -533,7 +533,7 @@
   <div id="input-badge" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <div id="answer-responses"></div>
   <button id="answer-btn">Answer</button>
-  <button id="next-question-btn" onclick="sessionStorage.setItem('vt-from-game','1');location.replace('/game?id=neil-test')">Next Question</button>
+  <button id="next-question-btn" onclick="sessionStorage.setItem('vt-from-game','1');location.replace('https://final-jeopardy-production.up.railway.app/game?id='+new URLSearchParams(location.search).get('id')+'&seed='+Math.random())">Next Question</button>
 
   <script>
     if (/android/i.test(navigator.userAgent)) { document.body.classList.add('android'); }
