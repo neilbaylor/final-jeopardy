@@ -17,15 +17,20 @@
   <script src="/js/player-cards.js"></script>
   <title>Final Jeopardy With Friends</title>
   <script>
+    // Apply vt-from-game class synchronously during parse (before CSS) so
+    // ::view-transition rules are evaluated with the correct selector state.
+    if (sessionStorage.getItem('vt-from-game') === '1') {
+      document.documentElement.classList.add('vt-from-game');
+    }
     // Signal to dashboard that we're coming back from game, for the reverse transition.
     window.addEventListener('pageswap', e => {
       if (e.viewTransition) sessionStorage.setItem('vt-from-game', '1');
     });
-    // When arriving from another game page, apply slide-from-bottom transition.
+    // Clean up sessionStorage after pagereveal; remove class if no transition occurred.
     window.addEventListener('pagereveal', e => {
-      if (e.viewTransition && sessionStorage.getItem('vt-from-game') === '1') {
+      if (sessionStorage.getItem('vt-from-game') === '1') {
         sessionStorage.removeItem('vt-from-game');
-        document.documentElement.classList.add('vt-from-game');
+        if (!e.viewTransition) document.documentElement.classList.remove('vt-from-game');
       }
     });
   </script>
