@@ -58,20 +58,20 @@
 
     /* Game → game: cross-fade */
     :root.vt-from-game::view-transition-new(root) {
-      animation: fade-in 5s ease 400ms both;
+      animation: fade-in 1s ease 400ms both;
       z-index: 2;
     }
     :root.vt-from-game::view-transition-old(root) {
-      animation: fade-out 5s ease both;
+      animation: fade-out 1s ease both;
       z-index: 1;
     }
     /* iOS Safari: shorter cross-fade, no delay — avoids rough compositing */
     @supports (-webkit-touch-callout: none) {
       :root.vt-from-game::view-transition-new(root) {
-        animation: fade-in 5s ease both;
+        animation: fade-in 0.32s ease both;
       }
       :root.vt-from-game::view-transition-old(root) {
-        animation: fade-out 5s ease both;
+        animation: fade-out 0.32s ease both;
       }
     }
 
