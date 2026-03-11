@@ -995,8 +995,8 @@
         } else {
           document.removeEventListener('touchmove', blockScroll);
         }
-        const fadeDuration = '330ms';
-        const fadeDelay = kbOffset > 0 ? '0ms' : '140ms';
+        const fadeDuration = kbOffset > 0 ? '330ms' : '360ms';
+        const fadeDelay = kbOffset > 0 ? '0ms' : '40ms';
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
           el.style.transition = 'none';
           el.style.opacity = '0';
