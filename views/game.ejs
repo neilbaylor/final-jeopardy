@@ -360,7 +360,8 @@
     @keyframes inputSpin { to { transform: rotate(360deg); } }
     @supports (-webkit-touch-callout: none) {
       /* Mobile Safari (non-standalone): override default 20px back to 12px */
-      #answer-input { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+      #answer-input  { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+      #input-spinner { bottom: calc(env(safe-area-inset-bottom, 0px) + 29px); }
       @media (display-mode: standalone) {
         #answer-btn, #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px); }
         #answer-input  { bottom: calc(env(safe-area-inset-bottom, 0px) + 5px); }
