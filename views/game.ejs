@@ -996,18 +996,16 @@
           document.removeEventListener('touchmove', blockScroll);
         }
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
-          el.style.transition = 'opacity 200ms 1s';
+          el.style.transition = 'none';
           el.style.opacity = '0';
-          el.addEventListener('transitionend', function onFadeOut(e) {
+          el.offsetHeight; // reflow so opacity snaps instantly
+          el.style.transform = shift;
+          el.style.transition = 'opacity 200ms 1s';
+          el.style.opacity = '1';
+          el.addEventListener('transitionend', function onFadeIn(e) {
             if (e.propertyName !== 'opacity') return;
-            el.removeEventListener('transitionend', onFadeOut);
-            el.style.transform = shift;
-            el.style.opacity = '1';
-            el.addEventListener('transitionend', function onFadeIn(e) {
-              if (e.propertyName !== 'opacity') return;
-              el.removeEventListener('transitionend', onFadeIn);
-              el.style.transition = '';
-            });
+            el.removeEventListener('transitionend', onFadeIn);
+            el.style.transition = '';
           });
         });
       });
