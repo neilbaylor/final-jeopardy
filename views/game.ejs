@@ -893,13 +893,13 @@
               clearTimeout(expiryTimerId);
 
               answerInput.disabled = true;
+              answerInput.blur();
               const submittedAnswer = answerInput.value.trim();
 
-              // Show spinner, then blur + slide input out
+              // Show spinner, then slide input out
               inputSpinnerEl.classList.add('visible');
               _setTimeout(() => {
                 inputSpinnerEl.classList.remove('visible');
-                answerInput.blur();
                 answerInput.classList.add('sliding-out');
                 _setTimeout(() => {
                   answerInput.classList.remove('visible', 'sliding-out');
