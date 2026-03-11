@@ -963,7 +963,7 @@
               if (e.key === 'Enter') triggerExpiry(true);
             });
           }
-        }, 3700);
+        }, 4150);
         }, 600);
       }, readingDelay(currentQuestion));
     });
@@ -996,7 +996,7 @@
           document.removeEventListener('touchmove', blockScroll);
         }
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
-          el.style.transition = 'opacity 100ms';
+          el.style.transition = 'opacity 200ms 1s';
           el.style.opacity = '0';
           el.addEventListener('transitionend', function onFadeOut(e) {
             if (e.propertyName !== 'opacity') return;
