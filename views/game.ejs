@@ -363,6 +363,9 @@
         #input-spinner { bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); }
       }
     }
+    body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px); }
+    body.android #answer-input  { bottom: calc(env(safe-area-inset-bottom, 0px) + 32px); }
+    body.android #input-spinner { bottom: calc(env(safe-area-inset-bottom, 0px) + 45px); }
 
     #input-badge {
       position: absolute;
@@ -523,6 +526,8 @@
   <button id="next-question-btn" onclick="sessionStorage.setItem('vt-from-game','1');location.replace('/game?id=neil-test')">Next Question</button>
 
   <script>
+    if (/android/i.test(navigator.userAgent)) { document.body.classList.add('android'); }
+
     const userId = localStorage.getItem('userId');
     if (!userId) { location.replace('/'); }
 
@@ -861,7 +866,6 @@
           answerInput.style.display = '';
           answerInput.offsetHeight; // reflow so transition fires
           answerInput.classList.add('visible');
-          answerInput.focus({ preventScroll: true });
 
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
