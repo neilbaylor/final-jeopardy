@@ -308,12 +308,25 @@
     #next-question-btn.visible { opacity: 1; pointer-events: auto; }
     #next-question-btn.pulse { animation: answerPulse 1.4s ease-out infinite; }
 
-    #answer-input {
+    #answer-input-wrap {
       position: absolute;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
       left: 50%;
       transform: translateX(-50%) translateY(140%);
       width: calc(100% - 39px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+    }
+    #answer-input-wrap.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+    #answer-input-wrap.sliding-out {
+      transform: translateX(-50%) translateY(calc(100% + env(safe-area-inset-bottom, 0px) + 24px));
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 1, 1), opacity 0.25s ease;
+      pointer-events: none;
+    }
+    #answer-input {
+      width: 100%;
       border-radius: 24px;
       padding: 13px 16px;
       font-size: 17px;
@@ -324,27 +337,20 @@
       background: #ffffff;
       color: #000;
       outline: none;
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease, border-color 0.2s ease;
+      transition: border-color 0.2s ease;
       text-align: left;
       -webkit-appearance: none;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      box-sizing: border-box;
     }
     #answer-input:focus { border-color: #007aff; }
     #answer-input::placeholder { color: #3c3c4399; }
-    #answer-input.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
     #answer-input:disabled { background: #f2f2f7; color: rgba(0,0,0,0.3); cursor: not-allowed; }
-    #answer-input.sliding-out {
-      transform: translateX(-50%) translateY(calc(100% + env(safe-area-inset-bottom, 0px) + 24px));
-      opacity: 0;
-      transition: transform 0.35s cubic-bezier(0.4, 0, 1, 1), opacity 0.25s ease;
-      pointer-events: none;
-    }
     #input-spinner {
       position: absolute;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 33px);
-      right: 42px;
+      top: 50%;
+      margin-top: -10px;
+      right: 14px;
       width: 20px;
       height: 20px;
       border: 2.5px solid rgba(0,0,0,0.1);
@@ -359,18 +365,14 @@
     #input-spinner.visible { opacity: 0.7; }
     @keyframes inputSpin { to { transform: rotate(360deg); } }
     @supports (-webkit-touch-callout: none) {
-      /* Mobile Safari (non-standalone): override default 20px back to 12px */
-      #answer-input  { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
-      #input-spinner { bottom: calc(env(safe-area-inset-bottom, 0px) + 25px); }
+      #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
       @media (display-mode: standalone) {
         #answer-btn, #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px); }
-        #answer-input  { bottom: calc(env(safe-area-inset-bottom, 0px) + 5px); }
-        #input-spinner { bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); }
+        #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 5px); }
       }
     }
     body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px); }
-    body.android #answer-input  { bottom: calc(env(safe-area-inset-bottom, 0px) + 32px); }
-    body.android #input-spinner { bottom: calc(env(safe-area-inset-bottom, 0px) + 45px); }
+    body.android #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 32px); }
 
     #input-badge {
       position: absolute;
@@ -524,8 +526,10 @@
   <div id="load-error"></div>
 
   <div id="game-players"></div>
-  <input id="answer-input" type="text" placeholder="Add your Answer" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" style="display:none" />
-  <div id="input-spinner" aria-hidden="true"></div>
+  <div id="answer-input-wrap" style="display:none">
+    <input id="answer-input" type="text" placeholder="Add your Answer" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" />
+    <div id="input-spinner" aria-hidden="true"></div>
+  </div>
   <div id="input-badge" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <div id="answer-responses"></div>
   <button id="answer-btn">Answer</button>
@@ -551,6 +555,7 @@
     const progressBar   = document.getElementById('progress-bar');
     const progressFill  = document.getElementById('progress-bar-fill');
     const answerBtn       = document.getElementById('answer-btn');
+    const answerInputWrap = document.getElementById('answer-input-wrap');
     const answerInput     = document.getElementById('answer-input');
     const nextQuestionBtn = document.getElementById('next-question-btn');
     const backBtn         = document.getElementById('back-btn');
@@ -800,8 +805,8 @@
       progressFill.style.background = '';
       answerBtn.style.display = '';
       answerBtn.classList.remove('visible', 'pulse');
-      answerInput.classList.remove('visible', 'sliding-out');
-      answerInput.style.display = 'none';
+      answerInputWrap.classList.remove('visible', 'sliding-out');
+      answerInputWrap.style.display = 'none';
       answerInput.disabled = false;
       answerInput.value = '';
       inputBadgeEl.classList.remove('visible');
@@ -878,9 +883,9 @@
         _setTimeout(() => {
           timerMsgEl.classList.remove('visible');
           goodLuckEl.classList.remove('visible');
-          answerInput.style.display = '';
-          answerInput.offsetHeight; // reflow so transition fires
-          answerInput.classList.add('visible');
+          answerInputWrap.style.display = '';
+          answerInputWrap.offsetHeight; // reflow so transition fires
+          answerInputWrap.classList.add('visible');
 
           {
             progressFill.style.animation = 'progressFill 30s linear forwards';
@@ -901,10 +906,10 @@
               inputSpinnerEl.classList.add('visible');
               _setTimeout(() => {
                 inputSpinnerEl.classList.remove('visible');
-                answerInput.classList.add('sliding-out');
+                answerInputWrap.classList.add('sliding-out');
                 _setTimeout(() => {
-                  answerInput.classList.remove('visible', 'sliding-out');
-                  answerInput.style.display = 'none';
+                  answerInputWrap.classList.remove('visible', 'sliding-out');
+                  answerInputWrap.style.display = 'none';
                 }, 350);
               }, inputSpinnerDuration);
 
