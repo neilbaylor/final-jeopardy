@@ -808,14 +808,11 @@
     // Re-run the full flow when restored from bfcache (back/forward navigation)
     window.addEventListener('pageshow', e => {
       if (e.persisted) {
-        // Delay spinner by 200ms on bfcache restore (snapshot already shows spinner)
-        spinner.classList.add('pre-enter');
         // Re-enable CSS transitions after the instant-hidden state has painted
         requestAnimationFrame(() => requestAnimationFrame(() => {
           categoryEl.style.transition = '';
           labelEl.style.transition = '';
           gamePlayersEl.style.transition = '';
-          setTimeout(() => spinner.classList.remove('pre-enter'), 200);
         }));
         loadGame();
       }
