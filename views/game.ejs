@@ -570,7 +570,7 @@
     sessionStorage.removeItem('vt-from-dashboard');
     const isMobileSafari = /iP(hone|ad|od)/.test(navigator.userAgent) &&
       (/Safari/.test(navigator.userAgent) || window.navigator.standalone);
-    const inputSpinnerDuration = isMobileSafari ? 900 : 600;
+    const inputSpinnerDuration = isMobileSafari ? 1350 : 1050;
     let gamePlayers = [];
     let currentCategory = '';
     let currentUserAvatarUrl = null;
@@ -963,7 +963,7 @@
               if (e.key === 'Enter') triggerExpiry(true);
             });
           }
-        }, 4150);
+        }, 3700);
         }, 600);
       }, readingDelay(currentQuestion));
     });
