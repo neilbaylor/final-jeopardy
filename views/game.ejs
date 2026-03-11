@@ -963,6 +963,15 @@
     // When the keyboard appears, push progress-bar, category-text, and question-text
     // down by the amount the viewport shrinks; restore when it closes.
     // categoryEl may have a .dismissing transform — only touch it when it's not dismissing.
+    if (/iP(hone|ad|od)/.test(navigator.userAgent)) {
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', e => {
+        const now = Date.now();
+        if (now - lastTouchEnd < 300) e.preventDefault();
+        lastTouchEnd = now;
+      }, { passive: false });
+    }
+
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseVVH = window.visualViewport.height;
       let kbOffset = 0;
