@@ -563,7 +563,10 @@
     function _setInterval(fn, ms) { const id = setInterval(fn, ms); _timerIds.add(id); return id; }
     function _clearAllTimers()    { _timerIds.forEach(id => { clearTimeout(id); clearInterval(id); }); _timerIds.clear(); }
 
-    // Reveal spinner + back btn after page transition completes (0.42s)
+    // Reveal spinner + back btn after page transition completes.
+    // Add 200ms extra delay when arriving via back/forward button.
+    const _navType = performance.getEntriesByType('navigation')[0]?.type;
+    const _spinnerDelay = _navType === 'back_forward' ? 620 : 420;
     _setTimeout(() => {
       spinner.classList.remove('pre-enter');
       backBtn.classList.remove('pre-enter');
@@ -573,7 +576,7 @@
       const spinnerNext = spinner.nextSibling;
       spinnerParent.removeChild(spinner);
       spinnerParent.insertBefore(spinner, spinnerNext);
-    }, 420);
+    }, _spinnerDelay);
 
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
@@ -808,11 +811,14 @@
     // Re-run the full flow when restored from bfcache (back/forward navigation)
     window.addEventListener('pageshow', e => {
       if (e.persisted) {
+        // Delay spinner by 200ms on bfcache restore (snapshot already shows spinner)
+        spinner.classList.add('pre-enter');
         // Re-enable CSS transitions after the instant-hidden state has painted
         requestAnimationFrame(() => requestAnimationFrame(() => {
           categoryEl.style.transition = '';
           labelEl.style.transition = '';
           gamePlayersEl.style.transition = '';
+          setTimeout(() => spinner.classList.remove('pre-enter'), 200);
         }));
         loadGame();
       }
