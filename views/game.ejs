@@ -996,7 +996,7 @@
           document.removeEventListener('touchmove', blockScroll);
         }
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
-          el.style.transition = 'opacity 80ms 25ms';
+          el.style.transition = 'opacity 70ms 25ms';
           el.style.opacity = '0';
           el.addEventListener('transitionend', function onFadeOut(e) {
             if (e.propertyName !== 'opacity') return;
