@@ -943,17 +943,13 @@
                 }, 1400); // 0.4s question translate + 1000ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
             };
-              if (earlySubmit) {
-                // Freeze fill immediately so it stops growing, then slide out after 500ms
-                const frozen = getComputedStyle(progressFill).transform;
-                const frozenBg = getComputedStyle(progressFill).backgroundColor;
-                progressFill.style.animation = 'none';
-                progressFill.style.transform = frozen;
-                progressFill.style.background = frozenBg;
-                _setTimeout(slideOut, 470);
-              } else {
-                slideOut();
-              }
+              // Freeze fill immediately so it stops growing, then slide out after 470ms
+              const frozen = getComputedStyle(progressFill).transform;
+              const frozenBg = getComputedStyle(progressFill).backgroundColor;
+              progressFill.style.animation = 'none';
+              progressFill.style.transform = frozen;
+              progressFill.style.background = frozenBg;
+              _setTimeout(slideOut, 470);
             };
 
             expiryTimerId = _setTimeout(triggerExpiry, 30000);
