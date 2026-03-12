@@ -994,8 +994,10 @@
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
           if (answerInput.disabled) {
             el.style.transition = 'none';
+            el.style.opacity = '0';
             el.offsetHeight; // force paint so transition:none takes effect
             el.style.transform = shift;
+            el.style.opacity = '1';
             el.offsetHeight; // force paint before clearing inline transition
             el.style.transition = '';
           } else {
