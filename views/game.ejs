@@ -995,14 +995,12 @@
         } else {
           document.removeEventListener('touchmove', blockScroll);
         }
-        const fadeDuration = kbOffset > 0 ? '330ms' : '360ms';
-        const fadeDelay = kbOffset > 0 ? '0ms' : '40ms';
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
           el.style.transition = 'none';
           el.style.opacity = '0';
           el.offsetHeight; // reflow so opacity snaps instantly
           el.style.transform = shift;
-          el.style.transition = `opacity ${fadeDuration} ease-in ${fadeDelay}`;
+          el.style.transition = 'opacity 375ms ease-in';
           el.style.opacity = '1';
           el.addEventListener('transitionend', function onFadeIn(e) {
             if (e.propertyName !== 'opacity') return;
