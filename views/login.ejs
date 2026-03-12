@@ -61,6 +61,12 @@
       animation-delay: 0.75s;
     }
 
+    @media (display-mode: standalone) {
+      .btn-area {
+        margin-bottom: max(env(safe-area-inset-bottom, 0px) + 0.5rem, 1.5rem);
+      }
+    }
+
     @keyframes fadeIn {
       to { opacity: 1; }
     }
