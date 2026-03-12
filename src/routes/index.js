@@ -253,7 +253,7 @@ router.get('/api/games', async (req, res) => {
           question_id: row.cq_question_id,
           question: row.cq_question,
           answer: title(stripOneOf(row.cq_answer)),
-          category: row.cq_category,
+          category: title(row.cq_category),
         } : null,
         answers: parse(row.answers) || [],
       });
@@ -300,7 +300,7 @@ router.get('/api/games', async (req, res) => {
         question_id: row.cq_question_id,
         question: row.cq_question,
         answer: title(stripOneOf(row.cq_answer)),
-        category: row.cq_category,
+        category: title(row.cq_category),
       } : null,
       answers: parse(row.answers) || [],
     }));
