@@ -191,6 +191,7 @@
       transform: translateY(20px);
       transition: opacity 1.43s ease 215ms, transform 0.8s ease 215ms;
       line-height: 1.45;
+      will-change: opacity;
     }
     #question-text.visible { opacity: 1; transform: translateY(0); }
 
@@ -231,6 +232,7 @@
       overflow: hidden;
       transform: translateY(-125%);
       transition: transform 0.505s ease;
+      will-change: opacity;
       z-index: 9;
     }
     #progress-bar.visible { transform: translateY(0); transition: transform 0.61s ease 0.2s; }
@@ -270,6 +272,7 @@
       text-align: center;
       opacity: 0;
       transition: opacity 0.7s ease 50ms;
+      will-change: opacity;
       z-index: 10;
     }
     #header-category.visible { opacity: 0.75; }
