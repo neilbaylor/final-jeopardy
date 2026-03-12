@@ -992,17 +992,25 @@
           document.removeEventListener('touchmove', blockScroll);
         }
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
-          el.style.transition = 'none';
-          el.style.opacity = '0';
-          el.offsetHeight; // reflow so opacity snaps instantly
-          el.style.transform = shift;
-          el.style.transition = 'opacity 375ms ease-in';
-          el.style.opacity = '1';
-          el.addEventListener('transitionend', function onFadeIn(e) {
-            if (e.propertyName !== 'opacity') return;
-            el.removeEventListener('transitionend', onFadeIn);
+          if (answerInput.disabled) {
+            el.style.transition = 'none';
+            el.offsetHeight; // force paint so transition:none takes effect
+            el.style.transform = shift;
+            el.offsetHeight; // force paint before clearing inline transition
             el.style.transition = '';
-          });
+          } else {
+            el.style.transition = 'none';
+            el.style.opacity = '0';
+            el.offsetHeight; // reflow so opacity snaps instantly
+            el.style.transform = shift;
+            el.style.transition = 'opacity 375ms ease-in';
+            el.style.opacity = '1';
+            el.addEventListener('transitionend', function onFadeIn(e) {
+              if (e.propertyName !== 'opacity') return;
+              el.removeEventListener('transitionend', onFadeIn);
+              el.style.transition = '';
+            });
+          }
         });
       });
     }
