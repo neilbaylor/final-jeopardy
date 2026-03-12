@@ -999,7 +999,6 @@
       let baseVVH = window.visualViewport.height;
       let kbOffset = 0;
       const blockScroll = e => e.preventDefault();
-      const resetScroll = () => window.scrollTo(0, 0);
       window.visualViewport.addEventListener('resize', () => {
         const newOffset = Math.max(0, baseVVH - window.visualViewport.height);
         if (newOffset === kbOffset) return;
@@ -1007,10 +1006,8 @@
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
           document.addEventListener('touchmove', blockScroll, { passive: false });
-          setTimeout(() => window.addEventListener('scroll', resetScroll), 300);
         } else {
           document.removeEventListener('touchmove', blockScroll);
-          window.removeEventListener('scroll', resetScroll);
         }
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
           if (answerInput.disabled) {
