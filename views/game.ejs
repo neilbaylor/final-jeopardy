@@ -557,13 +557,6 @@
     if (/android/i.test(navigator.userAgent)) { document.body.classList.add('android'); }
     if (sessionStorage.getItem('vt-from-dashboard') === '1' || document.documentElement.classList.contains('vt-from-game')) { document.body.classList.add('from-nav'); }
 
-    let keyboardOpen = false;
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', () => {
-        keyboardOpen = window.visualViewport.height < window.innerHeight * 0.8;
-      });
-    }
-    window.addEventListener('scroll', () => { if (keyboardOpen) window.scrollTo(0, 0); });
 
     const userId = localStorage.getItem('userId');
     if (!userId) { location.replace('/'); }
@@ -1006,6 +999,7 @@
       let baseVVH = window.visualViewport.height;
       let kbOffset = 0;
       const blockScroll = e => e.preventDefault();
+      const resetScroll = () => window.scrollTo(0, 0);
       window.visualViewport.addEventListener('resize', () => {
         const newOffset = Math.max(0, baseVVH - window.visualViewport.height);
         if (newOffset === kbOffset) return;
@@ -1013,8 +1007,10 @@
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
           document.addEventListener('touchmove', blockScroll, { passive: false });
+          window.addEventListener('scroll', resetScroll);
         } else {
           document.removeEventListener('touchmove', blockScroll);
+          window.removeEventListener('scroll', resetScroll);
         }
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
           if (answerInput.disabled) {
