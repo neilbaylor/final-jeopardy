@@ -171,7 +171,7 @@
       line-height: 1.35;
     }
     #category-text.visible { opacity: 1; }
-    #category-text:before {
+    body.from-nav #category-text:before {
       content: 'Category';
       font-size: 1rem;
       position: absolute;
@@ -553,6 +553,7 @@
 
   <script>
     if (/android/i.test(navigator.userAgent)) { document.body.classList.add('android'); }
+    if (sessionStorage.getItem('vt-from-dashboard') === '1' || document.documentElement.classList.contains('vt-from-game')) { document.body.classList.add('from-nav'); }
 
     const userId = localStorage.getItem('userId');
     if (!userId) { location.replace('/'); }
