@@ -1003,7 +1003,7 @@
             el.style.opacity = '0';
             el.offsetHeight; // reflow so opacity snaps instantly
             el.style.transform = shift;
-            el.style.transition = 'opacity 375ms ease-in';
+            el.style.transition = `opacity ${kbOffset > 0 ? 375 : 700}ms ease-in`;
             el.style.opacity = '1';
             el.addEventListener('transitionend', function onFadeIn(e) {
               if (e.propertyName !== 'opacity') return;
