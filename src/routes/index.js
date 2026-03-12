@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../config/database');
 const natural = require('natural');
+const title = require('title');
 const router = express.Router();
 
 const _ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
@@ -251,7 +252,7 @@ router.get('/api/games', async (req, res) => {
           asked_at: row.cq_asked_at,
           question_id: row.cq_question_id,
           question: row.cq_question,
-          answer: stripOneOf(row.cq_answer),
+          answer: title(stripOneOf(row.cq_answer)),
           category: row.cq_category,
         } : null,
         answers: parse(row.answers) || [],
@@ -298,7 +299,7 @@ router.get('/api/games', async (req, res) => {
         asked_at: row.cq_asked_at,
         question_id: row.cq_question_id,
         question: row.cq_question,
-        answer: stripOneOf(row.cq_answer),
+        answer: title(stripOneOf(row.cq_answer)),
         category: row.cq_category,
       } : null,
       answers: parse(row.answers) || [],

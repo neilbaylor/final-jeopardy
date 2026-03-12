@@ -16,7 +16,8 @@
     "mysql2": "^3.6.5",
     "natural": "^8.1.1",
     "passport": "^0.6.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "title": "^4.0.1"
   },
   "devDependencies": {
     "axios": "^1.13.6",
