@@ -1,7 +1,7 @@
 const express = require('express');
 const db = require('../config/database');
 const natural = require('natural');
-const title = require('title');
+const title = require('title').default;
 const router = express.Router();
 
 const _ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
