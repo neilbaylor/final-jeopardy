@@ -557,6 +557,8 @@
     if (/android/i.test(navigator.userAgent)) { document.body.classList.add('android'); }
     if (sessionStorage.getItem('vt-from-dashboard') === '1' || document.documentElement.classList.contains('vt-from-game')) { document.body.classList.add('from-nav'); }
 
+    window.addEventListener('scroll', () => window.scrollTo(0, 0));
+
     const userId = localStorage.getItem('userId');
     if (!userId) { location.replace('/'); }
 
