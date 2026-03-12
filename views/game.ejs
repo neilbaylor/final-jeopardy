@@ -31,6 +31,7 @@
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow: hidden; height: 100%; }
 
     /* Slide in from right over dashboard; dashboard parallaxes left */
     @view-transition { navigation: auto; }
@@ -78,6 +79,8 @@
     body {
       touch-action: none;
       background: #07102e;
+      position: fixed;
+      width: 100%;
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
