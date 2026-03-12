@@ -611,8 +611,6 @@
       spinnerParent.insertBefore(spinner, spinnerNext);
     }, 420);
 
-    const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
-
     // Reading delay: linear 4s (≤90 chars) → 7s (≥250 chars)
     function readingDelay(str) {
       const t = Math.min(Math.max((str.length - 90) / 160, 0), 1);
