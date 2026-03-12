@@ -693,7 +693,7 @@
         if (!game?.current_question?.category || !game?.current_question?.question || !game?.current_question?.answer) {
           await showLoadError(loadStart); return;
         }
-        const category = toTitleCase(game.current_question.category);
+        const category = game.current_question.category;
         currentQuestion      = game.current_question.question;
         currentAnswer        = game.current_question.answer;
         currentCategory      = category;
@@ -732,7 +732,7 @@
         questionEl.textContent = currentQuestion;
         const as = categoryStyle(currentAnswer);
         answerTextEl.style.fontSize = as.fontSize;
-        answerTextEl.textContent = toTitleCase(currentAnswer);
+        answerTextEl.textContent = currentAnswer;
 
         categoryEl.offsetHeight; // force reflow
         gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
