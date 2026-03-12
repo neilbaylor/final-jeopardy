@@ -557,7 +557,13 @@
     if (/android/i.test(navigator.userAgent)) { document.body.classList.add('android'); }
     if (sessionStorage.getItem('vt-from-dashboard') === '1' || document.documentElement.classList.contains('vt-from-game')) { document.body.classList.add('from-nav'); }
 
-    window.addEventListener('scroll', () => window.scrollTo(0, 0));
+    let keyboardOpen = false;
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => {
+        keyboardOpen = window.visualViewport.height < window.innerHeight * 0.8;
+      });
+    }
+    window.addEventListener('scroll', () => { if (keyboardOpen) window.scrollTo(0, 0); });
 
     const userId = localStorage.getItem('userId');
     if (!userId) { location.replace('/'); }
