@@ -1374,7 +1374,7 @@
           : `<div class="player-avatar-placeholder">👤</div>`;
         const statusClass = (p._answered && p._answeredAt) ? 'answered' : 'waiting';
         const statusText = relativeAnswerTime(p._answeredAt);
-        const answerText = p._isMe && myAnswer ? esc(myAnswer) : (p._answered ? 'Dummy answer' : '');
+        const answerText = p._isMe && myAnswer ? esc(myAnswer) : 'Dummy answer';
         return `<div class="answer-response-row">
           <div class="ar-player">
             <div class="player-avatar-wrap">${avatarInner}</div>
