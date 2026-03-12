@@ -371,8 +371,12 @@
         #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) - 4px); }
       }
     }
-    body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px); }
-    body.android #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 32px); }
+    body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
+    body.android #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+    @media (display-mode: standalone) {
+      body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px); }
+      body.android #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 32px); }
+    }
 
     #input-badge {
       position: absolute;
