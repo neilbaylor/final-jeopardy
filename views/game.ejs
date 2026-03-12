@@ -171,6 +171,15 @@
       line-height: 1.35;
     }
     #category-text.visible { opacity: 1; }
+    #category-text:before {
+      content: 'Category';
+      font-size: 1rem;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: -16px;
+      opacity: 0.7;
+    }
     #category-text.dismissing {
       transition: opacity 0.83s ease-out 50ms, transform 1.01s cubic-bezier(0.4, 0, 0.2, 1) 50ms;
       opacity: 0;
