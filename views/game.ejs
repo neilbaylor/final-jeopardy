@@ -321,6 +321,19 @@
     #next-question-btn { pointer-events: none; }
     #next-question-btn.visible { opacity: 1; pointer-events: auto; }
     #next-question-btn.pulse { animation: answerPulse 1.4s ease-out infinite; }
+    #next-question-btn { position: relative; }
+    #next-question-spinner {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(0,0,0,0.15);
+      border-top-color: rgba(0,0,0,0.55);
+      border-radius: 50%;
+      animation: googleBtnSpin 0.7s linear infinite;
+    }
 
     #answer-input-wrap {
       position: absolute;
@@ -551,7 +564,7 @@
   <div id="input-badge" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <div id="answer-responses"></div>
   <button id="answer-btn">Answer Question</button>
-  <button id="next-question-btn" onclick="sessionStorage.setItem('vt-from-game','1');location.replace('https://final-jeopardy-production.up.railway.app/game?id='+new URLSearchParams(location.search).get('id')+'&seed='+Math.random())">Next Question</button>
+  <button id="next-question-btn" onclick="const s=document.createElement('div');s.id='next-question-spinner';this.appendChild(s);this.style.pointerEvents='none';sessionStorage.setItem('vt-from-game','1');location.replace('https://final-jeopardy-production.up.railway.app/game?id='+new URLSearchParams(location.search).get('id')+'&seed='+Math.random())">Next Question</button>
 
   <script>
     if (/android/i.test(navigator.userAgent)) { document.body.classList.add('android'); }
