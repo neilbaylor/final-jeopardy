@@ -14,7 +14,7 @@ function relativeAnswerTime(ts) {
   if (diffHrs < 1) return 'Recent';
   if (diffHrs >= 24) return '1+ day ago';
   const hrs = Math.floor(diffHrs);
-  return hrs + ' hr ago';
+  return hrs === 1 ? '1hr ago' : hrs + 'hrs ago';
 }
 
 function nextQuestionIn(askedAt) {
