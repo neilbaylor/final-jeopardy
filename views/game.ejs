@@ -503,6 +503,9 @@
     .answer-response-row { display: flex; align-items: center; padding: 9.5px 14px; gap: 13px; }
     #answer-responses .game-row-summary { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px; font-size: 0.7rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.87; }
     .ar-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    #answer-responses .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 18.1px; height: 18.1px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
+    #answer-responses .player-answered-badge.incorrect { background: #e53935; }
+    #answer-responses .player-answered-badge svg { display: block; width: 9.7px; height: 9.7px; }
     #answer-responses .player-avatar-wrap { position: relative; flex-shrink: 0; width: 34.2px; height: 34.2px; }
     #answer-responses .player-avatar { width: 34.2px; height: 34.2px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
     #answer-responses .player-avatar-placeholder { width: 34.2px; height: 34.2px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.91rem; }
@@ -738,7 +741,7 @@
         const avatarInner = p.avatar_url
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${displayName}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
-        const statusClass = (p._answered && p._answeredAt) ? 'answered' : 'waiting';
+        const statusClass = 'waiting';
         const statusText  = relativeAnswerTime(p._answeredAt);
         let badge = '';
         if (p._answered && p._isCorrect) {
