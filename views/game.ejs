@@ -1019,7 +1019,7 @@
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
           document.addEventListener('touchmove', blockScroll, { passive: false });
-          setTimeout(() => window.addEventListener('scroll', resetScroll, { passive: true }), 300);
+          setTimeout(() => window.addEventListener('scroll', resetScroll, { passive: true }), 450);
         } else {
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
