@@ -11,7 +11,7 @@ function relativeAnswerTime(ts) {
   if (!ts) return 'Waiting';
   const diffMs = Date.now() - parseDbDate(ts).getTime();
   const diffHrs = diffMs / (1000 * 60 * 60);
-  if (diffHrs < 1) return 'Recently';
+  if (diffHrs < 1) return 'Recent';
   if (diffHrs >= 24) return '1+ day ago';
   const hrs = Math.floor(diffHrs);
   return hrs + ' hr ago';
