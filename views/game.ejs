@@ -112,7 +112,16 @@
     }
     #back-btn:active { opacity: 0.55; }
     #back-btn.disabled { opacity: 0; pointer-events: none; }
+    #back-btn.navigating { pointer-events: none; }
     #back-btn svg { flex-shrink: 0; }
+    #back-btn-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: rgba(255,255,255,0.85);
+      border-radius: 50%;
+      animation: inputSpin 0.75s linear infinite;
+    }
 
     /* Hide spinner + back btn until page transition completes */
     #spinner.pre-enter, #back-btn.pre-enter { opacity: 0 !important; }
@@ -592,7 +601,7 @@
 <body>
 <div id="page-wrap">
 
-  <button id="back-btn" class="pre-enter" onclick="window.location.href='/dashboard'">
+  <button id="back-btn" class="pre-enter" onclick="handleBackBtn()">
     <svg width="13" height="22" viewBox="0 0 10 17" fill="none">
       <path d="M9 1L1.5 8.5L9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
@@ -662,6 +671,13 @@
     const errorModalBackdrop = document.getElementById('error-modal-backdrop');
     document.getElementById('error-modal-ok').addEventListener('click', () => errorModalBackdrop.classList.remove('open'));
     errorModalBackdrop.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+    function handleBackBtn() {
+      if (backBtn.classList.contains('navigating')) return;
+      backBtn.classList.add('navigating');
+      backBtn.innerHTML = '<div id="back-btn-spinner"></div>';
+      window.location.href = '/dashboard';
+    }
 
     function showErrorModal(msg) {
       document.getElementById('error-modal-msg').textContent = msg;
