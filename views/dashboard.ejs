@@ -1234,9 +1234,9 @@
       document.body.classList.add('panel-open');
     }
     function closePanel() {
+      document.querySelector('.content').scrollTop = 0;
       document.body.classList.remove('panel-open');
       document.getElementById('create-btn').disabled = true;
-      document.getElementById('users-list-scroller').scrollTop = 0;
     }
 
     document.getElementById('new-game').addEventListener('click', () => {
