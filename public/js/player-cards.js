@@ -17,8 +17,8 @@ function relativeAnswerTime(ts) {
   return hrs + ' hr ago';
 }
 
-function nextQuestionIn(createdAt) {
-  const msRemaining = 24 * 60 * 60 * 1000 - (Date.now() - parseDbDate(createdAt).getTime());
+function nextQuestionIn(askedAt) {
+  const msRemaining = 24 * 60 * 60 * 1000 - (Date.now() - parseDbDate(askedAt).getTime());
   if (msRemaining <= 0) return null;
   const hrs = Math.round(msRemaining / (1000 * 60 * 60));
   if (msRemaining >= 24.5 * 60 * 60 * 1000) return '1 day+';
@@ -27,8 +27,8 @@ function nextQuestionIn(createdAt) {
   return hrs === 1 ? '1 hour' : `${hrs} hours`;
 }
 
-function nextQuestionSummary(createdAt, players) {
-  const t = nextQuestionIn(createdAt);
+function nextQuestionSummary(askedAt, players) {
+  const t = nextQuestionIn(askedAt);
   const unanswered = (players || []).filter(p => !p._answered);
   let suffix;
   if (unanswered.length === 1) {
