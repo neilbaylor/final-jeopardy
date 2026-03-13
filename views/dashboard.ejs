@@ -1374,7 +1374,7 @@
           : `<div class="player-avatar-placeholder">👤</div>`;
         const statusClass = (p._answered && p._answeredAt) ? 'answered' : 'waiting';
         const statusText = relativeAnswerTime(p._answeredAt);
-        const answerText = p._answer ? esc(p._answer) : 'Dummy answer';
+        const answerText = p._isMe && myAnswer ? esc(myAnswer) : 'Dummy answer';
         return `<div class="answer-response-row">
           <div class="ar-player">
             <div class="player-avatar-wrap">${avatarInner}</div>
@@ -1416,12 +1416,12 @@
 
         const playerWithAnswer = p => {
           const ans = answerByUser.get(p.id);
-          return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answer: ans ? ans.answer : null };
+          return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null };
         };
 
         // Build combined player list: others first, current user last
         const others = game.players || [];
-        const meEntry = currentUser ? { ...currentUser, _isMe: true, _answered: iAnswered, _isCorrect: myAnswer ? !!myAnswer.is_correct : null, _answeredAt: myAnswer ? myAnswer.answered_at : null, _answer: myAnswer ? myAnswer.answer : null } : null;
+        const meEntry = currentUser ? { ...currentUser, _isMe: true, _answered: iAnswered, _isCorrect: myAnswer ? !!myAnswer.is_correct : null, _answeredAt: myAnswer ? myAnswer.answered_at : null } : null;
         const combined = meEntry ? [...others.map(playerWithAnswer), meEntry] : others.map(playerWithAnswer);
 
         const overflow = combined.length > MAX_VISIBLE ? combined.length - MAX_VISIBLE : 0;
