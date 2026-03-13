@@ -799,7 +799,7 @@
           const ans = answerByUser.get(p.id);
           return { ...p, _isMe: String(p.id) === String(userId), _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null };
         });
-        const meAnswered = !!answerByUser.get(userId);
+        const meAnswered = !!answerByUser.get(Number(userId));
 
 
         // Enforce minimum 500ms spinner
