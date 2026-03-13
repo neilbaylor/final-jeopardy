@@ -533,6 +533,57 @@
       transition: opacity 0.4s ease;
     }
     #load-error.visible { opacity: 1; }
+
+    #error-modal-backdrop {
+      display: flex;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    #error-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #error-modal {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px 16px 14px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 3px 7px 6px rgba(0,0,0,0.23);
+      text-align: left;
+    }
+    #error-modal p {
+      font-size: 1.015rem;
+      font-weight: 600;
+      color: #333;
+      line-height: 1.45;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    #error-modal-ok {
+      background: linear-gradient(to top, #07102e, #112050);
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 999px;
+      padding: 0 28px;
+      height: 38px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      display: block;
+      margin: 10px auto 0;
+    }
   </style>
 </head>
 <body>
@@ -564,6 +615,13 @@
   <div id="answer-responses"></div>
   <button id="answer-btn">Answer Question</button>
   <button id="next-question-btn" onclick="const s=document.createElement('div');s.id='next-question-spinner';this.appendChild(s);this.style.pointerEvents='none';sessionStorage.setItem('vt-from-game','1');location.replace('https://final-jeopardy-production.up.railway.app/game?id='+new URLSearchParams(location.search).get('id')+'&seed='+Math.random())">Next Question</button>
+
+  <div id="error-modal-backdrop">
+    <div id="error-modal">
+      <p id="error-modal-msg"></p>
+      <button id="error-modal-ok">OK</button>
+    </div>
+  </div>
 
   <script>
     if (/android/i.test(navigator.userAgent)) { document.body.classList.add('android'); }
@@ -598,6 +656,15 @@
     const inputBadgeEl       = document.getElementById('input-badge');
     const inputSpinnerEl     = document.getElementById('input-spinner');
     const answerResponsesEl  = document.getElementById('answer-responses');
+    const errorModalBackdrop = document.getElementById('error-modal-backdrop');
+    document.getElementById('error-modal-ok').addEventListener('click', () => errorModalBackdrop.classList.remove('open'));
+    errorModalBackdrop.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+    function showErrorModal(msg) {
+      document.getElementById('error-modal-msg').textContent = msg;
+      errorModalBackdrop.classList.add('open');
+    }
+
     const fromDashboard      = sessionStorage.getItem('vt-from-dashboard') === '1';
     sessionStorage.removeItem('vt-from-dashboard');
     const isMobileSafari = /iP(hone|ad|od)/.test(navigator.userAgent) &&
@@ -607,6 +674,8 @@
     let currentCategory = '';
     let currentUserAvatarUrl = null;
     let answerBtnClickHandled = false;
+    let currentGameQuestionId = null;
+    let currentQuestionId = null;
 
     // Tracked timers — cleared on resetUI()
     const _timerIds = new Set();
@@ -655,7 +724,7 @@
     let currentAnswer      = '';
     let currentGameCreatedAt = '';
 
-    function buildAnswerResponsesHtml(players, myAnswer) {
+    function buildAnswerResponsesHtml(players) {
       const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       const sorted = [...players].sort((a, b) => (b._isMe ? 1 : 0) - (a._isMe ? 1 : 0));
       return sorted.slice(0, 5).map(p => {
@@ -671,15 +740,22 @@
           : `<div class="player-avatar-placeholder">👤</div>`;
         const statusClass = (p._answered && p._answeredAt) ? 'answered' : 'waiting';
         const statusText  = relativeAnswerTime(p._answeredAt);
+        let badge = '';
+        if (p._answered && p._isCorrect) {
+          badge = `<div class="player-answered-badge"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+        } else if (p._answered && p._isCorrect === false) {
+          badge = `<div class="player-answered-badge incorrect"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><line x1="1.5" y1="1.5" x2="4.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><line x1="4.5" y1="1.5" x2="1.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg></div>`;
+        }
+        const answerText = p._answerText || '';
         return `<div class="answer-response-row">
           <div class="ar-player">
-            <div class="player-avatar-wrap">${avatarInner}</div>
+            <div class="player-avatar-wrap">${avatarInner}${badge}</div>
             <div class="game-player-info">
               <span class="player-name">${displayName}</span>
               <span class="player-status ${statusClass}">${statusText}</span>
             </div>
           </div>
-          <div class="ar-answer">${p._isMe && myAnswer ? esc(myAnswer) : 'Dummy answer'}</div>
+          <div class="ar-answer">${esc(answerText)}</div>
         </div>`;
       }).join('') + `<div class="game-row-summary">${nextQuestionSummary(currentGameCreatedAt, players)}</div>`;
     }
@@ -713,6 +789,8 @@
         currentGameCreatedAt = game.created_at || '';
         currentUserAvatarUrl = game.current_user?.avatar_url || null;
         const cqId = game.current_question ? game.current_question.game_question_id : null;
+        currentGameQuestionId = cqId;
+        currentQuestionId = game.current_question ? game.current_question.question_id : null;
         const answerByUser = new Map((cqId ? (game.answers || []).filter(a => a.game_question_id === cqId) : []).map(a => [a.user_id, a]));
         gamePlayers = (game.players || []).map(p => {
           const ans = answerByUser.get(p.id);
@@ -858,6 +936,8 @@
       currentCategory      = '';
       currentGameCreatedAt = '';
       gamePlayers          = [];
+      currentGameQuestionId = null;
+      currentQuestionId     = null;
     }
 
     loadGame();
@@ -932,16 +1012,56 @@
               answerInput.blur();
               const submittedAnswer = answerInput.value.trim();
 
-              // Show spinner, then slide input out
+              // Show spinner
               inputSpinnerEl.classList.add('visible');
-              _setTimeout(() => {
+
+              // Minimum spinner duration
+              const minSpinnerDone = new Promise(r => setTimeout(r, inputSpinnerDuration));
+
+              // Track API results
+              let apiAnswers = null;
+              let shouldShowNextBtn = false;
+
+              // Call answer endpoint, then games endpoint
+              const apiDone = (async () => {
+                try {
+                  const answerRes = await fetch(`/api/games/${gameId}/answers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ playerId: userId, questionId: currentQuestionId, answer: submittedAnswer }),
+                  });
+                  if (!answerRes.ok) {
+                    showErrorModal('Sorry, something went wrong');
+                    return;
+                  }
+                  apiAnswers = await answerRes.json();
+                } catch {
+                  showErrorModal('Sorry, something went wrong');
+                  return;
+                }
+                // Update cache and check if question has advanced
+                try {
+                  const gamesRes = await fetch(`/api/games?userId=${encodeURIComponent(userId)}`);
+                  if (gamesRes.ok) {
+                    const games = await gamesRes.json();
+                    try { localStorage.setItem(`fjwf_games_${userId}`, JSON.stringify({ games, savedAt: Date.now() })); } catch {}
+                    const found = games.find(g => String(g.id) === String(gameId));
+                    if (found?.current_question) {
+                      shouldShowNextBtn = found.current_question.game_question_id !== currentGameQuestionId;
+                    }
+                  }
+                } catch {} // ignore games fetch failure
+              })();
+
+              // Hide spinner and slide input out once both min duration and API calls complete
+              Promise.all([minSpinnerDone, apiDone]).then(() => {
                 inputSpinnerEl.classList.remove('visible');
                 answerInputWrap.classList.add('sliding-out');
                 _setTimeout(() => {
                   answerInputWrap.classList.remove('visible', 'sliding-out');
                   answerInputWrap.style.display = 'none';
                 }, 350);
-              }, inputSpinnerDuration);
+              });
 
               const slideOut = () => {
                 progressBar.style.transition = 'transform 0.4s ease 0.6s';
@@ -957,23 +1077,39 @@
                   answerTextEl.classList.add('visible');
                   // Show answer-responses (top already pre-calculated at load time)
                   _setTimeout(() => {
-                    const meEntry = { _isMe: true, _answered: true, _isCorrect: null, _answeredAt: null, display_name: '', avatar_url: currentUserAvatarUrl };
-                    const arPlayers = [meEntry, ...gamePlayers].slice(0, 3);
-                    answerResponsesEl.innerHTML = buildAnswerResponsesHtml(arPlayers, submittedAnswer);
+                    const answerMap = new Map((apiAnswers || []).map(a => [String(a.user_id), a]));
+                    const myAns = answerMap.get(String(userId));
+                    const meEntry = {
+                      _isMe: true,
+                      _answered: true,
+                      _isCorrect: myAns ? !!myAns.is_correct : null,
+                      _answeredAt: myAns ? myAns.answered_at : null,
+                      _answerText: submittedAnswer,
+                      display_name: '',
+                      avatar_url: currentUserAvatarUrl,
+                    };
+                    const enrichedOthers = gamePlayers.map(p => {
+                      const ans = answerMap.get(String(p.id));
+                      return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answerText: ans ? ans.answer : null };
+                    });
+                    const arPlayers = [meEntry, ...enrichedOthers].slice(0, 3);
+                    answerResponsesEl.innerHTML = buildAnswerResponsesHtml(arPlayers);
                     answerResponsesEl.classList.remove('count-1', 'count-2');
                     if (arPlayers.length === 1) answerResponsesEl.classList.add('count-1');
                     else if (arPlayers.length === 2) answerResponsesEl.classList.add('count-2');
                     answerResponsesEl.classList.add('visible');
-                    _setTimeout(() => {
-                      nextQuestionBtn.classList.add('visible');
-                      _setTimeout(() => nextQuestionBtn.classList.add('pulse'), 1400);
-                    }, 1175);
+                    if (shouldShowNextBtn) {
+                      _setTimeout(() => {
+                        nextQuestionBtn.classList.add('visible');
+                        _setTimeout(() => nextQuestionBtn.classList.add('pulse'), 1400);
+                      }, 1175);
+                    }
                   }, 1700);
                   _setTimeout(() => backBtn.classList.remove('disabled'), 400);
                 }, 1400); // 0.4s question translate + 1000ms delay
               }, 500); // 600ms sooner than progress bar CSS delay
             };
-              // Freeze fill immediately so it stops growing, then slide out after 470ms
+              // Freeze fill immediately so it stops growing, then slide out after 600ms
               const frozen = getComputedStyle(progressFill).transform;
               const frozenBg = getComputedStyle(progressFill).backgroundColor;
               progressFill.style.animation = 'none';
