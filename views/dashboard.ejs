@@ -174,7 +174,7 @@
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.15);
+      border: 3px solid rgba(255,255,255,0.15);
       border-top-color: rgba(255,255,255,0.55);
       animation: spin 0.7s linear infinite;
     }
@@ -686,8 +686,9 @@
       font-size: 0.65rem;
       font-weight: 600;
     }
-    .player-status.answered { color: #2e7d32; }
-    .player-status.waiting  { color: #bbb; }
+    .player-status.answered       { color: #2e7d32; }
+    .player-status.answered-wrong { color: #e53935; }
+    .player-status.waiting        { color: #bbb; }
 
     /* Answer button */
     @keyframes answerPulse {
@@ -800,8 +801,9 @@
     #view-modal .game-player-info { display: flex; flex-direction: column; gap: 0; }
     #view-modal .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #view-modal .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-    #view-modal .player-status.waiting  { color: rgba(0,0,0,0.38); font-weight: 500; }
-    #view-modal .player-status.answered { color: #2e7d32; }
+    #view-modal .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
+    #view-modal .player-status.answered       { color: #2e7d32; }
+    #view-modal .player-status.answered-wrong { color: #e53935; }
     #view-modal .ar-answer { font-size: 1rem; font-weight: 500; color: #333; opacity: 0.9; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; }
     #view-modal-footer { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 8px 11px; font-size: 0.77rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 16px 16px; }
 
@@ -1372,7 +1374,7 @@
         const avatarInner = p.avatar_url
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${displayName}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
-        const statusClass = 'waiting';
+        const statusClass = !p._answered ? 'waiting' : p._isCorrect ? 'answered' : 'answered-wrong';
         const statusText = relativeAnswerTime(p._answeredAt);
         const answerText = p._isMe && myAnswer ? esc(myAnswer) : 'Dummy answer';
         let badge = '';
@@ -1410,8 +1412,18 @@
       const MAX_VISIBLE = 3;
       const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
 
-      const staggerMs = games.length > 1 ? Math.max(28, Math.round(70 / Math.sqrt(games.length - 1))) : 0;
-      list.innerHTML = games.map((game, idx) => {
+      const sortedGames = [...games].sort((a, b) => {
+        const cqIdA = a.current_question ? a.current_question.game_question_id : null;
+        const cqIdB = b.current_question ? b.current_question.game_question_id : null;
+        const aAnswered = !!(currentUser && cqIdA && (a.answers || []).some(ans => ans.game_question_id === cqIdA && ans.user_id === currentUser.id));
+        const bAnswered = !!(currentUser && cqIdB && (b.answers || []).some(ans => ans.game_question_id === cqIdB && ans.user_id === currentUser.id));
+        if (aAnswered !== bAnswered) return aAnswered ? 1 : -1;
+        const aTime = a.current_question ? new Date(a.current_question.asked_at || 0).getTime() : 0;
+        const bTime = b.current_question ? new Date(b.current_question.asked_at || 0).getTime() : 0;
+        return bTime - aTime;
+      });
+      const staggerMs = sortedGames.length > 1 ? Math.max(28, Math.round(70 / Math.sqrt(sortedGames.length - 1))) : 0;
+      list.innerHTML = sortedGames.map((game, idx) => {
         const rawCategory = game.current_question ? game.current_question.category : 'No question yet';
         const category = toTitleCase(rawCategory);
         const cqId = game.current_question ? game.current_question.game_question_id : null;
@@ -1478,7 +1490,7 @@
           }
         });
       }
-      prevGameIds = new Set(games.map(g => String(g.id)));
+      prevGameIds = new Set(sortedGames.map(g => String(g.id)));
 
       const DELETE_REVEAL = 70;
 

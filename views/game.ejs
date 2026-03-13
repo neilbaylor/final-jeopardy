@@ -115,10 +115,10 @@
     #back-btn.navigating { pointer-events: none; }
     #back-btn svg { flex-shrink: 0; }
     #back-btn-spinner {
-      width: 24px;
-      height: 24px;
-      border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: rgba(255,255,255,0.85);
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: rgba(255,255,255,0.55);
       border-radius: 50%;
       animation: inputSpin 0.75s linear infinite;
     }
@@ -478,8 +478,9 @@
     #game-players .game-player-info { display: flex; flex-direction: column; gap: 0; overflow: hidden; }
     #game-players .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #game-players .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-    #game-players .player-status.waiting  { color: rgba(0,0,0,0.38); font-weight: 500; }
-    #game-players .player-status.answered { color: #2e7d32; }
+    #game-players .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
+    #game-players .player-status.answered       { color: #2e7d32; }
+    #game-players .player-status.answered-wrong { color: #e53935; }
     #game-players .game-player-overflow { display: flex; align-items: center; justify-content: center; align-self: center; height: 34.2px; padding: 0 10px; border-radius: 50px; background: #f0f1f5; color: #555; font-size: 0.87rem; font-weight: 700; flex-shrink: 0; }
 
     /* 1–2 players: 20% larger */
@@ -521,8 +522,9 @@
     #answer-responses .game-player-info { display: flex; flex-direction: column; gap: 0; }
     #answer-responses .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-    #answer-responses .player-status.waiting  { color: rgba(0,0,0,0.38); font-weight: 500; }
-    #answer-responses .player-status.answered { color: #2e7d32; }
+    #answer-responses .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
+    #answer-responses .player-status.answered       { color: #2e7d32; }
+    #answer-responses .player-status.answered-wrong { color: #e53935; }
     .ar-answer { font-size: 1rem; font-weight: 500; color: #333; opacity: 0.9; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; }
     /* 1–2 players: 20% larger */
     #answer-responses.count-1 .ar-player, #answer-responses.count-2 .ar-player { gap: 8px; }
@@ -757,7 +759,7 @@
         const avatarInner = p.avatar_url
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${displayName}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
-        const statusClass = p._answered ? 'answered' : 'waiting';
+        const statusClass = !p._answered ? 'waiting' : p._isCorrect ? 'answered' : 'answered-wrong';
         const statusText  = relativeAnswerTime(p._answeredAt);
         let badge = '';
         if (p._answered && p._isCorrect) {
@@ -944,7 +946,8 @@
       gamePlayersEl.classList.remove('visible', 'count-1', 'count-2');
       gamePlayersEl.innerHTML = '';
       nextQuestionBtn.classList.remove('visible', 'pulse');
-      backBtn.classList.remove('disabled');
+      backBtn.classList.remove('disabled', 'navigating');
+      backBtn.innerHTML = '<svg width="13" height="22" viewBox="0 0 10 17" fill="none"><path d="M9 1L1.5 8.5L9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       loadErrorEl.classList.remove('visible');
       loadErrorEl.textContent = '';
       dotsEl.textContent = '';
