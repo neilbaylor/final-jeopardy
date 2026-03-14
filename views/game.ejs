@@ -472,12 +472,12 @@
     #game-players .player-avatar-wrap { position: relative; flex-shrink: 0; width: 34.2px; height: 34.2px; }
     #game-players .player-avatar { width: 34.2px; height: 34.2px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
     #game-players .player-avatar-placeholder { width: 34.2px; height: 34.2px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.91rem; }
-    #game-players .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 18.1px; height: 18.1px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
+    #game-players .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
     #game-players .player-answered-badge.incorrect { background: #e53935; }
-    #game-players .player-answered-badge svg { display: block; width: 9.7px; height: 9.7px; }
+    #game-players .player-answered-badge svg { display: block; width: 10px; height: 10px; }
     #game-players .game-player-info { display: flex; flex-direction: column; gap: 0; overflow: hidden; }
     #game-players .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #game-players .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+    #game-players .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #game-players .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
     #game-players .player-status.answered       { color: #2e7d32; }
     #game-players .player-status.answered-wrong { color: #e53935; }
@@ -489,7 +489,7 @@
     #game-players.count-1 .player-avatar, #game-players.count-2 .player-avatar { width: 41px; height: 41px; }
     #game-players.count-1 .player-avatar-placeholder, #game-players.count-2 .player-avatar-placeholder { width: 41px; height: 41px; font-size: 1.09rem; }
     #game-players.count-1 .player-answered-badge, #game-players.count-2 .player-answered-badge { width: 20px; height: 20px; bottom: -1px; right: -3.5px; }
-    #game-players.count-1 .player-answered-badge svg, #game-players.count-2 .player-answered-badge svg { width: 11.6px; height: 11.6px; }
+    #game-players.count-1 .player-answered-badge svg, #game-players.count-2 .player-answered-badge svg { width: 12px; height: 12px; }
     #game-players.count-1 .player-name, #game-players.count-2 .player-name { font-size: 1.08rem; max-width: 68px; }
     #game-players.count-1 .player-status, #game-players.count-2 .player-status { font-size: 1.01rem; }
 
@@ -513,15 +513,15 @@
     .answer-response-row { display: flex; align-items: center; padding: 9.5px 14px; gap: 13px; }
     #answer-responses .game-row-summary { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px; font-size: 0.7rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.87; }
     .ar-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; width: 100px; }
-    #answer-responses .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 18.1px; height: 18.1px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
+    #answer-responses .player-answered-badge { position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; border-radius: 50%; background: #43a047; border: 0.5px solid #fff; display: flex; align-items: center; justify-content: center; }
     #answer-responses .player-answered-badge.incorrect { background: #e53935; }
-    #answer-responses .player-answered-badge svg { display: block; width: 9.7px; height: 9.7px; }
+    #answer-responses .player-answered-badge svg { display: block; width: 10px; height: 10px; }
     #answer-responses .player-avatar-wrap { position: relative; flex-shrink: 0; width: 34.2px; height: 34.2px; }
     #answer-responses .player-avatar { width: 34.2px; height: 34.2px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
     #answer-responses .player-avatar-placeholder { width: 34.2px; height: 34.2px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.91rem; }
     #answer-responses .game-player-info { display: flex; flex-direction: column; gap: 0; }
     #answer-responses .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+    #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #answer-responses .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
     #answer-responses .player-status.answered       { color: #2e7d32; }
     #answer-responses .player-status.answered-wrong { color: #e53935; }
