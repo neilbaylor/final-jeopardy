@@ -42,6 +42,9 @@ self.addEventListener('fetch', (event) => {
   // Only handle same-origin requests
   if (url.origin !== self.location.origin) return;
 
+  // Never intercept these API endpoints — always go to network
+  if (url.pathname === '/api/games' || url.pathname === '/api/me') return;
+
   // Navigation requests: network-first, fall back to cached '/'
   if (request.mode === 'navigate') {
     event.respondWith(
