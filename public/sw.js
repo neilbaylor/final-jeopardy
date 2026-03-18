@@ -1,7 +1,9 @@
-const CACHE_NAME = 'fjwf-v1';
+const CACHE_NAME = 'fjwf-v2';
 
 const STATIC_ASSETS = [
   '/',
+  '/dashboard',
+  '/game',
   '/manifest.json',
   '/js/no-swipe-nav.js',
   '/js/player-cards.js',
