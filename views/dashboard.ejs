@@ -1449,7 +1449,7 @@
         const overflow = combined.length > MAX_VISIBLE ? combined.length - MAX_VISIBLE : 0;
         const visible = overflow > 0 ? combined.slice(0, MAX_VISIBLE) : combined;
 
-        const playerHtml = visible.map(p => buildPlayerCardHtml(p, { short: true })).join('');
+        const playerHtml = visible.map(p => buildPlayerCardHtml(p, { short: combined.length > 3 })).join('');
 
         const overflowHtml = overflow > 0
           ? `<div class="game-player"><div class="player-overflow-circle">+${overflow}</div></div>`
