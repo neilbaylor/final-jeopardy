@@ -42,7 +42,23 @@ self.addEventListener('fetch', (event) => {
   // Only handle same-origin requests
   if (url.origin !== self.location.origin) return;
 
-  // Never intercept API endpoints — always go to network
+  // /api/me: network-first, fall back to cache for offline support
+  if (url.pathname === '/api/me') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Never intercept other API endpoints — always go to network
   if (url.pathname.startsWith('/api/')) return;
 
   // Navigation requests: network-first, fall back to cached '/'
