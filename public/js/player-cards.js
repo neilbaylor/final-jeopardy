@@ -7,13 +7,14 @@ function parseDbDate(str) {
   return new Date(str.includes('Z') || str.includes('+') ? str : str.replace(' ', 'T') + 'Z');
 }
 
-function relativeAnswerTime(ts) {
+function relativeAnswerTime(ts, short) {
   if (!ts) return 'Waiting';
   const diffMs = Date.now() - parseDbDate(ts).getTime();
   const diffHrs = diffMs / (1000 * 60 * 60);
   if (diffHrs < 1) return 'Recent';
-  if (diffHrs >= 24) return '1+ day ago';
+  if (diffHrs >= 24) return short ? '1+ day' : '1+ day ago';
   const hrs = Math.floor(diffHrs);
+  if (short) return hrs === 1 ? '1 hr' : hrs + ' hrs';
   return hrs === 1 ? '1hr ago' : hrs + 'hrs ago';
 }
 
@@ -54,7 +55,7 @@ function buildGamePlayersHtml(players, summaryText) {
   return `<div class="players-row"${rowStyle}>${visible.map(buildPlayerCardHtml).join('') + overflowHtml}</div>${summary}`;
 }
 
-function buildPlayerCardHtml(p) {
+function buildPlayerCardHtml(p, opts) {
   const rawName = (p.display_name || '').trim();
   const parts = rawName.split(' ');
   const fn = parts[0] || '';
@@ -76,7 +77,7 @@ function buildPlayerCardHtml(p) {
   }
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}</div>`;
   const statusClass = !hasAnswer ? 'waiting' : isCorrect ? 'answered' : 'answered-wrong';
-  const statusText = relativeAnswerTime(p._answeredAt);
+  const statusText = relativeAnswerTime(p._answeredAt, opts && opts.short);
   return `<div class="game-player">
     ${avatarHtml}
     <div class="game-player-info">
