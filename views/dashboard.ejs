@@ -1494,7 +1494,7 @@
             </div>
             <div class="game-row-body">
               <div class="game-players" style="gap:${pqPlayers.length > 3 ? '2px' : '4px'}">${pqPlayerHtml}${pqOverflowHtml}</div>
-              <button class="view-btn pq-view-btn">Answers</button>
+              <button class="view-btn">Answers</button>
             </div>
             <div class="game-row-summary">${formatQuestionDate(pq.asked_at)}</div>
           </div>`;
@@ -1564,20 +1564,6 @@
         });
       });
 
-      document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          const gameId = btn.closest('.game-row-wrapper').dataset.gameId;
-          const { players, myAnswer, askedAt, category, question, correctAnswer } = gameViewData.get(gameId) || {};
-          document.getElementById('view-modal-category').textContent = category || '';
-          document.getElementById('view-modal-question').textContent = question || '';
-          document.getElementById('view-modal-answer').textContent = correctAnswer || '';
-          document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
-          document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(askedAt, players);
-          document.getElementById('view-modal-backdrop').classList.add('open');
-        });
-      });
-
       function openPrevModal(gameId) {
         const { players, myAnswer, askedAt, relativeTo, category, question, correctAnswer } = gamePrevViewData.get(gameId) || {};
         document.getElementById('view-modal-category').textContent = category || '';
@@ -1588,10 +1574,22 @@
         document.getElementById('view-modal-backdrop').classList.add('open');
       }
 
-      document.querySelectorAll('.pq-view-btn').forEach(btn => {
+      document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           e.stopPropagation();
-          openPrevModal(btn.closest('.game-row-previous').dataset.gameId);
+          const wrapper = btn.closest('.game-row-wrapper');
+          const gameId = wrapper.dataset.gameId;
+          if (wrapper.dataset.revealed === 'true' && gamePrevViewData.has(gameId)) {
+            openPrevModal(gameId);
+            return;
+          }
+          const { players, myAnswer, askedAt, category, question, correctAnswer } = gameViewData.get(gameId) || {};
+          document.getElementById('view-modal-category').textContent = category || '';
+          document.getElementById('view-modal-question').textContent = question || '';
+          document.getElementById('view-modal-answer').textContent = correctAnswer || '';
+          document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
+          document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(askedAt, players);
+          document.getElementById('view-modal-backdrop').classList.add('open');
         });
       });
 
@@ -1670,10 +1668,10 @@
           const dx = e.changedTouches[0].clientX - startX;
           const fw = mainRow.offsetWidth;
           if (isRevealed) {
-            if (dx < -70) { isRevealed = false; setTx(0, true); }
+            if (dx < -70) { isRevealed = false; wrapper.dataset.revealed = 'false'; setTx(0, true); }
             else           { setTx(fw, true); }
           } else {
-            if (dx > 70) { isRevealed = true; setTx(fw, true); }
+            if (dx > 70) { isRevealed = true; wrapper.dataset.revealed = 'true'; setTx(fw, true); }
             else          { setTx(0, true); }
           }
         };
