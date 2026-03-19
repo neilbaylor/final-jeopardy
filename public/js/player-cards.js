@@ -95,7 +95,9 @@ function buildPlayerCardHtml(p, opts) {
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}</div>`;
   const unansweredAsWrong = !hasAnswer && opts && opts.unansweredIncorrect;
   const statusClass = unansweredAsWrong ? 'answered-wrong' : (!hasAnswer ? 'waiting' : isCorrect ? 'answered' : 'answered-wrong');
-  const statusText = relativeAnswerTime(unansweredAsWrong ? (opts.askedAt || p._answeredAt) : p._answeredAt, opts && opts.short, opts && opts.relativeTo);
+  const statusText = (opts && opts.askedAt && p._answeredAt)
+    ? relativeAnswerTime(opts.askedAt, opts && opts.short, p._answeredAt)
+    : relativeAnswerTime(unansweredAsWrong ? (opts && opts.askedAt || p._answeredAt) : p._answeredAt, opts && opts.short, unansweredAsWrong ? null : (opts && opts.relativeTo));
   return `<div class="game-player">
     ${avatarHtml}
     <div class="game-player-info">

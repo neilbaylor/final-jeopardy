@@ -1395,7 +1395,9 @@
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${displayName}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
         const statusClass = !p._answered ? 'waiting' : p._isCorrect ? 'answered' : 'answered-wrong';
-        const statusText = relativeAnswerTime(p._answeredAt, false, relativeTo);
+        const statusText = (relativeTo && p._answeredAt)
+          ? relativeAnswerTime(relativeTo, false, p._answeredAt)
+          : relativeAnswerTime(p._answeredAt, false, null);
         const answerText = p._isMe && myAnswer ? esc(myAnswer) : (p._answer ? esc(p._answer) : '');
         let badge = '';
         if (p._answered && p._isCorrect) {
