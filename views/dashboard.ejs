@@ -520,13 +520,14 @@
       will-change: opacity;
     }
 
-    /* Game row wrapper (swipe-to-delete) */
+    /* Game row wrapper (swipe-to-delete / swipe-to-prev) */
     .game-row-wrapper {
       position: relative;
       border-radius: 14px;
       margin-bottom: 11px;
       border: 1px solid rgba(233, 233, 233, 0.3);
       contain: style;
+      overflow: hidden;
     }
     .game-row-wrapper:last-child {
       margin-bottom: 36px;
@@ -556,6 +557,88 @@
       align-items: center;
       justify-content: center;
     }
+    .game-row-prev-action {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      background: #1a237e;
+      border-radius: 14px;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      z-index: 0;
+    }
+    .prev-card-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.55);
+    }
+    .prev-card-category {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .prev-card-question {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .prev-card-correct-answer {
+      font-size: 0.72rem;
+      color: #a5d6a7;
+      font-style: italic;
+    }
+    .prev-card-players {
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .prev-player-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+    }
+    .prev-player-name {
+      color: rgba(255,255,255,0.7);
+      min-width: 36px;
+      flex-shrink: 0;
+    }
+    .prev-player-answer {
+      color: #fff;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .prev-result-badge {
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 700;
+    }
+    .prev-result-badge.correct { background: #43a047; color: #fff; }
+    .prev-result-badge.incorrect { background: #e53935; color: #fff; }
 
     @keyframes new-row-highlight {
       0%     { background-color: #fff; }
@@ -1459,7 +1542,33 @@
           : '';
 
         const isExisting = prevGameIds !== null && prevGameIds.has(String(game.id));
-        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
+        const prevQ = game.previous_question || null;
+        const prevAnswers = game.previous_answers || [];
+        const prevAnswerMap = new Map(prevAnswers.map(a => [a.user_id, a]));
+        const prevCardHtml = prevQ ? (() => {
+          const prevCat = toTitleCase(prevQ.category || '');
+          const prevPlayersHtml = combined.map(p => {
+            const ans = prevAnswerMap.get(p.id);
+            const rawName = (p.display_name || '').trim();
+            const name = p._isMe ? 'You' : (rawName.split(' ')[0] || rawName);
+            let badgeHtml = '';
+            if (ans && ans.is_correct === true) {
+              badgeHtml = `<span class="prev-result-badge correct">✓</span>`;
+            } else if (ans && ans.is_correct === false) {
+              badgeHtml = `<span class="prev-result-badge incorrect">✗</span>`;
+            }
+            return `<div class="prev-player-row"><span class="prev-player-name">${escHtml(name)}</span><span class="prev-player-answer">${ans ? escHtml(ans.answer) : '<em style="opacity:.5">—</em>'}</span>${badgeHtml}</div>`;
+          }).join('');
+          return `<div class="game-row-prev-action">
+            <span class="prev-card-label">Previous</span>
+            <span class="prev-card-category">${escHtml(prevCat)}</span>
+            <div class="prev-card-question">${escHtml(prevQ.question)}</div>
+            <div class="prev-card-correct-answer">Answer: ${escHtml(prevQ.answer)}</div>
+            <div class="prev-card-players">${prevPlayersHtml}</div>
+          </div>`;
+        })() : '';
+        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}"${prevQ ? ' data-has-prev="1"' : ''} style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
+          ${prevCardHtml}
           <div class="game-row-delete-action">
             <button class="delete-game-btn" aria-label="Delete game">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1502,24 +1611,27 @@
       const DELETE_REVEAL = 70;
 
       function closeAllSwipes(except) {
-        document.querySelectorAll('.game-row-wrapper.swipe-open').forEach(w => {
+        document.querySelectorAll('.game-row-wrapper.swipe-open, .game-row-wrapper.swipe-prev-open').forEach(w => {
           if (w === except) return;
           const r = w.querySelector('.game-row');
           r.style.transition = 'transform 0.25s ease';
           r.style.transform = '';
           w.classList.remove('swipe-open');
+          w.classList.remove('swipe-prev-open');
         });
       }
 
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
         const row = wrapper.querySelector('.game-row');
-        let startX, startY, moved = false, direction = null;
+        const hasPrev = wrapper.hasAttribute('data-has-prev');
+        let startX, startY, moved = false, direction = null, prevReveal = 0;
 
         row.addEventListener('touchstart', e => {
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
           moved = false;
           direction = null;
+          prevReveal = wrapper.offsetWidth;
           row.style.transition = 'none';
         }, { passive: true });
 
@@ -1535,26 +1647,46 @@
           if (direction === 'vertical') return;
           e.preventDefault();
           moved = true;
-          const isOpen = wrapper.classList.contains('swipe-open');
-          const base = isOpen ? -DELETE_REVEAL : 0;
-          row.style.transform = `translateX(${Math.max(-DELETE_REVEAL, Math.min(0, base + dx))}px)`;
+          const isOpenDelete = wrapper.classList.contains('swipe-open');
+          const isOpenPrev = wrapper.classList.contains('swipe-prev-open');
+          if (isOpenDelete) {
+            row.style.transform = `translateX(${Math.max(-DELETE_REVEAL, Math.min(0, -DELETE_REVEAL + dx))}px)`;
+          } else if (isOpenPrev) {
+            row.style.transform = `translateX(${Math.max(0, Math.min(prevReveal, prevReveal + dx))}px)`;
+          } else if (dx < 0) {
+            row.style.transform = `translateX(${Math.max(-DELETE_REVEAL, Math.min(0, dx))}px)`;
+          } else if (dx > 0 && hasPrev) {
+            row.style.transform = `translateX(${Math.max(0, Math.min(prevReveal, dx))}px)`;
+          }
         }, { passive: false });
 
         function finishSwipe(endX) {
           if (!moved) return;
           moved = false;
           const dx = endX - startX;
-          const isOpen = wrapper.classList.contains('swipe-open');
+          const isOpenDelete = wrapper.classList.contains('swipe-open');
+          const isOpenPrev = wrapper.classList.contains('swipe-prev-open');
           row.style.transition = 'transform 0.25s ease';
-          if (!isOpen && dx < -30) {
-            closeAllSwipes(wrapper);
-            row.style.transform = `translateX(-${DELETE_REVEAL}px)`;
-            wrapper.classList.add('swipe-open');
-          } else if (isOpen && dx > 30) {
+          if (!isOpenDelete && !isOpenPrev) {
+            if (dx < -30) {
+              closeAllSwipes(wrapper);
+              row.style.transform = `translateX(-${DELETE_REVEAL}px)`;
+              wrapper.classList.add('swipe-open');
+            } else if (dx > 60 && hasPrev) {
+              closeAllSwipes(wrapper);
+              row.style.transform = `translateX(${prevReveal}px)`;
+              wrapper.classList.add('swipe-prev-open');
+            } else {
+              row.style.transform = '';
+            }
+          } else if (isOpenDelete && dx > 30) {
             row.style.transform = '';
             wrapper.classList.remove('swipe-open');
+          } else if (isOpenPrev && dx < -30) {
+            row.style.transform = '';
+            wrapper.classList.remove('swipe-prev-open');
           } else {
-            row.style.transform = isOpen ? `translateX(-${DELETE_REVEAL}px)` : '';
+            row.style.transform = isOpenDelete ? `translateX(-${DELETE_REVEAL}px)` : `translateX(${prevReveal}px)`;
           }
         }
 
@@ -1562,7 +1694,7 @@
         row.addEventListener('touchcancel', e => finishSwipe(e.changedTouches[0].clientX), { passive: true });
 
         row.addEventListener('click', () => {
-          if (wrapper.classList.contains('swipe-open')) {
+          if (wrapper.classList.contains('swipe-open') || wrapper.classList.contains('swipe-prev-open')) {
             closeAllSwipes();
             return;
           }
