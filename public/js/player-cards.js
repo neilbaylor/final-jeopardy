@@ -37,7 +37,7 @@ function formatQuestionDate(askedAt) {
   const ampm = hours >= 12 ? 'pm' : 'am';
   const h = hours % 12 || 12;
   const m = String(mins).padStart(2, '0');
-  return `Question from ${month} ${day}, ${h}:${m}${ampm}`;
+  return `Question from <strong>${month} ${day}, ${h}:${m}${ampm}</strong>`;
 }
 
 function nextQuestionSummary(askedAt, players) {
