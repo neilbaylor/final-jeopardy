@@ -1597,25 +1597,27 @@
         row.addEventListener('click', () => openPrevModal(row.dataset.gameId));
       });
 
-      // Swipe-right to reveal previous question row, swipe-left to hide it again
+      // Swipe-right to reveal previous question row; swipe-left to reveal delete button
+      const DELETE_WIDTH = 90;
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
-        const prevRow = wrapper.querySelector('.game-row-previous');
-        if (!prevRow) return;
-        const inner   = wrapper.querySelector('.game-row-inner');
-        const mainRow = wrapper.querySelector('.game-row:not(.game-row-previous)');
+        const prevRow     = wrapper.querySelector('.game-row-previous');
+        const inner       = wrapper.querySelector('.game-row-inner');
+        const mainRow     = wrapper.querySelector('.game-row:not(.game-row-previous)');
+        const deleteAction = wrapper.querySelector('.game-row-delete-action');
 
-        let startX = 0, startY = 0, dirLocked = null, active = false, isRevealed = false;
+        let startX = 0, startY = 0, dirLocked = null, active = false, isRevealed = false, deleteRevealed = false;
 
+        const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         const setTx = (tx, animated) => {
-          const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
           mainRow.style.transition = animated ? ease : 'none';
-          prevRow.style.transition = animated ? ease : 'none';
-          mainRow.style.transform  = tx ? `translateX(${tx}px)` : '';
-          prevRow.style.transform  = tx ? `translateX(${tx}px)` : '';
+          if (prevRow) prevRow.style.transition = animated ? ease : 'none';
+          mainRow.style.transform = tx ? `translateX(${tx}px)` : '';
+          // prevRow only follows for positive (right-swipe) translations
+          if (prevRow) prevRow.style.transform = (tx > 0) ? `translateX(${tx}px)` : '';
           if (animated) {
             mainRow.addEventListener('transitionend', () => {
               mainRow.style.transition = '';
-              prevRow.style.transition = '';
+              if (prevRow) prevRow.style.transition = '';
             }, { once: true });
           }
         };
@@ -1627,7 +1629,7 @@
           dirLocked = null;
           active = true;
           mainRow.style.transition = 'none';
-          prevRow.style.transition = 'none';
+          if (prevRow) prevRow.style.transition = 'none';
         }, { passive: true });
 
         inner.addEventListener('touchmove', e => {
@@ -1651,14 +1653,26 @@
           e.preventDefault();
 
           const fw = mainRow.offsetWidth;
-          let tx;
           if (isRevealed) {
-            tx = Math.max(0, Math.min(fw, fw + dx));
+            const tx = Math.max(0, Math.min(fw, fw + dx));
+            mainRow.style.transform = tx ? `translateX(${tx}px)` : '';
+            if (prevRow) prevRow.style.transform = tx ? `translateX(${tx}px)` : '';
+          } else if (deleteRevealed) {
+            const tx = Math.max(-DELETE_WIDTH, Math.min(0, -DELETE_WIDTH + dx));
+            mainRow.style.transform = `translateX(${tx}px)`;
           } else {
-            tx = dx > 0 ? Math.min(fw, dx) : 0;
+            if (dx > 0 && prevRow) {
+              const tx = Math.min(fw, dx);
+              mainRow.style.transform = `translateX(${tx}px)`;
+              prevRow.style.transform = `translateX(${tx}px)`;
+            } else if (dx < 0) {
+              const tx = Math.max(-DELETE_WIDTH, dx);
+              mainRow.style.transform = `translateX(${tx}px)`;
+            } else {
+              mainRow.style.transform = '';
+              if (prevRow) prevRow.style.transform = '';
+            }
           }
-          mainRow.style.transform = tx ? `translateX(${tx}px)` : '';
-          prevRow.style.transform = tx ? `translateX(${tx}px)` : '';
         }, { passive: false });
 
         const onTouchEnd = e => {
@@ -1670,9 +1684,13 @@
           if (isRevealed) {
             if (dx < -70) { isRevealed = false; wrapper.dataset.revealed = 'false'; setTx(0, true); }
             else           { setTx(fw, true); }
+          } else if (deleteRevealed) {
+            if (dx > 70) { deleteRevealed = false; setTx(0, true); }
+            else          { setTx(-DELETE_WIDTH, true); }
           } else {
-            if (dx > 70) { isRevealed = true; wrapper.dataset.revealed = 'true'; setTx(fw, true); }
-            else          { setTx(0, true); }
+            if (dx > 70 && prevRow) { isRevealed = true; wrapper.dataset.revealed = 'true'; setTx(fw, true); }
+            else if (dx < -70)      { deleteRevealed = true; setTx(-DELETE_WIDTH, true); }
+            else                    { setTx(0, true); }
           }
         };
 
@@ -1680,8 +1698,18 @@
         inner.addEventListener('touchcancel', () => {
           if (!active) return;
           active = false;
-          setTx(isRevealed ? mainRow.offsetWidth : 0, true);
+          if (isRevealed) setTx(mainRow.offsetWidth, true);
+          else if (deleteRevealed) setTx(-DELETE_WIDTH, true);
+          else setTx(0, true);
         }, { passive: true });
+
+        if (deleteAction) {
+          deleteAction.addEventListener('click', () => {
+            const backdrop = document.getElementById('delete-modal-backdrop');
+            backdrop.dataset.gameId = wrapper.dataset.gameId;
+            backdrop.classList.add('open');
+          });
+        }
       });
     }
 
