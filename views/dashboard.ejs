@@ -1767,7 +1767,7 @@
       const ptrSpinner = document.getElementById('ptr-spinner');
       const THRESHOLD = 125;
       const DEADZONE = 36;
-      let startY = 0, mode = null, triggered = false, lastDy = 0, ptrInFlight = false;
+      let startY = 0, mode = null, triggered = false, lastDy = 0;
       // mode: null = undecided/native | 'ptr' = pull-to-refresh | 'push' = bottom overscroll
 
       const snapBack = () => {
@@ -1835,7 +1835,7 @@
         snapBack();
         if (wasMode === 'ptr') {
           ptr.classList.add('ptr-snap');
-          if (triggered && !ptrInFlight && usersCache !== null) {
+          if (triggered) {
             triggered = false;
             ptr.style.height = '48px';
             ptrSpinner.style.animationDelay = `${-(Math.min(Math.max(lastDy - 36, 0) * 0.45 / 56 * 360, 360) % 360) / 360 * 0.7}s`;
@@ -1843,10 +1843,8 @@
             requestAnimationFrame(() => {
               ptrSpinner.classList.add('ptr-spinning');
             });
-            ptrInFlight = true;
             usersCache = null;
             loadUsers(true).finally(() => {
-              ptrInFlight = false;
               setTimeout(() => {
                 ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
                 ptrSpinner.classList.remove('ptr-spinning');
@@ -1874,7 +1872,7 @@
       const ptrSpinner = document.getElementById('games-ptr-spinner');
       const THRESHOLD = 125;
       const DEADZONE = 36;
-      let startY = 0, mode = null, triggered = false, lastDy = 0, ptrInFlight = false;
+      let startY = 0, mode = null, triggered = false, lastDy = 0;
       // mode: null = undecided/native | 'ptr' = pull-to-refresh | 'push' = bottom overscroll
 
       const snapBack = () => {
@@ -1940,7 +1938,7 @@
         snapBack();
         if (wasMode === 'ptr') {
           ptr.classList.add('ptr-snap');
-          if (triggered && !ptrInFlight && prevGameIds !== null) {
+          if (triggered) {
             triggered = false;
             ptr.style.height = '48px';
             ptrSpinner.style.animationDelay = `${-(Math.min(Math.max(lastDy - 36, 0) * 2, 360) % 360) / 360 * 0.7}s`;
@@ -1948,9 +1946,7 @@
             requestAnimationFrame(() => {
               ptrSpinner.classList.add('ptr-spinning');
             });
-            ptrInFlight = true;
             loadGames(true).finally(() => {
-              ptrInFlight = false;
               setTimeout(() => {
                 ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
                 ptrSpinner.classList.remove('ptr-spinning');
