@@ -22,13 +22,33 @@ function stripOneOf(str) {
   return str.replace(/^\(\d+\s+of(?:\s+\d+)?\)\s*/i, '');
 }
 
+// Matches well-formed Roman numerals only (1–3999); rejects random all-caps words like "MIDI".
+const _romanRe = /^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+function romanToNum(s) {
+  const vals = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+  let result = 0;
+  for (let i = 0; i < s.length; i++) {
+    const cur = vals[s[i]], next = vals[s[i + 1]];
+    result += (next && cur < next) ? -cur : cur;
+  }
+  return result;
+}
+
 function normalizeAnswer(str) {
+  // Convert Roman numerals (all-uppercase tokens) before lowercasing
+  str = str.replace(/\b([IVXLCDM]+)\b/g, (m) => {
+    if (/[a-z]/.test(m) || !_romanRe.test(m)) return m;
+    const n = romanToNum(m);
+    return n > 0 ? String(n) : m;
+  });
+
   return str
     .toLowerCase()
     .replace(/[&+,]/g, ' ')        // & + , → space
-    .replace(/\band\b/g, ' ')      // word "and" → space (so & / + / , / and all vanish equally)
+    .replace(/\band\b/g, ' ')      // word "and" → space
+    .replace(/\b(\d+)(?:st|nd|rd|th)\b/g, '$1') // strip ordinal suffixes: 8th → 8
     .replace(/\b(\d+)\b/g, (_, n) => numToWords(parseInt(n, 10))) // 7 → seven
-    .replace(/['']/g, '')          // strip apostrophes before removing punctuation
+    .replace(/['']/g, '')          // strip apostrophes
     .replace(/[^a-z0-9\s]/g, ' ') // non-alphanumeric → space
     .replace(/\b(the|a|an)\b/g, ' ')
     .replace(/\s+/g, ' ')
