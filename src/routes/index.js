@@ -47,7 +47,13 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const correctParts = splitConnectors(correctAnswer);
   if (correctParts.length > 1) {
     const normCorrect = correctParts.map(normalizeAnswer).sort();
-    const userParts = splitConnectors(userAnswer);
+    let userParts = splitConnectors(userAnswer);
+    // If connector-split doesn't yield the right count, try whitespace-split
+    // e.g. correct "W and JFK", user answers "JFK W" (no connector)
+    if (userParts.length !== correctParts.length) {
+      const spaceParts = userAnswer.trim().split(/\s+/);
+      if (spaceParts.length === correctParts.length) userParts = spaceParts;
+    }
     if (userParts.length === correctParts.length) {
       const normUser = userParts.map(normalizeAnswer).sort();
       if (normCorrect.every((p, i) => p === normUser[i] || natural.JaroWinklerDistance(p, normUser[i]) >= 0.88)) {
