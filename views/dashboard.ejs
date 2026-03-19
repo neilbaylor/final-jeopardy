@@ -1541,6 +1541,25 @@
       prevGameIds = new Set(sortedGames.map(g => String(g.id)));
 
 
+      document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
+        const row = wrapper.querySelector('.game-row:not(.game-row-previous)');
+        row.addEventListener('click', () => {
+          const btn = wrapper.querySelector('.answer-btn');
+          if (btn) {
+            btn.style.width = btn.offsetWidth + 'px';
+            btn.innerHTML = '<span class="btn-spinner"></span>';
+            btn.classList.add('loading');
+            window.location.href = `/game?id=${wrapper.dataset.gameId}`;
+          } else {
+            const viewBtn = wrapper.querySelector('.view-btn');
+            if (viewBtn) {
+              if (!viewBtn.classList.contains('loading')) viewBtn.click();
+              return;
+            }
+          }
+        });
+      });
+
       document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           e.stopPropagation();
