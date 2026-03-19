@@ -41,6 +41,21 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   if (a === b) return true;
   if (natural.JaroWinklerDistance(a, b) >= 0.88) return true;
 
+  // Order-independent match for answers joined by "and" / "or" / "&"
+  // e.g. "Neil Taylor and Joe Ross" accepts "Joe Ross & Neil Taylor"
+  const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|&)\s*/i).map(p => p.trim()).filter(Boolean);
+  const correctParts = splitConnectors(correctAnswer);
+  if (correctParts.length > 1) {
+    const normCorrect = correctParts.map(normalizeAnswer).sort();
+    const userParts = splitConnectors(userAnswer);
+    if (userParts.length === correctParts.length) {
+      const normUser = userParts.map(normalizeAnswer).sort();
+      if (normCorrect.every((p, i) => p === normUser[i] || natural.JaroWinklerDistance(p, normUser[i]) >= 0.88)) {
+        return true;
+      }
+    }
+  }
+
   // "(1 Of) X & Y" — user only needs to name one of the listed answers.
   const oneOfMatch = correctAnswer.match(/^\(\d+\s+of\)\s*/i);
   if (oneOfMatch) {
