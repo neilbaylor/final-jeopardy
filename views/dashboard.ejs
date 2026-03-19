@@ -532,7 +532,7 @@
     }
     .game-row-delete-action {
       position: absolute;
-      left: 0;
+      right: 0;
       top: 0;
       height: 100%;
       width: 90px;
@@ -540,7 +540,7 @@
       align-items: center;
       justify-content: center;
       background: #e53935;
-      border-radius: 14px 0 0 14px;
+      border-radius: 0 14px 14px 0;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
@@ -550,7 +550,7 @@
       color: #fff;
       pointer-events: none;
       padding: 0;
-      margin: -2px 0 0 -10px;
+      margin: -2px -10px 0 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1534,8 +1534,8 @@
           e.preventDefault();
           moved = true;
           const isOpen = wrapper.classList.contains('swipe-open');
-          const base = isOpen ? DELETE_REVEAL : 0;
-          row.style.transform = `translateX(${Math.max(0, Math.min(DELETE_REVEAL, base + dx))}px)`;
+          const base = isOpen ? -DELETE_REVEAL : 0;
+          row.style.transform = `translateX(${Math.max(-DELETE_REVEAL, Math.min(0, base + dx))}px)`;
         }, { passive: false });
 
         function finishSwipe(endX) {
@@ -1544,15 +1544,15 @@
           const dx = endX - startX;
           const isOpen = wrapper.classList.contains('swipe-open');
           row.style.transition = 'transform 0.25s ease';
-          if (!isOpen && dx > 30) {
+          if (!isOpen && dx < -30) {
             closeAllSwipes(wrapper);
-            row.style.transform = `translateX(${DELETE_REVEAL}px)`;
+            row.style.transform = `translateX(-${DELETE_REVEAL}px)`;
             wrapper.classList.add('swipe-open');
-          } else if (isOpen && dx < -30) {
+          } else if (isOpen && dx > 30) {
             row.style.transform = '';
             wrapper.classList.remove('swipe-open');
           } else {
-            row.style.transform = isOpen ? `translateX(${DELETE_REVEAL}px)` : '';
+            row.style.transform = isOpen ? `translateX(-${DELETE_REVEAL}px)` : '';
           }
         }
 
