@@ -13,9 +13,10 @@ function relativeAnswerTime(ts, short, relativeTo) {
   const diffMs = now - parseDbDate(ts).getTime();
   const diffHrs = diffMs / (1000 * 60 * 60);
   if (diffHrs < 1) return 'Recent';
-  if (diffHrs >= 24) return short ? '1+ day' : '1+ day ago';
+  const noAgo = !!relativeTo;
+  if (diffHrs >= 24) return (short || noAgo) ? '1+ day' : '1+ day ago';
   const hrs = Math.floor(diffHrs);
-  if (short) return hrs === 1 ? '1 hr' : hrs + ' hrs';
+  if (short || noAgo) return hrs === 1 ? '1 hr' : hrs + ' hrs';
   return hrs === 1 ? '1hr ago' : hrs + 'hrs ago';
 }
 
