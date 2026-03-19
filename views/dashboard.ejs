@@ -1464,8 +1464,32 @@
           ? `<div class="game-player"><div class="player-overflow-circle">+${overflow}</div></div>`
           : '';
 
+        const pq = game.previous_question;
+        const pqAnswerByUser = pq
+          ? new Map((game.previous_answers || []).filter(a => a.game_question_id === pq.game_question_id).map(a => [a.user_id, a]))
+          : null;
+        const prevRowHtml = pq ? (() => {
+          const pqCategory = toTitleCase(pq.category);
+          const pqPlayers = combined.map(p => {
+            const ans = pqAnswerByUser.get(p.id);
+            return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answer: ans ? ans.answer : null };
+          });
+          const pqVisible = pqPlayers.length > MAX_VISIBLE ? pqPlayers.slice(0, MAX_VISIBLE) : pqPlayers;
+          const pqOverflow = pqPlayers.length > MAX_VISIBLE ? pqPlayers.length - MAX_VISIBLE : 0;
+          const pqPlayerHtml = pqVisible.map(p => buildPlayerCardHtml(p, { short: pqPlayers.length > 3 })).join('');
+          const pqOverflowHtml = pqOverflow > 0 ? `<div class="game-player"><div class="player-overflow-circle">+${pqOverflow}</div></div>` : '';
+          return `<div class="game-row game-row-previous">
+            <div class="game-row-header">
+              <span class="game-category">${escHtml(pqCategory)}</span>
+            </div>
+            <div class="game-row-body">
+              <div class="game-players" style="gap:${pqPlayers.length > 3 ? '2px' : '4px'}">${pqPlayerHtml}${pqOverflowHtml}</div>
+            </div>
+          </div>`;
+        })() : '';
+
         const isExisting = prevGameIds !== null && prevGameIds.has(String(game.id));
-        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
+        return `${prevRowHtml}<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
           <div class="game-row-inner">
           <div class="game-row-delete-action">
             <button class="delete-game-btn" aria-label="Delete game">
