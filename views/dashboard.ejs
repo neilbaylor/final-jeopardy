@@ -568,11 +568,17 @@
       animation-delay: 200ms;
     }
 
+    .game-row-inner {
+      display: flex;
+      overflow: hidden;
+      border-radius: 14px;
+      box-shadow: 0 2px 13px rgba(0, 0, 0, 0.16);
+    }
+
     /* Game row card */
     .game-row {
       background: #fff;
       border-radius: 14px;
-      box-shadow: 0 2px 13px rgba(0,0,0,0.16);
       border: 1px solid rgba(0,0,0,0.07);
       overflow: hidden;
       position: relative;
@@ -1460,6 +1466,7 @@
 
         const isExisting = prevGameIds !== null && prevGameIds.has(String(game.id));
         return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
+          <div class="game-row-inner">
           <div class="game-row-delete-action">
             <button class="delete-game-btn" aria-label="Delete game">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1480,6 +1487,7 @@
               }
             </div>
             <div class="game-row-summary">${nextQuestionSummary(game.current_question ? game.current_question.asked_at : '', combined)}</div>
+          </div>
           </div>
         </div>`;
       }).join('');
