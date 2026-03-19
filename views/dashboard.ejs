@@ -1490,8 +1490,9 @@
         })() : '';
 
         const isExisting = prevGameIds !== null && prevGameIds.has(String(game.id));
-        return `${prevRowHtml}<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
+        return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
           <div class="game-row-inner">
+          ${prevRowHtml}
           <div class="game-row-delete-action">
             <button class="delete-game-btn" aria-label="Delete game">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
