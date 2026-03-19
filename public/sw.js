@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fjwf-v3';
+const CACHE_NAME = 'fjwf-v4';
 
 const STATIC_ASSETS = [
   '/',
