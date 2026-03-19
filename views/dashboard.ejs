@@ -1411,6 +1411,7 @@
     }
 
     let gameViewData = new Map();
+    let gamePrevViewData = new Map();
     function renderGames(games) {
       const list = document.getElementById('games-list');
       if (!Array.isArray(games) || games.length === 0) {
@@ -1479,12 +1480,15 @@
           const pqOverflow = pqPlayers.length > MAX_VISIBLE ? pqPlayers.length - MAX_VISIBLE : 0;
           const pqPlayerHtml = pqVisible.map(p => buildPlayerCardHtml(p, { short: pqPlayers.length > 3 })).join('');
           const pqOverflowHtml = pqOverflow > 0 ? `<div class="game-player"><div class="player-overflow-circle">+${pqOverflow}</div></div>` : '';
-          return `<div class="game-row game-row-previous">
+          const myPqAnswer = pqAnswerByUser.get(currentUser ? currentUser.id : null);
+          gamePrevViewData.set(String(game.id), { players: pqPlayers, myAnswer: myPqAnswer ? myPqAnswer.answer : '', askedAt: pq.asked_at, category: pqCategory, question: pq.question, correctAnswer: pq.answer });
+          return `<div class="game-row game-row-previous" data-game-id="${escHtml(game.id)}">
             <div class="game-row-header">
               <span class="game-category">${escHtml(pqCategory)}</span>
             </div>
             <div class="game-row-body">
               <div class="game-players" style="gap:${pqPlayers.length > 3 ? '2px' : '4px'}">${pqPlayerHtml}${pqOverflowHtml}</div>
+              <button class="view-btn pq-view-btn">Answers</button>
             </div>
             <div class="game-row-summary">${formatQuestionDate(pq.asked_at)}</div>
           </div>`;
@@ -1637,6 +1641,27 @@
           document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(askedAt, players);
           document.getElementById('view-modal-backdrop').classList.add('open');
         });
+      });
+
+      function openPrevModal(gameId) {
+        const { players, myAnswer, askedAt, category, question, correctAnswer } = gamePrevViewData.get(gameId) || {};
+        document.getElementById('view-modal-category').textContent = category || '';
+        document.getElementById('view-modal-question').textContent = question || '';
+        document.getElementById('view-modal-answer').textContent = correctAnswer || '';
+        document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
+        document.getElementById('view-modal-footer').innerHTML = formatQuestionDate(askedAt);
+        document.getElementById('view-modal-backdrop').classList.add('open');
+      }
+
+      document.querySelectorAll('.pq-view-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          openPrevModal(btn.closest('.game-row-previous').dataset.gameId);
+        });
+      });
+
+      document.querySelectorAll('.game-row-previous').forEach(row => {
+        row.addEventListener('click', () => openPrevModal(row.dataset.gameId));
       });
     }
 
