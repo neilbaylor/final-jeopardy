@@ -1394,16 +1394,18 @@
         const avatarInner = p.avatar_url
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${displayName}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
-        const statusClass = !p._answered ? 'waiting' : p._isCorrect ? 'answered' : 'answered-wrong';
+        const unansweredIncorrect = !p._answered && !!relativeTo;
+        const statusClass = unansweredIncorrect ? 'answered-wrong' : (!p._answered ? 'waiting' : p._isCorrect ? 'answered' : 'answered-wrong');
         const statusText = (relativeTo && p._answeredAt)
           ? relativeAnswerTime(relativeTo, false, p._answeredAt)
           : relativeAnswerTime(p._answeredAt, false, null);
         const answerText = p._isMe && myAnswer ? esc(myAnswer) : (p._answer ? esc(p._answer) : '');
+        const incorrectBadge = `<div class="player-answered-badge incorrect"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><line x1="1.5" y1="1.5" x2="4.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><line x1="4.5" y1="1.5" x2="1.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg></div>`;
         let badge = '';
         if (p._answered && p._isCorrect) {
           badge = `<div class="player-answered-badge"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
-        } else if (p._answered && p._isCorrect === false) {
-          badge = `<div class="player-answered-badge incorrect"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><line x1="1.5" y1="1.5" x2="4.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><line x1="4.5" y1="1.5" x2="1.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg></div>`;
+        } else if ((p._answered && p._isCorrect === false) || unansweredIncorrect) {
+          badge = incorrectBadge;
         }
         return `<div class="answer-response-row">
           <div class="ar-player">
