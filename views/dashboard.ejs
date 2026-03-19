@@ -1483,7 +1483,7 @@
           });
           const pqVisible = pqPlayers.length > MAX_VISIBLE ? pqPlayers.slice(0, MAX_VISIBLE) : pqPlayers;
           const pqOverflow = pqPlayers.length > MAX_VISIBLE ? pqPlayers.length - MAX_VISIBLE : 0;
-          const pqPlayerHtml = pqVisible.map(p => buildPlayerCardHtml(p, { short: pqPlayers.length > 3 })).join('');
+          const pqPlayerHtml = pqVisible.map(p => buildPlayerCardHtml(p, { short: pqPlayers.length > 3, unansweredIncorrect: true })).join('');
           const pqOverflowHtml = pqOverflow > 0 ? `<div class="game-player"><div class="player-overflow-circle">+${pqOverflow}</div></div>` : '';
           const myPqAnswer = pqAnswerByUser.get(currentUser ? currentUser.id : null);
           gamePrevViewData.set(String(game.id), { players: pqPlayers, myAnswer: myPqAnswer ? myPqAnswer.answer : '', askedAt: pq.asked_at, category: pqCategory, question: pq.question, correctAnswer: pq.answer });
