@@ -1382,7 +1382,7 @@
 
     function buildViewResponsesHtml(players, myAnswer, relativeTo) {
       const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-      const sorted = [...players].sort((a, b) => (b._isMe ? 1 : 0) - (a._isMe ? 1 : 0));
+      const sorted = [...players].sort((a, b) => (a._isMe ? 1 : 0) - (b._isMe ? 1 : 0));
       return sorted.slice(0, 5).map(p => {
         const rawName = (p.display_name || '').trim();
         const parts = rawName.split(' ');
