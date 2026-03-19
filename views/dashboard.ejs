@@ -1380,7 +1380,7 @@
         });
     }
 
-    function buildViewResponsesHtml(players, myAnswer) {
+    function buildViewResponsesHtml(players, myAnswer, relativeTo) {
       const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       const sorted = [...players].sort((a, b) => (b._isMe ? 1 : 0) - (a._isMe ? 1 : 0));
       return sorted.slice(0, 5).map(p => {
@@ -1395,7 +1395,7 @@
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${displayName}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
         const statusClass = !p._answered ? 'waiting' : p._isCorrect ? 'answered' : 'answered-wrong';
-        const statusText = relativeAnswerTime(p._answeredAt);
+        const statusText = relativeAnswerTime(p._answeredAt, false, relativeTo);
         const answerText = p._isMe && myAnswer ? esc(myAnswer) : (p._answer ? esc(p._answer) : '');
         let badge = '';
         if (p._answered && p._isCorrect) {
@@ -1487,7 +1487,7 @@
           const pqPlayerHtml = pqVisible.map(p => buildPlayerCardHtml(p, { short: pqPlayers.length > 3, unansweredIncorrect: true, askedAt: pq.asked_at, relativeTo: game.current_question ? game.current_question.asked_at : null })).join('');
           const pqOverflowHtml = pqOverflow > 0 ? `<div class="game-player"><div class="player-overflow-circle">+${pqOverflow}</div></div>` : '';
           const myPqAnswer = pqAnswerByUser.get(currentUser ? currentUser.id : null);
-          gamePrevViewData.set(String(game.id), { players: pqPlayers, myAnswer: myPqAnswer ? myPqAnswer.answer : '', askedAt: pq.asked_at, category: pqCategory, question: pq.question, correctAnswer: pq.answer });
+          gamePrevViewData.set(String(game.id), { players: pqPlayers, myAnswer: myPqAnswer ? myPqAnswer.answer : '', askedAt: pq.asked_at, relativeTo: game.current_question ? game.current_question.asked_at : null, category: pqCategory, question: pq.question, correctAnswer: pq.answer });
           return `<div class="game-row game-row-previous" data-game-id="${escHtml(game.id)}">
             <div class="game-row-header">
               <span class="game-category">${escHtml(pqCategory)}</span>
@@ -1579,11 +1579,11 @@
       });
 
       function openPrevModal(gameId) {
-        const { players, myAnswer, askedAt, category, question, correctAnswer } = gamePrevViewData.get(gameId) || {};
+        const { players, myAnswer, askedAt, relativeTo, category, question, correctAnswer } = gamePrevViewData.get(gameId) || {};
         document.getElementById('view-modal-category').textContent = category || '';
         document.getElementById('view-modal-question').textContent = question || '';
         document.getElementById('view-modal-answer').textContent = correctAnswer || '';
-        document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
+        document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer, relativeTo);
         document.getElementById('view-modal-footer').innerHTML = formatQuestionDate(askedAt);
         document.getElementById('view-modal-backdrop').classList.add('open');
       }
