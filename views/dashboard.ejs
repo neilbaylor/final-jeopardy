@@ -1486,6 +1486,7 @@
             <div class="game-row-body">
               <div class="game-players" style="gap:${pqPlayers.length > 3 ? '2px' : '4px'}">${pqPlayerHtml}${pqOverflowHtml}</div>
             </div>
+            <div class="game-row-summary">${formatQuestionDate(pq.asked_at)}</div>
           </div>`;
         })() : '';
 
