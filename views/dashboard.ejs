@@ -1545,23 +1545,36 @@
       function closeAllSwipes(except) {
         document.querySelectorAll('.game-row-wrapper.swipe-open').forEach(w => {
           if (w === except) return;
-          const r = w.querySelector('.game-row');
+          const r = w.querySelector('.game-row:not(.game-row-previous)');
+          const pr = w.querySelector('.game-row-previous');
           r.style.transition = 'transform 0.25s ease';
           r.style.transform = '';
+          if (pr) { pr.style.transition = 'transform 0.25s ease'; pr.style.transform = ''; }
           w.classList.remove('swipe-open');
         });
       }
 
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
-        const row = wrapper.querySelector('.game-row');
+        const row = wrapper.querySelector('.game-row:not(.game-row-previous)');
+        const prevRow = wrapper.querySelector('.game-row-previous');
         let startX, startY, moved = false, direction = null;
+
+        function setTranslate(tx, animate) {
+          const t = `transform ${animate ? '0.25s ease' : 'none'}`;
+          row.style.transition = t;
+          row.style.transform = tx ? `translateX(${tx}px)` : '';
+          if (prevRow) {
+            prevRow.style.transition = t;
+            prevRow.style.transform = tx ? `translateX(${tx}px)` : '';
+          }
+        }
 
         row.addEventListener('touchstart', e => {
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
           moved = false;
           direction = null;
-          row.style.transition = 'none';
+          setTranslate(null, false);
         }, { passive: true });
 
         row.addEventListener('touchmove', e => {
@@ -1576,26 +1589,24 @@
           if (direction === 'vertical') return;
           e.preventDefault();
           moved = true;
-          const isOpen = wrapper.classList.contains('swipe-open');
-          const base = isOpen ? -DELETE_REVEAL : 0;
-          row.style.transform = `translateX(${Math.max(-DELETE_REVEAL, Math.min(0, base + dx))}px)`;
+          if (dx < 0) {
+            setTranslate(Math.min(-dx, wrapper.offsetWidth), false);
+          }
         }, { passive: false });
 
         function finishSwipe(endX) {
           if (!moved) return;
           moved = false;
           const dx = endX - startX;
-          const isOpen = wrapper.classList.contains('swipe-open');
-          row.style.transition = 'transform 0.25s ease';
-          if (!isOpen && dx < -30) {
+          if (dx < -DELETE_REVEAL) {
             closeAllSwipes(wrapper);
-            row.style.transform = `translateX(-${DELETE_REVEAL}px)`;
+            row.style.transition = 'transform 0.25s ease';
+            row.style.transform = 'translateX(100%)';
+            if (prevRow) { prevRow.style.transition = 'transform 0.25s ease'; prevRow.style.transform = 'translateX(100%)'; }
             wrapper.classList.add('swipe-open');
-          } else if (isOpen && dx > 30) {
-            row.style.transform = '';
-            wrapper.classList.remove('swipe-open');
           } else {
-            row.style.transform = isOpen ? `translateX(-${DELETE_REVEAL}px)` : '';
+            setTranslate(null, true);
+            wrapper.classList.remove('swipe-open');
           }
         }
 
