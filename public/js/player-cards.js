@@ -28,17 +28,6 @@ function nextQuestionIn(askedAt) {
   return hrs === 1 ? '1 hour' : `${hrs} hours`;
 }
 
-function formatQuestionDate(askedAt) {
-  const d = parseDbDate(askedAt);
-  const month = d.toLocaleDateString(undefined, { month: 'long' });
-  const day = d.getDate();
-  const hours = d.getHours();
-  const mins = d.getMinutes();
-  const ampm = hours >= 12 ? 'pm' : 'am';
-  const h = hours % 12 || 12;
-  const m = String(mins).padStart(2, '0');
-  return `Question from ${month} ${day}, ${h}:${m}${ampm}`;
-}
 
 function nextQuestionSummary(askedAt, players) {
   const t = nextQuestionIn(askedAt);
