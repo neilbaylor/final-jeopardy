@@ -32,14 +32,30 @@ function nextQuestionIn(askedAt) {
 
 function formatQuestionDate(askedAt) {
   const d = parseDbDate(askedAt);
-  const month = d.toLocaleDateString(undefined, { month: 'long' });
-  const day = d.getDate();
   const hours = d.getHours();
   const mins = d.getMinutes();
   const ampm = hours >= 12 ? 'pm' : 'am';
   const h = hours % 12 || 12;
   const m = String(mins).padStart(2, '0');
-  return `Question asked <strong>${month} ${day}, ${h}:${m}${ampm}</strong>`;
+  const time = `${h}:${m}${ampm}`;
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  let label;
+  if (dDay.getTime() === today.getTime()) {
+    label = `Today at ${time}`;
+  } else if (dDay.getTime() === yesterday.getTime()) {
+    label = `Yesterday at ${time}`;
+  } else {
+    const month = d.toLocaleDateString(undefined, { month: 'long' });
+    const day = d.getDate();
+    label = `${month} ${day} at ${time}`;
+  }
+  return `Question asked <strong>${label}</strong>`;
 }
 
 function nextQuestionSummary(askedAt, players) {
