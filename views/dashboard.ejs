@@ -1651,7 +1651,7 @@
         const setDeleteOpacity = show => {
           if (!deleteAction) return;
           deleteAction.style.transition = show
-            ? 'opacity 0.25s ease 0.1ms'
+            ? 'none'
             : 'opacity 0s 300ms';
           deleteAction.style.opacity = show ? '1' : '0';
         };
