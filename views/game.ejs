@@ -631,7 +631,7 @@
   <div id="input-badge" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <div id="answer-responses"></div>
   <button id="answer-btn">Answer Question</button>
-  <button id="next-question-btn" onclick="const s=document.createElement('div');s.id='next-question-spinner';this.appendChild(s);this.style.pointerEvents='none';sessionStorage.setItem('vt-from-game','1');location.replace('/game?id='+new URLSearchParams(location.search).get('id')+'&seed='+Math.random())">Next Question</button>
+  <button id="next-question-btn" onclick="const s=document.createElement('div');s.id='next-question-spinner';this.appendChild(s);this.style.pointerEvents='none';sessionStorage.setItem('vt-from-game','1');location.replace('/game?id='+new URLSearchParams(location.search).get('id')+'&seed='+(this.dataset.seed||Math.random()))">Next Question</button>
 
   <div id="error-modal-backdrop">
     <div id="error-modal">
@@ -1126,9 +1126,11 @@
                     if (shouldShowNextBtn) {
                       const gameId = new URLSearchParams(location.search).get('id');
                       if (gameId && !document.querySelector(`link[rel="prefetch"][data-next-prefetch]`)) {
+                        const seed = Math.random();
+                        nextQuestionBtn.dataset.seed = seed;
                         const link = document.createElement('link');
                         link.rel = 'prefetch';
-                        link.href = `/game?id=${encodeURIComponent(gameId)}`;
+                        link.href = `/game?id=${encodeURIComponent(gameId)}&seed=${seed}`;
                         link.dataset.nextPrefetch = '1';
                         document.head.appendChild(link);
                       }
