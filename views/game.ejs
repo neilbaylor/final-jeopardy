@@ -1126,11 +1126,20 @@
                     if (shouldShowNextBtn) {
                       const gameId = new URLSearchParams(location.search).get('id');
                       if (gameId && !document.querySelector(`link[rel="prefetch"][data-next-prefetch]`)) {
+                        const seed = Math.random();
                         const link = document.createElement('link');
                         link.rel = 'prefetch';
-                        link.href = `/game?id=${encodeURIComponent(gameId)}`;
+                        link.href = `https://final-jeopardy-production.up.railway.app/game?id=${encodeURIComponent(gameId)}&seed=${seed}`;
                         link.dataset.nextPrefetch = '1';
                         document.head.appendChild(link);
+                        nextQuestionBtn.onclick = function() {
+                          const s = document.createElement('div');
+                          s.id = 'next-question-spinner';
+                          this.appendChild(s);
+                          this.style.pointerEvents = 'none';
+                          sessionStorage.setItem('vt-from-game', '1');
+                          location.replace(`https://final-jeopardy-production.up.railway.app/game?id=${encodeURIComponent(gameId)}&seed=${seed}`);
+                        };
                       }
                       _setTimeout(() => {
                         nextQuestionBtn.classList.add('visible');
