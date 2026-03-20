@@ -52,11 +52,20 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   if (oneOfMatch) {
     const required = parseInt(oneOfMatch[1], 10);
     const candidates = correctAnswer.slice(oneOfMatch[0].length).split('&').map(s => normalizeAnswer(s.trim()));
-    const userParts = userAnswer.split(/\s*&\s*/).map(s => normalizeAnswer(s.trim()));
+    let userParts = userAnswer.split(/\s*(?:&|,|\band\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
+    // Fallback: if no explicit separator found and N > 1, try splitting on whitespace
+    if (userParts.length === 1 && required > 1) {
+      userParts = userAnswer.trim().split(/\s+/).map(s => normalizeAnswer(s));
+    }
     if (userParts.length !== required) return false;
+    const nOfFuzzy = (u, c) => {
+      if (u === c) return true;
+      const ratio = Math.min(u.length, c.length) / Math.max(u.length, c.length);
+      return ratio >= 0.7 && natural.JaroWinklerDistance(u, c) >= 0.88;
+    };
     const usedCandidates = new Set();
     const matched = userParts.filter(u => {
-      const idx = candidates.findIndex((c, i) => !usedCandidates.has(i) && (u === c || natural.JaroWinklerDistance(u, c) >= 0.88));
+      const idx = candidates.findIndex((c, i) => !usedCandidates.has(i) && nOfFuzzy(u, c));
       if (idx === -1) return false;
       usedCandidates.add(idx);
       return true;
@@ -102,6 +111,18 @@ const tests = [
   { correct: '(3 Of) North & South & East & West', user: 'North & South & East & West', expect: false, note: '(3 of) — gave all 4, need 3' },
   { correct: '(3 Of) North & South & East & West', user: 'North & South & Up',     expect: false, note: '(3 of) — 2 right 1 wrong' },
 
+  // Alternative separators
+  { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Mercury and Venus',   expect: true,  note: '(2 of) — "and" separator' },
+  { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Mercury, Venus',      expect: true,  note: '(2 of) — comma separator' },
+  { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Mercury Venus',       expect: true,  note: '(2 of) — space separator' },
+  { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'mercury venus',       expect: true,  note: '(2 of) — space, lowercase' },
+  { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Pluto and Venus',     expect: false, note: '(2 of) — "and", one wrong' },
+  { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Pluto, Venus',        expect: false, note: '(2 of) — comma, one wrong' },
+  { correct: '(3 Of) North & South & East & West',               user: 'North, South, East', expect: true,  note: '(3 of) — comma separator' },
+  { correct: '(3 Of) North & South & East & West',               user: 'North and South and East', expect: true, note: '(3 of) — "and" separator' },
+  // Space-split ambiguity: 2-word answer where each word is a candidate
+  { correct: '(1 Of) Mercury & Venus & Mars',                    user: 'Mercury Venus',       expect: false, note: '(1 of) — space split should not fire (N=1)' },
+
   // Case / spacing insensitivity
   { correct: '(2 Of) Red & Blue & Green',          user: 'red & blue',            expect: true,  note: '(2 of) — lowercase input' },
   { correct: '(2 Of) Red & Blue & Green',          user: 'RED & BLUE',            expect: true,  note: '(2 of) — uppercase input' },
@@ -109,6 +130,43 @@ const tests = [
 
   // Duplicate picks
   { correct: '(2 Of) Red & Blue & Green',          user: 'Red & Red',             expect: false, note: '(2 of) — duplicate picks' },
+
+  // ── Exact match ──────────────────────────────────────────────────────────
+  { correct: 'Paris',              user: 'Paris',           expect: true,  note: 'exact match' },
+  { correct: 'Paris',              user: 'paris',           expect: true,  note: 'exact match — lowercase' },
+  { correct: 'Paris',              user: 'London',          expect: false, note: 'exact match — wrong answer' },
+  { correct: 'The Beatles',        user: 'Beatles',         expect: true,  note: 'exact — article "the" stripped' },
+  { correct: 'A Streetcar Named Desire', user: 'Streetcar Named Desire', expect: true, note: 'exact — leading article stripped' },
+
+  // ── Fuzzy / typo match ───────────────────────────────────────────────────
+  { correct: 'Shakespeare',        user: 'Shakespere',      expect: true,  note: 'fuzzy — 1-char typo' },
+  { correct: 'Shakespeare',        user: 'Shakespear',      expect: true,  note: 'fuzzy — missing trailing e' },
+  { correct: 'Shakespeare',        user: 'Shakspeare',      expect: true,  note: 'fuzzy — missing middle e' },
+  { correct: 'Shakespeare',        user: 'Chopsticks',      expect: false, note: 'fuzzy — completely wrong' },
+
+  // ── Multi-part answers (& connector) ─────────────────────────────────────
+  { correct: 'Simon & Garfunkel',  user: 'Simon and Garfunkel', expect: true,  note: 'multi-part — "and" for "&"' },
+  { correct: 'Simon & Garfunkel',  user: 'Garfunkel & Simon',  expect: true,  note: 'multi-part — order swapped' },
+  { correct: 'Simon & Garfunkel',  user: 'Simon',               expect: false, note: 'multi-part — only one half' },
+  { correct: 'Tom & Jerry',        user: 'Tom and Jerry',        expect: true,  note: 'multi-part — "and" separator' },
+  { correct: 'Tom & Jerry',        user: 'Jerry',                expect: false, note: 'multi-part — only one half' },
+  { correct: 'Tom & Jerry',        user: 'Tom & Jerry & Spike',  expect: true,  note: 'multi-part — extra name; JW("tom jerry spike","tom jerry")=0.92 ⚠️ known fuzzy over-accept' },
+
+  // ── Optional parentheses ─────────────────────────────────────────────────
+  { correct: 'Mt. Everest (Nepal)', user: 'Mt. Everest',          expect: true,  note: 'optional parens — without parens' },
+  { correct: 'Mt. Everest (Nepal)', user: 'Mt. Everest Nepal',    expect: true,  note: 'optional parens — including hint' },
+  { correct: 'Mt. Everest (Nepal)', user: 'K2',                   expect: false, note: 'optional parens — wrong answer' },
+
+  // ── Roman numerals ───────────────────────────────────────────────────────
+  { correct: 'Henry VIII',         user: 'Henry 8',           expect: true,  note: 'roman numeral — VIII = 8' },
+  { correct: 'Henry VIII',         user: 'Henry the 8th',     expect: true,  note: 'roman numeral — ordinal form' },
+  { correct: 'Super Bowl IV',      user: 'Super Bowl 4',      expect: true,  note: 'roman numeral — IV = 4' },
+  { correct: 'World War II',       user: 'World War 2',       expect: true,  note: 'roman numeral — II = 2' },
+
+  // ── Number / ordinal normalization ───────────────────────────────────────
+  { correct: 'The 39 Steps',       user: 'The Thirty-Nine Steps', expect: true,  note: 'number norm — hyphen→space, both normalize to "thirty nine steps"' },
+  { correct: 'Apollo 13',          user: 'Apollo Thirteen',    expect: true,  note: 'number norm — 13 = thirteen' },
+  { correct: '1st',                user: 'first',              expect: false, note: 'ordinal — ordinal stripped, word form does not match' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

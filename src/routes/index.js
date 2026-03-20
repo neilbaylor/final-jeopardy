@@ -87,11 +87,20 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   if (oneOfMatch) {
     const required = parseInt(oneOfMatch[1], 10);
     const candidates = correctAnswer.slice(oneOfMatch[0].length).split('&').map(s => normalizeAnswer(s.trim()));
-    const userParts = userAnswer.split(/\s*&\s*/).map(s => normalizeAnswer(s.trim()));
+    let userParts = userAnswer.split(/\s*(?:&|,|\band\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
+    // Fallback: if no explicit separator found and N > 1, try splitting on whitespace
+    if (userParts.length === 1 && required > 1) {
+      userParts = userAnswer.trim().split(/\s+/).map(s => normalizeAnswer(s));
+    }
     if (userParts.length !== required) return false;
+    const nOfFuzzy = (u, c) => {
+      if (u === c) return true;
+      const ratio = Math.min(u.length, c.length) / Math.max(u.length, c.length);
+      return ratio >= 0.7 && natural.JaroWinklerDistance(u, c) >= 0.88;
+    };
     const usedCandidates = new Set();
     const matched = userParts.filter(u => {
-      const idx = candidates.findIndex((c, i) => !usedCandidates.has(i) && (u === c || natural.JaroWinklerDistance(u, c) >= 0.88));
+      const idx = candidates.findIndex((c, i) => !usedCandidates.has(i) && nOfFuzzy(u, c));
       if (idx === -1) return false;
       usedCandidates.add(idx);
       return true;
