@@ -536,13 +536,16 @@
       top: 0;
       height: 100%;
       width: 90px;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       background: #e53935;
       border-radius: 0 14px 14px 0;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+    }
+    .game-row-delete-action.visible {
+      display: flex;
     }
     .delete-game-btn {
       background: none;
@@ -1618,6 +1621,7 @@
           mainRow.style.transform = tx ? `translateX(${tx}px)` : '';
           // prevRow only follows for positive (right-swipe) translations
           if (prevRow) prevRow.style.transform = (tx > 0) ? `translateX(${tx}px)` : '';
+          if (deleteAction) deleteAction.classList.toggle('visible', tx < 0);
           if (animated) {
             mainRow.addEventListener('transitionend', () => {
               mainRow.style.transition = '';
@@ -1664,17 +1668,21 @@
           } else if (deleteRevealed) {
             const tx = Math.max(-DELETE_WIDTH, Math.min(0, -DELETE_WIDTH + dx));
             mainRow.style.transform = `translateX(${tx}px)`;
+            if (deleteAction) deleteAction.classList.toggle('visible', tx < 0);
           } else {
             if (dx > 0 && prevRow) {
               const tx = Math.min(fw, dx);
               mainRow.style.transform = `translateX(${tx}px)`;
               prevRow.style.transform = `translateX(${tx}px)`;
+              if (deleteAction) deleteAction.classList.remove('visible');
             } else if (dx < 0) {
               const tx = Math.max(-DELETE_WIDTH, dx);
               mainRow.style.transform = `translateX(${tx}px)`;
+              if (deleteAction) deleteAction.classList.toggle('visible', dx < -1);
             } else {
               mainRow.style.transform = '';
               if (prevRow) prevRow.style.transform = '';
+              if (deleteAction) deleteAction.classList.remove('visible');
             }
           }
         }, { passive: false });
