@@ -93,6 +93,9 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
     return false;
   }
 
+  // Allow omitting a leading qualifier (e.g. "Virgin Islands" for "U.S. Virgin Islands").
+  if (b.endsWith(a) && b.length > a.length && b[b.length - a.length - 1] === ' ') return true;
+
   // If the correct answer has parenthetical words, they are optional.
   // e.g. "(Randolph) Caldecott" accepts both "Caldecott" and "Randolph Caldecott".
   if (/\(/.test(correctAnswer)) {
