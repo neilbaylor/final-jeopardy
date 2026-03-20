@@ -536,7 +536,6 @@
       top: 0;
       z-index: -1;
       opacity: 0;
-      transition: opacity 0.2s ease;
       height: 100%;
       width: 90px;
       display: flex;
@@ -1668,7 +1667,11 @@
 
         const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         const setDeleteOpacity = show => {
-          if (deleteAction) deleteAction.style.opacity = show ? '1' : '0';
+          if (!deleteAction) return;
+          deleteAction.style.transition = show
+            ? 'opacity 0.25s ease'
+            : 'opacity 0s 300ms';
+          deleteAction.style.opacity = show ? '1' : '0';
         };
         const setTx = (tx, animated) => {
           mainRow.style.transition = animated ? ease : 'none';
