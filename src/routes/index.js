@@ -82,15 +82,21 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
     }
   }
 
-  // "(1 Of) X & Y" — user only needs to name one of the listed answers.
-  const oneOfMatch = correctAnswer.match(/^\(\d+\s+of\)\s*/i);
+  // "(N Of) X & Y & Z" — user must name exactly N of the listed answers.
+  const oneOfMatch = correctAnswer.match(/^\((\d+)\s+of\)\s*/i);
   if (oneOfMatch) {
-    const candidates = correctAnswer.slice(oneOfMatch[0].length).split('&').map(s => normalizeAnswer(s));
-    for (const c of candidates) {
-      if (a === c) return true;
-      if (natural.JaroWinklerDistance(a, c) >= 0.88) return true;
-    }
-    return false;
+    const required = parseInt(oneOfMatch[1], 10);
+    const candidates = correctAnswer.slice(oneOfMatch[0].length).split('&').map(s => normalizeAnswer(s.trim()));
+    const userParts = userAnswer.split(/\s*&\s*/).map(s => normalizeAnswer(s.trim()));
+    if (userParts.length !== required) return false;
+    const usedCandidates = new Set();
+    const matched = userParts.filter(u => {
+      const idx = candidates.findIndex((c, i) => !usedCandidates.has(i) && (u === c || natural.JaroWinklerDistance(u, c) >= 0.88));
+      if (idx === -1) return false;
+      usedCandidates.add(idx);
+      return true;
+    });
+    return matched.length === required;
   }
 
   // Allow omitting a leading qualifier (e.g. "Virgin Islands" for "U.S. Virgin Islands").
