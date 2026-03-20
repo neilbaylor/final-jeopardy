@@ -143,7 +143,24 @@ router.get('/api/users', async (req, res) => {
       'SELECT id, display_name, avatar_url FROM users WHERE id != ?',
       [userId]
     );
-    return res.json(rows);
+    const fakeNames = [
+      'Alice Johnson','Bob Smith','Carol White','David Brown','Eva Martinez',
+      'Frank Wilson','Grace Lee','Henry Taylor','Iris Anderson','Jack Thomas',
+      'Karen Jackson','Liam Harris','Mia Martin','Noah Thompson','Olivia Garcia',
+      'Peter Martinez','Quinn Robinson','Rachel Clark','Samuel Rodriguez','Tina Lewis',
+      'Uma Walker','Victor Hall','Wendy Allen','Xavier Young','Yara Hernandez',
+      'Zach King','Amber Scott','Brian Green','Chloe Adams','Derek Baker',
+      'Ella Gonzalez','Felix Nelson','Gina Carter','Hugo Mitchell','Iris Perez',
+      'James Roberts','Kylie Turner','Leo Phillips','Mona Campbell','Nathan Parker',
+      'Opal Evans','Paul Edwards','Quinn Collins','Rose Stewart','Sam Sanchez',
+      'Tara Morris','Ulrich Rogers','Vera Reed','Walter Cook','Xena Morgan',
+    ];
+    const fakeUsers = fakeNames.map((name, i) => ({
+      id: 99000 + i,
+      display_name: name,
+      avatar_url: `https://i.pravatar.cc/150?u=fake${i}`,
+    }));
+    return res.json([...rows, ...fakeUsers]);
   } catch (err) {
     return res.status(500).json({ error: 'Database error' });
   }
