@@ -697,6 +697,9 @@
     .player-answered-badge svg {
       display: block;
     }
+    @supports (-webkit-touch-callout: none) {
+      .player-answered-badge svg { position: relative; left: 0.5px; }
+    }
     .player-overflow-circle {
       width: 25px;
       height: 25px;
