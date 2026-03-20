@@ -589,6 +589,30 @@
     .game-row-previous {
       border-right: 0;
     }
+    .game-row:nth-child(3):before, .game-row:nth-child(3):after, .game-row:nth-child(1):before, .game-row:nth-child(1):after  {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: #ccc;
+      position: absolute;
+      top: 3px;
+      left: 50%;
+      z-index: 2;
+      border-radius: 50%;
+      border: 1px solid #bbb;
+      opacity: 0.8;
+      transform: translateX(-50%);
+    }
+    .game-row:nth-child(3):after {
+      margin-left: -8px;
+      background: #fff;
+    }
+    .game-row:nth-child(1):before {
+      background: #fff;
+    }
+    .game-row:nth-child(1):after {
+      background: #ccc;
+    }
     .game-row-header {
       padding: 8px 9px 0;
     }
