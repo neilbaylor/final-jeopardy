@@ -488,4 +488,3 @@ router.delete('/api/games/:gameId', async (req, res) => {
 });
 
 module.exports = router;
-if (process.env.NODE_ENV === 'test') module.exports._test = { isAnswerCorrect };
