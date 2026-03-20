@@ -14,7 +14,6 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
   <link rel="apple-touch-icon" href="/images/hone-screen-new.png" />
-  <link rel="prefetch" href="/game" />
   <script src="/js/no-swipe-nav.js"></script>
   <script src="/js/player-cards.js"></script>
   <title>Final Jeopardy with Friends</title>
@@ -1574,6 +1573,18 @@
         });
       }
       prevGameIds = new Set(sortedGames.map(g => String(g.id)));
+
+      // Prefetch /game?id=X for each game that still has an answer button
+      document.querySelectorAll('link[rel="prefetch"][data-game-prefetch]').forEach(el => el.remove());
+      list.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
+        if (wrapper.querySelector('.answer-btn')) {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.href = `/game?id=${encodeURIComponent(wrapper.dataset.gameId)}`;
+          link.dataset.gamePrefetch = '1';
+          document.head.appendChild(link);
+        }
+      });
 
 
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
