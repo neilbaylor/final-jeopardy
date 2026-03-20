@@ -748,7 +748,7 @@
     let currentAnswer      = '';
     let currentGameAskedAt = '';
 
-    function buildAnswerResponsesHtml(players) {
+    function buildAnswerResponsesHtml(players, nextReady) {
       const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       const sorted = [...players].sort((a, b) => (b._isMe ? 1 : 0) - (a._isMe ? 1 : 0));
       return sorted.slice(0, 5).map(p => {
@@ -781,7 +781,7 @@
           </div>
           <div class="ar-answer">${esc(answerText)}</div>
         </div>`;
-      }).join('') + `<div class="game-row-summary">${nextQuestionSummary(currentGameAskedAt, players)}</div>`;
+      }).join('') + `<div class="game-row-summary">${nextReady ? 'New question <strong>ready now</strong>' : nextQuestionSummary(currentGameAskedAt, players)}</div>`;
     }
 
     async function showLoadError(loadStart) {
@@ -1118,7 +1118,7 @@
                       return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answerText: ans ? ans.answer : null };
                     });
                     const arPlayers = [meEntry, ...enrichedOthers].slice(0, 3);
-                    answerResponsesEl.innerHTML = buildAnswerResponsesHtml(arPlayers);
+                    answerResponsesEl.innerHTML = buildAnswerResponsesHtml(arPlayers, shouldShowNextBtn);
                     answerResponsesEl.classList.remove('count-1', 'count-2');
                     if (arPlayers.length === 1) answerResponsesEl.classList.add('count-1');
                     else if (arPlayers.length === 2) answerResponsesEl.classList.add('count-2');
