@@ -600,7 +600,7 @@
       z-index: 2;
       border-radius: 50%;
       border: 1px solid #bbb;
-      opacity: 0.59;
+      opacity: 0.52;
       transform: translateX(-50%);
     }
     .game-row:nth-child(3):after {
@@ -1711,14 +1711,14 @@
           const dx = e.changedTouches[0].clientX - startX;
           const fw = mainRow.offsetWidth;
           if (isRevealed) {
-            if (dx < -70) { isRevealed = false; wrapper.dataset.revealed = 'false'; setTx(0, true); }
+            if (dx < -40) { isRevealed = false; wrapper.dataset.revealed = 'false'; setTx(0, true); }
             else           { setTx(fw, true); }
           } else if (deleteRevealed) {
-            if (dx > 70) { deleteRevealed = false; setTx(0, true); }
+            if (dx > 40) { deleteRevealed = false; setTx(0, true); }
             else          { setTx(-DELETE_WIDTH, true); }
           } else {
-            if (dx > 70 && prevRow) { isRevealed = true; wrapper.dataset.revealed = 'true'; setTx(fw, true); }
-            else if (dx < -70)      { deleteRevealed = true; setTx(-DELETE_WIDTH, true); }
+            if (dx > 40 && prevRow) { isRevealed = true; wrapper.dataset.revealed = 'true'; setTx(fw, true); }
+            else if (dx < -40)      { deleteRevealed = true; setTx(-DELETE_WIDTH, true); }
             else                    { setTx(0, true); }
           }
         };
