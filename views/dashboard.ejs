@@ -535,6 +535,8 @@
       right: 0;
       top: 0;
       z-index: -1;
+      opacity: 0;
+      transition: opacity 0.2s ease;
       height: 100%;
       width: 90px;
       display: flex;
@@ -1665,6 +1667,9 @@
         let startX = 0, startY = 0, dirLocked = null, active = false, isRevealed = false, deleteRevealed = false;
 
         const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        const setDeleteOpacity = show => {
+          if (deleteAction) deleteAction.style.opacity = show ? '1' : '0';
+        };
         const setTx = (tx, animated) => {
           mainRow.style.transition = animated ? ease : 'none';
           if (prevRow) prevRow.style.transition = animated ? ease : 'none';
@@ -1717,17 +1722,21 @@
           } else if (deleteRevealed) {
             const tx = Math.max(-DELETE_WIDTH, Math.min(0, -DELETE_WIDTH + dx));
             mainRow.style.transform = `translateX(${tx}px)`;
+            setDeleteOpacity(tx < 0);
           } else {
             if (dx > 0 && prevRow) {
               const tx = Math.min(fw, dx);
               mainRow.style.transform = `translateX(${tx}px)`;
               prevRow.style.transform = `translateX(${tx}px)`;
+              setDeleteOpacity(false);
             } else if (dx < 0) {
               const tx = Math.max(-DELETE_WIDTH, dx);
               mainRow.style.transform = `translateX(${tx}px)`;
+              setDeleteOpacity(true);
             } else {
               mainRow.style.transform = '';
               if (prevRow) prevRow.style.transform = '';
+              setDeleteOpacity(false);
             }
           }
         }, { passive: false });
@@ -1742,12 +1751,12 @@
             if (dx < -40) { isRevealed = false; wrapper.dataset.revealed = 'false'; setTx(0, true); }
             else           { setTx(fw, true); }
           } else if (deleteRevealed) {
-            if (dx > 40) { deleteRevealed = false; setTx(0, true); }
-            else          { setTx(-DELETE_WIDTH, true); }
+            if (dx > 40) { deleteRevealed = false; setDeleteOpacity(false); setTx(0, true); }
+            else          { setDeleteOpacity(true); setTx(-DELETE_WIDTH, true); }
           } else {
             if (dx > 40 && prevRow) { isRevealed = true; wrapper.dataset.revealed = 'true'; setTx(fw, true); }
-            else if (dx < -40)      { deleteRevealed = true; setTx(-DELETE_WIDTH, true); }
-            else                    { setTx(0, true); }
+            else if (dx < -40)      { deleteRevealed = true; setDeleteOpacity(true); setTx(-DELETE_WIDTH, true); }
+            else                    { setDeleteOpacity(false); setTx(0, true); }
           }
         };
 
@@ -1756,8 +1765,8 @@
           if (!active) return;
           active = false;
           if (isRevealed) setTx(mainRow.offsetWidth, true);
-          else if (deleteRevealed) setTx(-DELETE_WIDTH, true);
-          else setTx(0, true);
+          else if (deleteRevealed) { setDeleteOpacity(true); setTx(-DELETE_WIDTH, true); }
+          else { setDeleteOpacity(false); setTx(0, true); }
         }, { passive: true });
 
         if (deleteAction) {
