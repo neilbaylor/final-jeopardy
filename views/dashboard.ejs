@@ -1601,24 +1601,6 @@
       });
 
 
-      document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
-        const row = wrapper.querySelector('.game-row:not(.game-row-previous)');
-        row.addEventListener('click', () => {
-          const btn = wrapper.querySelector('.answer-btn');
-          if (btn) {
-            btn.style.width = btn.offsetWidth + 'px';
-            btn.innerHTML = '<span class="btn-spinner"></span>';
-            btn.classList.add('loading');
-            window.location.href = `/game?id=${wrapper.dataset.gameId}`;
-          } else {
-            const viewBtn = wrapper.querySelector('.view-btn');
-            if (viewBtn) {
-              if (!viewBtn.classList.contains('loading')) viewBtn.click();
-              return;
-            }
-          }
-        });
-      });
 
       function openPrevModal(gameId) {
         const { players, myAnswer, askedAt, relativeTo, category, question, correctAnswer } = gamePrevViewData.get(gameId) || {};
@@ -1686,6 +1668,25 @@
             }, { once: true });
           }
         };
+
+        mainRow.addEventListener('click', () => {
+          if (deleteRevealed) {
+            deleteRevealed = false;
+            setDeleteOpacity(false);
+            setTx(0, true);
+            return;
+          }
+          const btn = wrapper.querySelector('.answer-btn');
+          if (btn) {
+            btn.style.width = btn.offsetWidth + 'px';
+            btn.innerHTML = '<span class="btn-spinner"></span>';
+            btn.classList.add('loading');
+            window.location.href = `/game?id=${wrapper.dataset.gameId}`;
+          } else {
+            const viewBtn = wrapper.querySelector('.view-btn');
+            if (viewBtn && !viewBtn.classList.contains('loading')) viewBtn.click();
+          }
+        });
 
         inner.addEventListener('touchstart', e => {
           if (e.touches.length !== 1) return;
