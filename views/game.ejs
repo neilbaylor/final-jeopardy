@@ -1124,6 +1124,14 @@
                     else if (arPlayers.length === 2) answerResponsesEl.classList.add('count-2');
                     answerResponsesEl.classList.add('visible');
                     if (shouldShowNextBtn) {
+                      const gameId = new URLSearchParams(location.search).get('id');
+                      if (gameId && !document.querySelector(`link[rel="prefetch"][data-next-prefetch]`)) {
+                        const link = document.createElement('link');
+                        link.rel = 'prefetch';
+                        link.href = `/game?id=${encodeURIComponent(gameId)}`;
+                        link.dataset.nextPrefetch = '1';
+                        document.head.appendChild(link);
+                      }
                       _setTimeout(() => {
                         nextQuestionBtn.classList.add('visible');
                         _setTimeout(() => nextQuestionBtn.classList.add('pulse'), 1400);
