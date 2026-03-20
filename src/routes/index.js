@@ -94,8 +94,8 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   }
 
   // Allow omitting a leading qualifier (e.g. "Virgin Islands" for "U.S. Virgin Islands").
-  // Require user's answer to be multi-word so bare generic words (e.g. "city") don't match.
-  if (a.includes(' ') && b.endsWith(a) && b.length > a.length && b[b.length - a.length - 1] === ' ') return true;
+  // Require multi-word answer and suffix must be ≥75% of the full answer length.
+  if (a.includes(' ') && b.endsWith(a) && b.length > a.length && b[b.length - a.length - 1] === ' ' && a.length / b.length >= 0.75) return true;
 
   // If the correct answer has parenthetical words, they are optional.
   // e.g. "(Randolph) Caldecott" accepts both "Caldecott" and "Randolph Caldecott".
