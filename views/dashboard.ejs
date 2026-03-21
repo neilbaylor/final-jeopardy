@@ -1512,7 +1512,7 @@
         const overflow = combined.length > MAX_VISIBLE ? combined.length - MAX_VISIBLE : 0;
         const visible = overflow > 0 ? combined.slice(0, MAX_VISIBLE) : combined;
 
-        const playerHtml = visible.map(p => buildPlayerCardHtml(p, { short: combined.length > 3 })).join('');
+        const playerHtml = visible.map(p => buildPlayerCardHtml(p, { short: combined.length > 3, simpleCoin: true })).join('');
 
         const overflowHtml = overflow > 0
           ? `<div class="game-player"><div class="player-overflow-circle">+${overflow}</div></div>`
@@ -1530,7 +1530,7 @@
           });
           const pqVisible = pqPlayers.length > MAX_VISIBLE ? pqPlayers.slice(0, MAX_VISIBLE) : pqPlayers;
           const pqOverflow = pqPlayers.length > MAX_VISIBLE ? pqPlayers.length - MAX_VISIBLE : 0;
-          const pqPlayerHtml = pqVisible.map(p => buildPlayerCardHtml(p, { short: pqPlayers.length > 3, unansweredIncorrect: true, askedAt: pq.asked_at, relativeTo: pq.asked_at })).join('');
+          const pqPlayerHtml = pqVisible.map(p => buildPlayerCardHtml(p, { short: pqPlayers.length > 3, unansweredIncorrect: true, askedAt: pq.asked_at, relativeTo: pq.asked_at, simpleCoin: true })).join('');
           const pqOverflowHtml = pqOverflow > 0 ? `<div class="game-player"><div class="player-overflow-circle">+${pqOverflow}</div></div>` : '';
           const myPqAnswer = pqAnswerByUser.get(currentUser ? currentUser.id : null);
           gamePrevViewData.set(String(game.id), { players: pqPlayers, myAnswer: myPqAnswer ? myPqAnswer.answer : '', askedAt: pq.asked_at, relativeTo: pq.asked_at, category: pqCategory, question: pq.question, correctAnswer: pq.answer });
