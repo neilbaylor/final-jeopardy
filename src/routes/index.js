@@ -36,9 +36,10 @@ function romanToNum(s) {
 
 function normalizeAnswer(str) {
   // Convert Roman numerals (all-uppercase tokens) before lowercasing
-  str = str.replace(/\b([IVXLCDM]+)\b/g, (m) => {
-    if (/[a-z]/.test(m) || !_romanRe.test(m)) return m;
-    const n = romanToNum(m);
+  str = str.replace(/\b([IVXLCDMivxlcdm]+)\b/g, (m) => {
+    const u = m.toUpperCase();
+    if (!_romanRe.test(u)) return m;
+    const n = romanToNum(u);
     return n > 0 ? String(n) : m;
   });
 

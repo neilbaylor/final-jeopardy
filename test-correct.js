@@ -31,9 +31,10 @@ function romanToNum(s) {
 }
 
 function normalizeAnswer(str) {
-  str = str.replace(/\b([IVXLCDM]+)\b/g, (m) => {
-    if (/[a-z]/.test(m) || !_romanRe.test(m)) return m;
-    const n = romanToNum(m);
+  str = str.replace(/\b([IVXLCDMivxlcdm]+)\b/g, (m) => {
+    const u = m.toUpperCase();
+    if (!_romanRe.test(u)) return m;
+    const n = romanToNum(u);
     return n > 0 ? String(n) : m;
   });
   return str
@@ -204,6 +205,12 @@ const tests = [
   { correct: 'Henry VIII',         user: 'Henry the 8th',     expect: true,  note: 'roman numeral — ordinal form' },
   { correct: 'Super Bowl IV',      user: 'Super Bowl 4',      expect: true,  note: 'roman numeral — IV = 4' },
   { correct: 'World War II',       user: 'World War 2',       expect: true,  note: 'roman numeral — II = 2' },
+
+  // ── Lowercase / mixed-case roman numerals ────────────────────────────────
+  { correct: 'Henry Viii',          user: 'Henry viii',        expect: true,  note: 'roman numeral — lowercase viii matches Viii' },
+  { correct: 'Henry VIII',          user: 'Henry viii',        expect: true,  note: 'roman numeral — lowercase viii matches VIII' },
+  { correct: 'World War ii',        user: 'World War 2',       expect: true,  note: 'roman numeral — lowercase ii = 2' },
+  { correct: 'Super Bowl iv',       user: 'Super Bowl 4',      expect: true,  note: 'roman numeral — lowercase iv = 4' },
 
   // ── All-caps sequences that are NOT valid roman numerals ──────────────────
   // _romanRe rejects these; they must stay as words, not become numbers
