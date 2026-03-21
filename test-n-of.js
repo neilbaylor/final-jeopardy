@@ -167,6 +167,20 @@ const tests = [
   { correct: 'The 39 Steps',       user: 'The Thirty-Nine Steps', expect: true,  note: 'number norm — hyphen→space, both normalize to "thirty nine steps"' },
   { correct: 'Apollo 13',          user: 'Apollo Thirteen',    expect: true,  note: 'number norm — 13 = thirteen' },
   { correct: '1st',                user: 'first',              expect: false, note: 'ordinal — ordinal stripped, word form does not match' },
+
+  // ── Suffix / leading-qualifier omission (≥72% length, word boundary) ─────
+  // correct normalized length vs user normalized length ratios shown
+  { correct: 'U.S. Virgin Islands',          user: 'Virgin Islands',         expect: true,  note: 'suffix — omit leading "U.S." qualifier' },
+  { correct: 'The United States of America', user: 'States of America',      expect: false, note: 'suffix — too short (<72% of full length)' },
+  { correct: 'The United States of America', user: 'United States of America', expect: true, note: 'suffix — omit "The", long enough' },
+  { correct: 'Lake Superior',                user: 'Superior',               expect: false, note: 'suffix — single word, a.includes(" ") fails' },
+  { correct: 'Mount Saint Helens',           user: 'Saint Helens',           expect: false, note: 'suffix — ratio 0.667 < 0.72, rejected' },
+  { correct: 'Mount Saint Helens',           user: 'Helens',                 expect: false, note: 'suffix — single word rejected' },
+  { correct: 'New York City',                user: 'York City',              expect: false, note: 'suffix — ratio 0.692 < 0.72, rejected' },
+  { correct: 'New York City',                user: 'City',                   expect: false, note: 'suffix — single word rejected' },
+  { correct: 'New York City',                user: 'New York',               expect: true,  note: 'suffix — not a suffix, but JW=0.923 ⚠️ fuzzy over-accept' },
+  // boundary check — must break on a space, not mid-word
+  { correct: 'Springfield',                  user: 'field',                  expect: false, note: 'suffix — no space boundary, single word anyway' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
