@@ -704,6 +704,7 @@
     const isMobileSafari = /iP(hone|ad|od)/.test(navigator.userAgent) &&
       (/Safari/.test(navigator.userAgent) || window.navigator.standalone);
     const inputSpinnerDuration = isMobileSafari ? 1350 : 1050;
+    const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
     let gamePlayers = [];
     let currentCategory = '';
     let currentUserAvatarUrl = null;
@@ -830,7 +831,7 @@
         if (!game?.current_question?.category || !game?.current_question?.question || !game?.current_question?.answer) {
           await showLoadError(loadStart); return;
         }
-        const category = game.current_question.category;
+        const category = toTitleCase(game.current_question.category);
         currentQuestion      = game.current_question.question;
         currentAnswer        = game.current_question.answer;
         currentCategory      = category;
