@@ -274,7 +274,8 @@ router.get('/api/games', async (req, res) => {
         `SELECT
            g.id,
            g.created_at,
-           (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url))
+           (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url,
+                                            'score', (SELECT COUNT(*) FROM game_answers ga2 JOIN game_questions gq2 ON ga2.game_question_id = gq2.id WHERE gq2.game_id = g.id AND ga2.user_id = u.id AND ga2.is_correct = 1)))
             FROM game_users gu2 JOIN users u ON gu2.user_id = u.id
             WHERE gu2.game_id = g.id AND (${escapedUserId} IS NULL OR gu2.user_id != ${escapedUserId})) AS players,
            (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_id,
@@ -349,7 +350,8 @@ router.get('/api/games', async (req, res) => {
       `SELECT
          g.id,
          g.created_at,
-         (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url))
+         (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'display_name', u.display_name, 'avatar_url', u.avatar_url,
+                                          'score', (SELECT COUNT(*) FROM game_answers ga2 JOIN game_questions gq2 ON ga2.game_question_id = gq2.id WHERE gq2.game_id = g.id AND ga2.user_id = u.id AND ga2.is_correct = 1)))
           FROM game_users gu2 JOIN users u ON gu2.user_id = u.id
           WHERE gu2.game_id = g.id AND gu2.user_id != ${db.escape(userId)}) AS players,
          (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_id,
