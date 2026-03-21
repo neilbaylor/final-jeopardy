@@ -762,7 +762,10 @@
 
     function randomizeCoinDelays(el) {
       el.querySelectorAll('.player-score-coin').forEach(coin => {
-        coin.style.animationDelay = `-${Math.floor(Math.random() * 700)}ms`;
+        coin.style.animationDelay = `-${Math.floor(Math.random() * 3500)}ms`;
+        coin.style.animationName = 'none';
+        coin.offsetHeight;
+        coin.style.animationName = '';
       });
     }
 
