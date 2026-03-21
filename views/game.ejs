@@ -701,6 +701,7 @@
     let gamePlayers = [];
     let currentCategory = '';
     let currentUserAvatarUrl = null;
+    let currentMyScore = 0;
     let answerBtnClickHandled = false;
     let currentGameQuestionId = null;
     let currentQuestionId = null;
@@ -816,6 +817,7 @@
         currentCategory      = category;
         currentGameAskedAt = game.current_question ? game.current_question.asked_at || '' : '';
         currentUserAvatarUrl = game.current_user?.avatar_url || null;
+        currentMyScore = game.my_score || 0;
         const cqId = game.current_question ? game.current_question.game_question_id : null;
         currentGameQuestionId = cqId;
         currentQuestionId = game.current_question ? game.current_question.question_id : null;
@@ -1116,7 +1118,7 @@
                       _answerText: submittedAnswer,
                       display_name: '',
                       avatar_url: currentUserAvatarUrl,
-                      score: game.my_score || 0,
+                      score: currentMyScore,
                     };
                     const enrichedOthers = gamePlayers.map(p => {
                       const ans = answerMap.get(String(p.id));
