@@ -83,7 +83,7 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   }
 
   // "(N Of) X & Y & Z" — user must name exactly N of the listed answers.
-  const oneOfMatch = correctAnswer.match(/^\((\d+)\s+of\)\s*/i);
+  const oneOfMatch = correctAnswer.match(/^\((\d+)\s+of(?:\s+\d+)?\)\s*/i);
   if (oneOfMatch) {
     const required = parseInt(oneOfMatch[1], 10);
     const candidates = correctAnswer.slice(oneOfMatch[0].length).split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim()));
