@@ -776,9 +776,13 @@
           badge = `<div class="player-answered-badge incorrect"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><line x1="1.5" y1="1.5" x2="4.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><line x1="4.5" y1="1.5" x2="1.5" y2="4.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg></div>`;
         }
         const answerText = p._answerText || '';
+        const score = p.score || 0;
+        const coinBadge = score > 0
+          ? `<img src="/images/coin.png" class="player-score-coin" /><span class="player-score-label">${score}</span>`
+          : '';
         return `<div class="answer-response-row">
           <div class="ar-player">
-            <div class="player-avatar-wrap">${avatarInner}${badge}</div>
+            <div class="player-avatar-wrap">${avatarInner}${badge}${coinBadge}</div>
             <div class="game-player-info">
               <span class="player-name">${displayName}</span>
               <span class="player-status ${statusClass}">${statusText}</span>
