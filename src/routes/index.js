@@ -288,6 +288,8 @@ router.get('/api/games', async (req, res) => {
                                              'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
             FROM game_answers ga
             WHERE ga.game_question_id = (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1)) AS answers,
+           (SELECT COUNT(*) FROM game_answers ga3 JOIN game_questions gq3 ON ga3.game_question_id = gq3.id
+            WHERE gq3.game_id = g.id AND ga3.user_id = ${escapedUserId} AND ga3.is_correct = 1) AS my_score,
            (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_id,
            (SELECT gq.asked_at FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_asked_at,
            (SELECT q.id FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_question_id,
@@ -327,6 +329,7 @@ router.get('/api/games', async (req, res) => {
           category: title(row.cq_category),
         } : null,
         answers: parse(row.answers) || [],
+        my_score: row.my_score || 0,
         previous_question: row.pq_id ? {
           game_question_id: row.pq_id,
           asked_at: row.pq_asked_at,
@@ -364,6 +367,8 @@ router.get('/api/games', async (req, res) => {
                                            'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
           FROM game_answers ga
           WHERE ga.game_question_id = (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1)) AS answers,
+         (SELECT COUNT(*) FROM game_answers ga3 JOIN game_questions gq3 ON ga3.game_question_id = gq3.id
+          WHERE gq3.game_id = g.id AND ga3.user_id = ${db.escape(userId)} AND ga3.is_correct = 1) AS my_score,
          (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_id,
          (SELECT gq.asked_at FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_asked_at,
          (SELECT q.id FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_question_id,
@@ -394,6 +399,7 @@ router.get('/api/games', async (req, res) => {
         category: title(row.cq_category),
       } : null,
       answers: parse(row.answers) || [],
+      my_score: row.my_score || 0,
       previous_question: row.pq_id ? {
         game_question_id: row.pq_id,
         asked_at: row.pq_asked_at,
