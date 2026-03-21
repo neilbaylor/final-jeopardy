@@ -732,6 +732,7 @@
     }
     .player-score-coin { position: absolute; top: -1px; left: -1px; width: 15px; opacity: 0.83; }
     .player-score-label { position: absolute; left: -0.5px; top: -2.5px; width: 13.5px; text-align: center; font-size: 0.6rem; letter-spacing: -1px; font-weight: 700; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(113, 55, 17, 1), 0 2px 7px rgba(113, 55, 17, 1); line-height: 16.8px; }
+    @supports (-webkit-touch-callout: none) { .player-score-label { margin-top: 0.25px; } }
     .player-status {
       font-size: 0.65rem;
       font-weight: 600;
