@@ -1112,6 +1112,7 @@
                       _answerText: submittedAnswer,
                       display_name: '',
                       avatar_url: currentUserAvatarUrl,
+                      score: game.my_score || 0,
                     };
                     const enrichedOthers = gamePlayers.map(p => {
                       const ans = answerMap.get(String(p.id));

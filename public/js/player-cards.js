@@ -114,10 +114,14 @@ function buildPlayerCardHtml(p, opts) {
   const statusText = (opts && opts.askedAt && p._answeredAt)
     ? relativeAnswerTime(opts.askedAt, opts && opts.short, p._answeredAt)
     : relativeAnswerTime(unansweredAsWrong ? (opts && opts.askedAt || p._answeredAt) : p._answeredAt, unansweredAsWrong || (opts && opts.short), unansweredAsWrong ? null : (opts && opts.relativeTo));
+  const score = p.score || 0;
+  const coinBadge = score > 0
+    ? `<img src="/images/coin.png" style="position:absolute;right:0;top:50%;transform:translateY(-50%);width:15px;height:15px;" /><span style="position:absolute;right:0;top:50%;transform:translateY(-50%);width:15px;text-align:center;font-size:0.5rem;font-weight:800;color:#4d3200;text-shadow:0 0 1px rgba(255,255,255,0.8),0 0 2px rgba(0,0,0,0.4);line-height:15px;">${score}</span>`
+    : '';
   return `<div class="game-player">
     ${avatarHtml}
     <div class="game-player-info">
-      <span class="player-name">${displayName}</span>
+      <span class="player-name" style="position:relative;">${displayName}${coinBadge}</span>
       <span class="player-status ${statusClass}">${statusText}</span>
     </div>
   </div>`;

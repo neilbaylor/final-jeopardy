@@ -1504,7 +1504,7 @@
 
         // Build combined player list: others first, current user last
         const others = game.players || [];
-        const meEntry = currentUser ? { ...currentUser, _isMe: true, _answered: iAnswered, _isCorrect: myAnswer ? !!myAnswer.is_correct : null, _answeredAt: myAnswer ? myAnswer.answered_at : null } : null;
+        const meEntry = currentUser ? { ...currentUser, _isMe: true, score: game.my_score || 0, _answered: iAnswered, _isCorrect: myAnswer ? !!myAnswer.is_correct : null, _answeredAt: myAnswer ? myAnswer.answered_at : null } : null;
         const combined = meEntry ? [...others.map(playerWithAnswer), meEntry] : others.map(playerWithAnswer);
 
         const overflow = combined.length > MAX_VISIBLE ? combined.length - MAX_VISIBLE : 0;
