@@ -82,7 +82,7 @@ function buildGamePlayersHtml(players, summaryText) {
     : '';
   const gapPx = players.length === 2 ? 16 : players.length === 3 ? 7 : 7;
   const rowStyle = gapPx !== 7 ? ` style="gap: ${gapPx}px"` : '';
-  return `<div class="players-row"${rowStyle}>${visible.map(buildPlayerCardHtml).join('') + overflowHtml}</div>${summary}`;
+  return `<div class="players-row"${rowStyle}>${visible.map(p => buildPlayerCardHtml(p, { simpleCoin: true })).join('') + overflowHtml}</div>${summary}`;
 }
 
 function buildPlayerCardHtml(p, opts) {
