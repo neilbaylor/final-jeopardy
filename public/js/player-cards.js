@@ -99,7 +99,7 @@ function buildPlayerCardHtml(p, opts) {
     : `<div class="player-avatar-placeholder">👤</div>`;
   const hasAnswer = p._answered;
   const isCorrect = p._isCorrect;
-  const incorrectBadge = `<div class="player-answered-badge incorrect"><svg width="8" height="8" viewBox="0 0 8 8" fill="none" overflow="visible"><line x1="2" y1="2" x2="6" y2="6" stroke="#e53935" stroke-width="1.4" stroke-linecap="round"/><line x1="6" y1="2" x2="2" y2="6" stroke="#e53935" stroke-width="1.4" stroke-linecap="round"/></svg></div>`;
+  const incorrectBadge = `<div class="player-answered-badge incorrect"><svg width="8" height="8" viewBox="0 0 8 8" fill="none" overflow="visible"><line x1="2" y1="2" x2="6" y2="6" stroke="#ef5350" stroke-width="1.4" stroke-linecap="round"/><line x1="6" y1="2" x2="2" y2="6" stroke="#ef5350" stroke-width="1.4" stroke-linecap="round"/></svg></div>`;
   let badge = '';
   if (hasAnswer && isCorrect) {
     badge = `<div class="player-answered-badge"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#43a047" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
