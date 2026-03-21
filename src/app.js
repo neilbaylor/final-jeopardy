@@ -4,7 +4,6 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const passport = require('./config/passport');
 const db = require('./config/database');
-const { execSync } = require('child_process');
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
@@ -12,20 +11,9 @@ const authRouter = require('./routes/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const GIT_SHA = (() => {
-  try { return execSync('git rev-parse HEAD', { cwd: __dirname }).toString().trim(); } catch { return 'dev'; }
-})();
-
 // View engine
 app.set('view engine', 'ejs');
 app.set('views', `${__dirname}/../views`);
-
-// Service worker (dynamic, so SHA is embedded)
-app.get('/sw.js', (req, res) => {
-  res.setHeader('Content-Type', 'application/javascript');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.send(buildServiceWorker(GIT_SHA));
-});
 
 // Static files
 app.use(express.static(`${__dirname}/../public`));
@@ -136,50 +124,6 @@ async function seedIfEmpty() {
   } catch (err) {
     console.error('Seed check failed:', err.message);
   }
-}
-
-function buildServiceWorker(sha) {
-  return `const CACHE_NAME = 'app-${sha}';
-const STATIC_ASSETS = [
-  '/js/player-cards.js',
-  '/js/no-swipe-nav.js',
-  '/manifest.json',
-  '/images/coin.png',
-  '/images/coin-simple.png',
-  '/images/fjwf_logo.svg',
-  '/images/fjwf_logo.webp',
-  '/images/favicon-16x16.png',
-  '/images/favicon-32x32.png',
-  '/images/apple-touch-icon.png',
-  '/images/android-chrome-192x192.png',
-  '/images/android-chrome-512x512.png',
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-  if (STATIC_ASSETS.some(a => url.pathname === a)) {
-    event.respondWith(
-      caches.match(event.request).then(cached => cached || fetch(event.request))
-    );
-  }
-});
-`;
 }
 
 // Start server (init DB schema, then listen)
