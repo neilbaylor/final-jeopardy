@@ -86,8 +86,8 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const oneOfMatch = correctAnswer.match(/^\((\d+)\s+of\)\s*/i);
   if (oneOfMatch) {
     const required = parseInt(oneOfMatch[1], 10);
-    const candidates = correctAnswer.slice(oneOfMatch[0].length).split('&').map(s => normalizeAnswer(s.trim()));
-    let userParts = userAnswer.split(/\s*(?:&|,|\band\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
+    const candidates = correctAnswer.slice(oneOfMatch[0].length).split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim()));
+    let userParts = userAnswer.split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
     // Fallback: if no explicit separator found and N > 1, try splitting on whitespace
     if (userParts.length === 1 && required > 1) {
       userParts = userAnswer.trim().split(/\s+/).map(s => normalizeAnswer(s));

@@ -51,8 +51,8 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const oneOfMatch = correctAnswer.match(/^\((\d+)\s+of\)\s*/i);
   if (oneOfMatch) {
     const required = parseInt(oneOfMatch[1], 10);
-    const candidates = correctAnswer.slice(oneOfMatch[0].length).split('&').map(s => normalizeAnswer(s.trim()));
-    let userParts = userAnswer.split(/\s*(?:&|,|\band\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
+    const candidates = correctAnswer.slice(oneOfMatch[0].length).split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim()));
+    let userParts = userAnswer.split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
     // Fallback: if no explicit separator found and N > 1, try splitting on whitespace
     if (userParts.length === 1 && required > 1) {
       userParts = userAnswer.trim().split(/\s+/).map(s => normalizeAnswer(s));
@@ -113,6 +113,7 @@ const tests = [
 
   // Alternative separators
   { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Mercury and Venus',   expect: true,  note: '(2 of) — "and" separator' },
+  { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Mercury or Venus',    expect: true,  note: '(2 of) — "or" separator' },
   { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Mercury, Venus',      expect: true,  note: '(2 of) — comma separator' },
   { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Mercury Venus',       expect: true,  note: '(2 of) — space separator' },
   { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'mercury venus',       expect: true,  note: '(2 of) — space, lowercase' },
@@ -120,6 +121,9 @@ const tests = [
   { correct: '(2 Of) Mercury & Venus & Mars & Jupiter & Saturn', user: 'Pluto, Venus',        expect: false, note: '(2 of) — comma, one wrong' },
   { correct: '(3 Of) North & South & East & West',               user: 'North, South, East', expect: true,  note: '(3 of) — comma separator' },
   { correct: '(3 Of) North & South & East & West',               user: 'North and South and East', expect: true, note: '(3 of) — "and" separator' },
+  { correct: '(3 Of) North & South & East & West',               user: 'North or South or East', expect: true, note: '(3 of) — "or" separator' },
+  { correct: '(3 Of) North or South or East or West',            user: 'North or South or East', expect: true, note: '(3 of) — "or" in correct answer, "or" separator in user' },
+  { correct: '(3 Of) North or South or East or West',            user: 'North & South & East', expect: true, note: '(3 of) — "or" in correct answer, "&" separator in user' },
   // Space-split ambiguity: 2-word answer where each word is a candidate
   { correct: '(1 Of) Mercury & Venus & Mars',                    user: 'Mercury Venus',       expect: false, note: '(1 of) — space split should not fire (N=1)' },
 
