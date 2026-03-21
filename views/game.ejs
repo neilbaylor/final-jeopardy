@@ -482,7 +482,7 @@
     @keyframes coin-shimmer { 0%, 40%, 60%, 100% { filter: brightness(1) drop-shadow(0 0 1px rgba(255,220,80,0)); } 50% { filter: brightness(1.28) drop-shadow(0 0 4px rgba(255,220,80,0.52)); } }
     #game-players .player-score-coin { position: absolute; top: 3px; left: -3px; width: 23px; opacity: 0.95; animation: coin-shimmer 6.5s linear infinite; }
     #game-players .player-score-label { position: absolute; left: -2.25px; top: 2.25px; width: 20.5px; text-align: center; font-size: 0.7rem; letter-spacing: -0.5px; font-weight: 700; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(113, 55, 17, 1), 0 2px 7px rgba(113, 55, 17, 1); line-height: 21.8px; opacity: 0.95; }
-    @supports (-webkit-touch-callout: none) { #game-players .player-score-label { margin-top: 0.85px; } }
+    @supports (-webkit-touch-callout: none) { #game-players .player-score-label { margin-top: 1px; } }
     #game-players:not(.count-1):not(.count-2) .player-score-coin { top: 2.5px; left: -3px; width: 20px; }
     #game-players:not(.count-1):not(.count-2) .player-score-label { left: -3.25px; top: 2.25px; width: 20px; line-height: 19.8px; font-size: 0.67rem; }
 
@@ -533,7 +533,7 @@
     #answer-responses .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
     #answer-responses .player-score-coin { position: absolute; top: 3px; left: -3px; width: 23px; opacity: 0.95; animation: coin-shimmer 6.5s linear infinite; }
     #answer-responses .player-score-label { position: absolute; left: -2.25px; top: 2.25px; width: 20.5px; text-align: center; font-size: 0.7rem; letter-spacing: -0.5px; font-weight: 700; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(113, 55, 17, 1), 0 2px 7px rgba(113, 55, 17, 1); line-height: 21.8px; opacity: 0.95; }
-    @supports (-webkit-touch-callout: none) { #answer-responses .player-score-label { margin-top: 0.85px; } }
+    @supports (-webkit-touch-callout: none) { #answer-responses .player-score-label { margin-top: 1px; } }
 
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #answer-responses .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
