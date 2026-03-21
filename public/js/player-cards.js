@@ -108,20 +108,20 @@ function buildPlayerCardHtml(p, opts) {
   } else if (!hasAnswer && opts && opts.unansweredIncorrect) {
     badge = incorrectBadge;
   }
-  const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}</div>`;
+  const score = p.score || 0;
+  const coinBadge = score > 0
+    ? `<img src="/images/coin.png" class="player-score-coin" /><span class="player-score-label">${score}</span>`
+    : '';
+  const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}${coinBadge}</div>`;
   const unansweredAsWrong = !hasAnswer && opts && opts.unansweredIncorrect;
   const statusClass = unansweredAsWrong ? 'answered-wrong' : (!hasAnswer ? 'waiting' : isCorrect ? 'answered' : 'answered-wrong');
   const statusText = (opts && opts.askedAt && p._answeredAt)
     ? relativeAnswerTime(opts.askedAt, opts && opts.short, p._answeredAt)
     : relativeAnswerTime(unansweredAsWrong ? (opts && opts.askedAt || p._answeredAt) : p._answeredAt, unansweredAsWrong || (opts && opts.short), unansweredAsWrong ? null : (opts && opts.relativeTo));
-  const score = p.score || 0;
-  const coinBadge = score > 0
-    ? `<img src="/images/coin.png" class="player-score-coin" /><span class="player-score-label">${score}</span>`
-    : '';
   return `<div class="game-player">
     ${avatarHtml}
     <div class="game-player-info">
-      <span class="player-name">${displayName}${coinBadge}</span>
+      <span class="player-name">${displayName}</span>
       <span class="player-status ${statusClass}">${statusText}</span>
     </div>
   </div>`;
