@@ -1056,6 +1056,7 @@
               // Track API results
               let apiAnswers = null;
               let shouldShowNextBtn = false;
+              let latestGameData = null;
 
               // Call answer endpoint, then games endpoint
               const apiDone = (async () => {
@@ -1081,8 +1082,11 @@
                     const games = await gamesRes.json();
                     try { localStorage.setItem(`fjwf_games_${userId}`, JSON.stringify({ games, savedAt: Date.now() })); } catch {}
                     const found = games.find(g => String(g.id) === String(gameId));
-                    if (found?.current_question) {
-                      shouldShowNextBtn = found.current_question.game_question_id !== currentGameQuestionId;
+                    if (found) {
+                      latestGameData = found;
+                      if (found.current_question) {
+                        shouldShowNextBtn = found.current_question.game_question_id !== currentGameQuestionId;
+                      }
                     }
                   }
                 } catch {} // ignore games fetch failure
@@ -1122,11 +1126,13 @@
                       _answerText: submittedAnswer,
                       display_name: '',
                       avatar_url: currentUserAvatarUrl,
-                      score: currentMyScore,
+                      score: latestGameData ? latestGameData.my_score : currentMyScore,
                     };
+                    const latestPlayers = latestGameData ? latestGameData.players : null;
                     const enrichedOthers = gamePlayers.map(p => {
                       const ans = answerMap.get(String(p.id));
-                      return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answerText: ans ? ans.answer : null };
+                      const latest = latestPlayers && latestPlayers.find(lp => String(lp.id) === String(p.id));
+                      return { ...p, score: latest ? latest.score : p.score, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answerText: ans ? ans.answer : null };
                     });
                     const arPlayers = [meEntry, ...enrichedOthers].slice(0, 3);
                     answerResponsesEl.innerHTML = buildAnswerResponsesHtml(arPlayers, shouldShowNextBtn);
