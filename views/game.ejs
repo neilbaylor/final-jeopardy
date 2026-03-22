@@ -479,11 +479,14 @@
     #game-players .player-answered-badge svg { display: block; width: 10px; height: 10px; }
     #game-players .game-player-info { display: flex; flex-direction: column; gap: 0; overflow: hidden; }
     #game-players .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; top: 1px; }
-    #game-players .player-score-coin { position: absolute; top: 3px; left: -3px; width: 23px; }
+    .coin { border-radius: 50%; position: relative; background: radial-gradient(circle at 35% 35%, #e6c35a 0%, #c9972f 30%, #a8741f 55%, #7a520f 80%, #5a3a08 100%); box-shadow: inset 0 1px 2px rgba(255,255,255,0.25), inset 0 -3px 5px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.4); border: 2px solid #b8962e; }
+    .coin::before { content: ""; position: absolute; inset: 6%; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.25), rgba(255,255,255,0.08) 30%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0.45)); box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), inset 0 -3px 4px rgba(0,0,0,0.5); }
+    .coin::after { content: ""; position: absolute; top: 14%; left: 20%; width: 32%; height: 20%; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 40%, rgba(255,255,255,0) 75%); transform: rotate(-20deg); }
+    #game-players .player-score-coin { position: absolute; top: 3px; left: -3px; width: 23px; height: 23px; }
     #game-players .player-score-label { position: absolute; left: -2.25px; top: 3.35px; width: 20.5px; text-align: center; font-size: 0.7rem; letter-spacing: -0.5px; font-weight: 700; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(50, 20, 0, 1), 0 2px 7px rgba(50, 20, 0, 1); line-height: 21.8px; }
     @supports (-webkit-touch-callout: none) { #game-players .player-score-label { margin-top: 1.3px; } }
     @supports (-webkit-touch-callout: none) { #game-players:not(.count-1):not(.count-2) .player-score-label { margin-top: 0.5px; } }
-    #game-players:not(.count-1):not(.count-2) .player-score-coin { top: 1.5px; left: -3px; width: 20px; }
+    #game-players:not(.count-1):not(.count-2) .player-score-coin { top: 1.5px; left: -3px; width: 20px; height: 20px; }
     #game-players:not(.count-1):not(.count-2) .player-score-label { left: -3.25px; top: 2px; width: 20px; line-height: 19.8px; font-size: 0.67rem; }
 
     #game-players .player-status { font-size: 0.81rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -531,7 +534,7 @@
     #answer-responses .player-avatar-placeholder { width: 34.2px; height: 34.2px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.91rem; }
     #answer-responses .game-player-info { display: flex; flex-direction: column; gap: 0; }
     #answer-responses .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
-    #answer-responses .player-score-coin { position: absolute; top: 3px; left: -3px; width: 23px; }
+    #answer-responses .player-score-coin { position: absolute; top: 3px; left: -3px; width: 23px; height: 23px; }
     #answer-responses .player-score-label { position: absolute; left: -2.25px; top: 2.25px; width: 20.5px; text-align: center; font-size: 0.7rem; letter-spacing: -0.5px; font-weight: 700; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(50, 20, 0, 1), 0 2px 7px rgba(50, 20, 0, 1); line-height: 21.8px; }
     @supports (-webkit-touch-callout: none) { #answer-responses .player-score-label { margin-top: 1.3px; } }
 
@@ -786,7 +789,7 @@
         const answerText = p._answerText || '';
         const score = p.score || 0;
         const coinBadge = score > 0
-          ? `<img src="/images/new-coin.png" class="player-score-coin" /><span class="player-score-label">${Math.min(score, 99)}</span>`
+          ? `<div class="coin player-score-coin"></div><span class="player-score-label">${Math.min(score, 99)}</span>`
           : '';
         return `<div class="answer-response-row">
           <div class="ar-player">
