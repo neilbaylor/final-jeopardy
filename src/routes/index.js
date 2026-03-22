@@ -56,6 +56,68 @@ function normalizeAnswer(str) {
     .trim();
 }
 
+// Common English first names used to detect "FirstName LastName" patterns.
+const COMMON_FIRST_NAMES = new Set([
+  // Male
+  'aaron','adam','alan','albert','alexander','alfred','andrew','anthony','arthur','austin',
+  'barry','ben','benjamin','bill','billy','bob','bobby','brad','brandon','brian','bruce','bryan',
+  'carl','carlos','chad','charles','chris','christopher','chuck','clark','clifford','craig','dale',
+  'dan','daniel','david','dean','dennis','dick','donald','douglas','drew','dustin','dylan',
+  'earl','eddie','edward','eli','elijah','eric','ethan','eugene',
+  'floyd','frank','fred','gabriel','gary','gene','george','glen','gregory',
+  'harold','harry','henry','ian','jacob','james','jason','jay','jeff','jeffrey',
+  'jerry','jim','jimmy','joe','john','johnny','jonathan','jose','joseph','joshua','justin',
+  'keith','ken','kenneth','kevin','kurt','kyle','lance','larry','leo','logan','louis','liam','lucas','luke',
+  'mark','martin','mason','matt','matthew','max','michael','mike','miles',
+  'nathan','neil','nicholas','nick','noah',
+  'oliver','oscar','owen','paul','patrick','peter','pete',
+  'ray','raymond','richard','rick','robert','roger','ronald','roy','russell','ryan',
+  'sam','samuel','scott','sean','simon','stanley','stephen','steve','steven',
+  'ted','thomas','timothy','timothy','tom','tony','travis','tyler',
+  'victor','vincent','walter','warren','wayne','william','zachary','zach',
+  // Female
+  'abigail','ada','alice','amber','amy','andrea','angela','ann','anna','annie',
+  'april','ashley','audrey','ava',
+  'barbara','betty','brenda','brittany',
+  'carol','carolyn','catherine','cheryl','chloe','christina','christine','claire','connie','crystal','cynthia',
+  'danielle','dawn','deborah','debra','denise','diane','donna','doris','dorothy',
+  'eleanor','elizabeth','ella','emily','emma','erica','eva','evelyn',
+  'faith','frances','gina','gloria','grace','hailey','hannah','heather','helen','holly',
+  'ida','irene','jacqueline','jane','janet','jean','jennifer','jessica','joan','joyce','joy','judith','judy','julie',
+  'karen','kate','kat','katherine','kathleen','kelly','kimberly',
+  'laura','lauren','leah','lena','lily','linda','lisa','lucy','mae','maggie','margaret','maria',
+  'martha','mary','megan','melissa','michelle','minnie','molly',
+  'nancy','natalie','nell','nicole','nina',
+  'olivia','pamela','patricia','penelope','rachel','rebecca','rita','roberta','rose','ruth',
+  'samantha','sandra','sarah','sharon','shirley','sophia','stella','stephanie','sue','susan','stephanie',
+  'tammy','teresa','tiffany','tina','tonya','vanessa','vera','victoria','violet','virginia','vivian',
+  'zoe','zoey',
+]);
+
+// If `namePart` is "FirstName LastName" (exactly 2 words, first is a known first name),
+// returns the last name; otherwise returns null.
+function extractLastName(namePart) {
+  const words = namePart.trim().split(/\s+/);
+  if (words.length === 2 && COMMON_FIRST_NAMES.has(words[0].toLowerCase())) {
+    return words[1];
+  }
+  return null;
+}
+
+// Compare a normalized user part against a correct part (also normalized).
+// Also accepts just the last name when correctPartOrig is a "FirstName LastName".
+function matchesPart(userNorm, correctNorm, correctPartOrig) {
+  if (userNorm === correctNorm) return true;
+  if (natural.JaroWinklerDistance(userNorm, correctNorm) >= 0.88) return true;
+  const ln = extractLastName(correctPartOrig);
+  if (ln !== null) {
+    const lnNorm = normalizeAnswer(ln);
+    if (userNorm === lnNorm) return true;
+    if (natural.JaroWinklerDistance(userNorm, lnNorm) >= 0.88) return true;
+  }
+  return false;
+}
+
 function isAnswerCorrect(userAnswer, correctAnswer) {
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
@@ -64,10 +126,10 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
 
   // Order-independent match for answers joined by "and" / "or" / "&"
   // e.g. "Neil Taylor and Joe Ross" accepts "Joe Ross & Neil Taylor"
+  // Also accepts just last names: "Taylor and Ross" for "Neil Taylor and Joe Ross"
   const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|&)\s*/i).map(p => p.trim()).filter(Boolean);
   const correctParts = splitConnectors(correctAnswer);
   if (correctParts.length > 1) {
-    const normCorrect = correctParts.map(normalizeAnswer).sort();
     let userParts = splitConnectors(userAnswer);
     // If connector-split doesn't yield the right count, try whitespace-split
     // e.g. correct "W and JFK", user answers "JFK W" (no connector)
@@ -76,32 +138,49 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
       if (spaceParts.length === correctParts.length) userParts = spaceParts;
     }
     if (userParts.length === correctParts.length) {
-      const normUser = userParts.map(normalizeAnswer).sort();
-      if (normCorrect.every((p, i) => p === normUser[i] || natural.JaroWinklerDistance(p, normUser[i]) >= 0.88)) {
+      const normUser = userParts.map(normalizeAnswer);
+      const normCorrect = correctParts.map(normalizeAnswer);
+      // Greedy bipartite match — supports last-name shorthand
+      const usedCorrect = new Set();
+      const allMatched = normUser.every(u => {
+        const idx = correctParts.findIndex((cp, i) => !usedCorrect.has(i) && matchesPart(u, normCorrect[i], cp));
+        if (idx === -1) return false;
+        usedCorrect.add(idx);
         return true;
-      }
+      });
+      if (allMatched) return true;
     }
   }
 
   // "(N Of) X & Y & Z" — user must name exactly N of the listed answers.
+  // Also accepts last names when candidates are "FirstName LastName".
   const oneOfMatch = correctAnswer.match(/^\((\d+)\s+of(?:\s+\d+)?\)\s*/i);
   if (oneOfMatch) {
     const required = parseInt(oneOfMatch[1], 10);
-    const candidates = correctAnswer.slice(oneOfMatch[0].length).split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim()));
+    const candidatesOrig = correctAnswer.slice(oneOfMatch[0].length).split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => s.trim());
+    const candidates = candidatesOrig.map(s => normalizeAnswer(s));
     let userParts = userAnswer.split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
     // Fallback: if no explicit separator found and N > 1, try splitting on whitespace
     if (userParts.length === 1 && required > 1) {
       userParts = userAnswer.trim().split(/\s+/).map(s => normalizeAnswer(s));
     }
     if (userParts.length !== required) return false;
-    const nOfFuzzy = (u, c) => {
-      if (u === c) return true;
-      const ratio = Math.min(u.length, c.length) / Math.max(u.length, c.length);
-      return ratio >= 0.7 && natural.JaroWinklerDistance(u, c) >= 0.88;
+    const nOfFuzzy = (u, cNorm, cOrig) => {
+      if (u === cNorm) return true;
+      const ratio = Math.min(u.length, cNorm.length) / Math.max(u.length, cNorm.length);
+      if (ratio >= 0.7 && natural.JaroWinklerDistance(u, cNorm) >= 0.88) return true;
+      // Also accept last name of full-name candidates
+      const ln = extractLastName(cOrig);
+      if (ln !== null) {
+        const lnNorm = normalizeAnswer(ln);
+        if (u === lnNorm) return true;
+        if (natural.JaroWinklerDistance(u, lnNorm) >= 0.88) return true;
+      }
+      return false;
     };
     const usedCandidates = new Set();
     const matched = userParts.filter(u => {
-      const idx = candidates.findIndex((c, i) => !usedCandidates.has(i) && nOfFuzzy(u, c));
+      const idx = candidatesOrig.findIndex((cOrig, i) => !usedCandidates.has(i) && nOfFuzzy(u, candidates[i], cOrig));
       if (idx === -1) return false;
       usedCandidates.add(idx);
       return true;
@@ -119,6 +198,15 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
     const withoutOptional = normalizeAnswer(correctAnswer.replace(/\([^)]*\)/g, ''));
     if (a === withoutOptional) return true;
     if (natural.JaroWinklerDistance(a, withoutOptional) >= 0.88) return true;
+  }
+
+  // Last-name-only: if the correct answer is a single "FirstName LastName", also accept
+  // just the last name. Multi-person answers are handled above in the multi-part section.
+  const singleLn = extractLastName(correctAnswer);
+  if (singleLn !== null) {
+    const lnNorm = normalizeAnswer(singleLn);
+    if (a === lnNorm) return true;
+    if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
   }
 
   return false;

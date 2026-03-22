@@ -50,6 +50,64 @@ function normalizeAnswer(str) {
     .trim();
 }
 
+// Common English first names used to detect "FirstName LastName" patterns.
+const COMMON_FIRST_NAMES = new Set([
+  // Male
+  'aaron','adam','alan','albert','alexander','alfred','andrew','anthony','arthur','austin',
+  'barry','ben','benjamin','bill','billy','bob','bobby','brad','brandon','brian','bruce','bryan',
+  'carl','carlos','chad','charles','chris','christopher','chuck','clark','clifford','craig','dale',
+  'dan','daniel','david','dean','dennis','dick','donald','douglas','drew','dustin','dylan',
+  'earl','eddie','edward','eli','elijah','eric','ethan','eugene',
+  'floyd','frank','fred','gabriel','gary','gene','george','glen','gregory',
+  'harold','harry','henry','ian','jacob','james','jason','jay','jeff','jeffrey',
+  'jerry','jim','jimmy','joe','john','johnny','jonathan','jose','joseph','joshua','justin',
+  'keith','ken','kenneth','kevin','kurt','kyle','lance','larry','leo','logan','louis','liam','lucas','luke',
+  'mark','martin','mason','matt','matthew','max','michael','mike','miles',
+  'nathan','neil','nicholas','nick','noah',
+  'oliver','oscar','owen','paul','patrick','peter','pete',
+  'ray','raymond','richard','rick','robert','roger','ronald','roy','russell','ryan',
+  'sam','samuel','scott','sean','simon','stanley','stephen','steve','steven',
+  'ted','thomas','timothy','timothy','tom','tony','travis','tyler',
+  'victor','vincent','walter','warren','wayne','william','zachary','zach',
+  // Female
+  'abigail','ada','alice','amber','amy','andrea','angela','ann','anna','annie',
+  'april','ashley','audrey','ava',
+  'barbara','betty','brenda','brittany',
+  'carol','carolyn','catherine','cheryl','chloe','christina','christine','claire','connie','crystal','cynthia',
+  'danielle','dawn','deborah','debra','denise','diane','donna','doris','dorothy',
+  'eleanor','elizabeth','ella','emily','emma','erica','eva','evelyn',
+  'faith','frances','gina','gloria','grace','hailey','hannah','heather','helen','holly',
+  'ida','irene','jacqueline','jane','janet','jean','jennifer','jessica','joan','joyce','joy','judith','judy','julie',
+  'karen','kate','kat','katherine','kathleen','kelly','kimberly',
+  'laura','lauren','leah','lena','lily','linda','lisa','lucy','mae','maggie','margaret','maria',
+  'martha','mary','megan','melissa','michelle','minnie','molly',
+  'nancy','natalie','nell','nicole','nina',
+  'olivia','pamela','patricia','penelope','rachel','rebecca','rita','roberta','rose','ruth',
+  'samantha','sandra','sarah','sharon','shirley','sophia','stella','stephanie','sue','susan','stephanie',
+  'tammy','teresa','tiffany','tina','tonya','vanessa','vera','victoria','violet','virginia','vivian',
+  'zoe','zoey',
+]);
+
+function extractLastName(namePart) {
+  const words = namePart.trim().split(/\s+/);
+  if (words.length === 2 && COMMON_FIRST_NAMES.has(words[0].toLowerCase())) {
+    return words[1];
+  }
+  return null;
+}
+
+function matchesPart(userNorm, correctNorm, correctPartOrig) {
+  if (userNorm === correctNorm) return true;
+  if (natural.JaroWinklerDistance(userNorm, correctNorm) >= 0.88) return true;
+  const ln = extractLastName(correctPartOrig);
+  if (ln !== null) {
+    const lnNorm = normalizeAnswer(ln);
+    if (userNorm === lnNorm) return true;
+    if (natural.JaroWinklerDistance(userNorm, lnNorm) >= 0.88) return true;
+  }
+  return false;
+}
+
 function isAnswerCorrect(userAnswer, correctAnswer) {
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
@@ -59,15 +117,22 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|&)\s*/i).map(p => p.trim()).filter(Boolean);
   const correctParts = splitConnectors(correctAnswer);
   if (correctParts.length > 1) {
-    const normCorrect = correctParts.map(normalizeAnswer).sort();
     let userParts = splitConnectors(userAnswer);
     if (userParts.length !== correctParts.length) {
       const spaceParts = userAnswer.trim().split(/\s+/);
       if (spaceParts.length === correctParts.length) userParts = spaceParts;
     }
     if (userParts.length === correctParts.length) {
-      const normUser = userParts.map(normalizeAnswer).sort();
-      if (normCorrect.every((p, i) => p === normUser[i] || natural.JaroWinklerDistance(p, normUser[i]) >= 0.88)) return true;
+      const normUser = userParts.map(normalizeAnswer);
+      const normCorrect = correctParts.map(normalizeAnswer);
+      const usedCorrect = new Set();
+      const allMatched = normUser.every(u => {
+        const idx = correctParts.findIndex((cp, i) => !usedCorrect.has(i) && matchesPart(u, normCorrect[i], cp));
+        if (idx === -1) return false;
+        usedCorrect.add(idx);
+        return true;
+      });
+      if (allMatched) return true;
     }
   }
 
@@ -75,21 +140,28 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const oneOfMatch = correctAnswer.match(/^\((\d+)\s+of(?:\s+\d+)?\)\s*/i);
   if (oneOfMatch) {
     const required = parseInt(oneOfMatch[1], 10);
-    const candidates = correctAnswer.slice(oneOfMatch[0].length).split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim()));
+    const candidatesOrig = correctAnswer.slice(oneOfMatch[0].length).split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => s.trim());
+    const candidates = candidatesOrig.map(s => normalizeAnswer(s));
     let userParts = userAnswer.split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
-    // Fallback: if no explicit separator found and N > 1, try splitting on whitespace
     if (userParts.length === 1 && required > 1) {
       userParts = userAnswer.trim().split(/\s+/).map(s => normalizeAnswer(s));
     }
     if (userParts.length !== required) return false;
-    const nOfFuzzy = (u, c) => {
-      if (u === c) return true;
-      const ratio = Math.min(u.length, c.length) / Math.max(u.length, c.length);
-      return ratio >= 0.7 && natural.JaroWinklerDistance(u, c) >= 0.88;
+    const nOfFuzzy = (u, cNorm, cOrig) => {
+      if (u === cNorm) return true;
+      const ratio = Math.min(u.length, cNorm.length) / Math.max(u.length, cNorm.length);
+      if (ratio >= 0.7 && natural.JaroWinklerDistance(u, cNorm) >= 0.88) return true;
+      const ln = extractLastName(cOrig);
+      if (ln !== null) {
+        const lnNorm = normalizeAnswer(ln);
+        if (u === lnNorm) return true;
+        if (natural.JaroWinklerDistance(u, lnNorm) >= 0.88) return true;
+      }
+      return false;
     };
     const usedCandidates = new Set();
     const matched = userParts.filter(u => {
-      const idx = candidates.findIndex((c, i) => !usedCandidates.has(i) && nOfFuzzy(u, c));
+      const idx = candidatesOrig.findIndex((cOrig, i) => !usedCandidates.has(i) && nOfFuzzy(u, candidates[i], cOrig));
       if (idx === -1) return false;
       usedCandidates.add(idx);
       return true;
@@ -103,6 +175,15 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
     if (a === withoutOptional) return true;
     if (natural.JaroWinklerDistance(a, withoutOptional) >= 0.88) return true;
   }
+
+  // Last-name-only: single "FirstName LastName" correct answer — also accept just the last name.
+  const singleLn = extractLastName(correctAnswer);
+  if (singleLn !== null) {
+    const lnNorm = normalizeAnswer(singleLn);
+    if (a === lnNorm) return true;
+    if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
+  }
+
   return false;
 }
 
@@ -164,6 +245,60 @@ const tests = [
   { correct: '(1 of 3) Mercury & Venus & Mars',          user: 'Mercury',         expect: true,  note: '(1 of 3) — valid single pick ⚠️ unhandled format' },
   { correct: '(1 of 3) Mercury & Venus & Mars',          user: 'Pluto',           expect: false, note: '(1 of 3) — wrong pick' },
   { correct: '(2 of 4) North & South & East & West',     user: 'North & South',   expect: true,  note: '(2 of 4) — valid 2 picks ⚠️ unhandled format' },
+
+  // ── Last-name-only: single person ─────────────────────────────────────────
+  { correct: 'John Thompson',          user: 'Thompson',            expect: true,  note: 'last-name — single person, last name only' },
+  { correct: 'John Thompson',          user: 'John Thompson',       expect: true,  note: 'last-name — single person, full name still accepted' },
+  { correct: 'John Thompson',          user: 'John',                expect: false, note: 'last-name — first name only rejected' },
+  { correct: 'John Thompson',          user: 'Smith',               expect: false, note: 'last-name — wrong last name rejected' },
+  { correct: 'Mary Johnson',           user: 'Johnson',             expect: true,  note: 'last-name — female first name, last name only' },
+  { correct: 'Mary Johnson',           user: 'mary johnson',        expect: true,  note: 'last-name — full name lowercase accepted' },
+  { correct: 'Michael Jordan',         user: 'Jordan',              expect: true,  note: 'last-name — single person, last name only' },
+  { correct: 'Michael Jordan',         user: 'Jordon',              expect: true,  note: 'last-name — last name typo still matches' },
+
+  // ── Last-name-only: non-person answers should NOT trigger ──────────────────
+  { correct: 'New York',               user: 'York',                expect: false, note: 'last-name — not a person name, should not accept last word' },
+  { correct: 'Mount Everest',          user: 'Everest',             expect: false, note: 'last-name — "Mount" not a first name, no last-name logic' },
+  { correct: 'Jupiter',               user: 'Jupiter',              expect: true,  note: 'last-name — single word, exact match' },
+
+  // ── Last-name-only: two people joined by "and" ────────────────────────────
+  { correct: 'John Thompson and Tyler Clark',   user: 'Thompson and Clark',   expect: true,  note: 'last-name — two people, both last names' },
+  { correct: 'John Thompson and Tyler Clark',   user: 'Thompson & Clark',     expect: true,  note: 'last-name — two people, & separator' },
+  { correct: 'John Thompson and Tyler Clark',   user: 'Clark and Thompson',   expect: true,  note: 'last-name — two people, reversed order' },
+  { correct: 'John Thompson and Tyler Clark',   user: 'Thompson',             expect: false, note: 'last-name — two people, only one last name given' },
+  { correct: 'John Thompson and Tyler Clark',   user: 'Smith and Clark',      expect: false, note: 'last-name — two people, one wrong last name' },
+  { correct: 'John Thompson and Tyler Clark',   user: 'John Thompson',        expect: true,  note: 'last-name — two people, one full name; JW prefix over-accept ⚠️ known' },
+
+  // ── Last-name-only: two people joined by "&" ─────────────────────────────
+  { correct: 'Neil Taylor & Joe Ross',          user: 'Taylor and Ross',      expect: true,  note: 'last-name — & in correct, full last names' },
+  { correct: 'Neil Taylor & Joe Ross',          user: 'Ross & Taylor',        expect: true,  note: 'last-name — & in correct, reversed order' },
+  { correct: 'Neil Taylor & Joe Ross',          user: 'Taylor',               expect: false, note: 'last-name — & in correct, only one last name' },
+
+  // ── Last-name-only: (1 of N) with person names ────────────────────────────
+  { correct: '(1 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Thompson',  expect: true,  note: 'last-name + (1 of) — pick one last name' },
+  { correct: '(1 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Clark',     expect: true,  note: 'last-name + (1 of) — different last name' },
+  { correct: '(1 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Johnson',   expect: true,  note: 'last-name + (1 of) — third last name' },
+  { correct: '(1 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Smith',     expect: false, note: 'last-name + (1 of) — wrong last name' },
+  { correct: '(1 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Thompson & Clark', expect: false, note: 'last-name + (1 of) — gave 2, need 1' },
+  { correct: '(1 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'John Thompson', expect: true, note: 'last-name + (1 of) — full name still accepted' },
+
+  // ── Last-name-only: (2 of N) with person names ────────────────────────────
+  { correct: '(2 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Thompson & Clark',   expect: true,  note: 'last-name + (2 of) — both last names' },
+  { correct: '(2 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Clark & Johnson',    expect: true,  note: 'last-name + (2 of) — different valid pair' },
+  { correct: '(2 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Thompson',            expect: false, note: 'last-name + (2 of) — only one last name given' },
+  { correct: '(2 Of) John Thompson & Tyler Clark & Mike Johnson',  user: 'Thompson & Smith',   expect: false, note: 'last-name + (2 of) — one wrong last name' },
+
+  // ── Last-name-only: (1 of M) format ──────────────────────────────────────
+  { correct: '(1 of 3) John Thompson & Tyler Clark & Mike Johnson', user: 'Thompson', expect: true,  note: 'last-name + (1 of 3) — last name accepted' },
+  { correct: '(1 of 3) John Thompson & Tyler Clark & Mike Johnson', user: 'Clark',    expect: true,  note: 'last-name + (1 of 3) — another last name' },
+  { correct: '(1 of 3) John Thompson & Tyler Clark & Mike Johnson', user: 'Smith',    expect: false, note: 'last-name + (1 of 3) — wrong last name' },
+
+  // ── Last-name-only: mixed — some names, some non-names ───────────────────
+  // If only some parts are names, only those parts get last-name treatment
+  { correct: 'John Thompson and Paris',  user: 'Thompson and Paris',  expect: true,  note: 'last-name — mixed: person + non-person' },
+
+  // ── Last-name-only: three-word names should NOT trigger ───────────────────
+  { correct: 'Mary Jo Smith',            user: 'Smith',               expect: false, note: 'last-name — 3-word name, no last-name simplification' },
 
   // ── Exact match ───────────────────────────────────────────────────────────
   { correct: 'Paris',              user: 'Paris',           expect: true,  note: 'exact match' },
