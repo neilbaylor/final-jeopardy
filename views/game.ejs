@@ -535,6 +535,28 @@
     #answer-responses .player-score-coin { position: absolute; top: 3px; left: -4px; width: 21px; height: 21px; }
     #answer-responses .player-score-label { position: absolute; left: -4.25px; top: 2.25px; width: 20.5px; text-align: center; font-size: 0.7rem; letter-spacing: -0.5px; font-weight: 700; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(50, 20, 0, 1), 0 2px 7px rgba(50, 20, 0, 1); line-height: 21.8px; }
     @supports (-webkit-touch-callout: none) { #answer-responses .player-score-label { margin-top: 1.3px; } }
+    @keyframes coin-fall-3d {
+      0%   { transform: perspective(250px) translateY(-60px) rotateX(540deg) scale(0.35); opacity: 0; }
+      20%  { opacity: 1; }
+      65%  { transform: perspective(250px) translateY(4px) rotateX(12deg) scale(1.08); opacity: 1; }
+      82%  { transform: perspective(250px) translateY(-2px) rotateX(-3deg) scale(0.97); }
+      100% { transform: perspective(250px) translateY(0) rotateX(0deg) scale(1); }
+    }
+    @keyframes coin-shimmer-pass {
+      0%   { transform: skewX(-15deg) translateX(0); opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: skewX(-15deg) translateX(350%); opacity: 0; }
+    }
+    #answer-responses .player-score-coin.coin-landing,
+    #answer-responses .player-score-label.coin-landing { animation: coin-fall-3d 0.65s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
+    #answer-responses .player-score-coin.coin-landing { overflow: hidden; }
+    #answer-responses .player-score-coin.coin-landing::after {
+      content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
+      opacity: 0; pointer-events: none;
+      animation: coin-shimmer-pass 0.5s ease-in-out 0.75s 2 forwards;
+    }
 
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #answer-responses .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
@@ -786,8 +808,9 @@
         }
         const answerText = p._answerText || '';
         const score = p.score || 0;
+        const coinLandingClass = (p._isMe && p._isCorrect) ? ' coin-landing' : '';
         const coinBadge = score > 0
-          ? `<div class="coin player-score-coin"></div><span class="player-score-label">${Math.min(score, 99)}</span>`
+          ? `<div class="coin player-score-coin${coinLandingClass}"></div><span class="player-score-label${coinLandingClass}">${Math.min(score, 99)}</span>`
           : '';
         return `<div class="answer-response-row">
           <div class="ar-player">
