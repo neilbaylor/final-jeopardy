@@ -110,7 +110,7 @@ function buildPlayerCardHtml(p, opts) {
   }
   const score = p.score || 0;
   const coinBadge = score > 0
-    ? `<div class="coin player-score-coin"></div><span class="player-score-label">${Math.min(score, 99)}</span>`
+    ? `<div class="coin player-score-coin">${Math.min(score, 99)}</div>`
     : '';
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}${coinBadge}</div>`;
   const unansweredAsWrong = !hasAnswer && opts && opts.unansweredIncorrect;
