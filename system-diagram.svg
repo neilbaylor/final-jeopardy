@@ -1,0 +1,166 @@
+<svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10b981"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f59e0b"/>
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00000022"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="580" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Final Jeopardy — System Architecture</text>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- RAILWAY PaaS container -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <rect x="230" y="60" width="500" height="430" rx="14" fill="#f0f4ff" stroke="#6366f1" stroke-width="2" stroke-dasharray="6,3" filter="url(#shadow)"/>
+
+  <!-- Railway badge -->
+  <rect x="340" y="50" width="220" height="26" rx="6" fill="#6366f1"/>
+  <text x="342" y="55" font-size="14" font-weight="700" fill="white">
+    <tspan dx="8" dy="12">&#x25A3; Railway PaaS</tspan>
+  </text>
+
+  <!-- ── Web Server box ── -->
+  <rect x="266" y="95" width="195" height="110" rx="10" fill="white" stroke="#6366f1" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="266" y="95" width="195" height="30" rx="10" fill="#6366f1"/>
+  <rect x="266" y="110" width="195" height="15" fill="#6366f1"/>
+  <text x="363" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="white">Express.js Web Server</text>
+  <text x="290" y="143" font-size="11" fill="#374151">&#x25B6; REST API + EJS views</text>
+  <text x="290" y="160" font-size="11" fill="#374151">&#x25B6; Google OAuth (Passport.js)</text>
+  <text x="290" y="177" font-size="11" fill="#374151">&#x25B6; Session store (MySQL)</text>
+
+  <!-- ── DB Seed box ── -->
+  <rect x="266" y="225" width="195" height="115" rx="10" fill="white" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="266" y="225" width="195" height="30" rx="10" fill="#10b981"/>
+  <rect x="266" y="240" width="195" height="15" fill="#10b981"/>
+  <text x="363" y="246" text-anchor="middle" font-size="13" font-weight="700" fill="white">DB Seed  (startup)</text>
+  <text x="290" y="273" font-size="11" fill="#374151">&#x25B6; Runs on app startup</text>
+  <text x="290" y="290" font-size="11" fill="#374151">&#x25B6; Skips if questions exist</text>
+  <text x="290" y="307" font-size="11" fill="#374151">&#x25B6; Scrapes j-archive.com</text>
+  <text x="290" y="324" font-size="11" fill="#6b7280">(FORCE_RESEED=true to re-run)</text>
+
+  <!-- ── Cron Job box ── -->
+  <rect x="266" y="360" width="195" height="115" rx="10" fill="white" stroke="#f59e0b" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="266" y="360" width="195" height="30" rx="10" fill="#f59e0b"/>
+  <rect x="266" y="375" width="195" height="15" fill="#f59e0b"/>
+  <text x="363" y="381" text-anchor="middle" font-size="13" font-weight="700" fill="white">Cron Job  (daily)</text>
+  <text x="290" y="408" font-size="11" fill="#374151">&#x25B6; advance-questions.js</text>
+  <text x="290" y="425" font-size="11" fill="#374151">&#x25B6; Finds stale games (24h)</text>
+  <text x="290" y="442" font-size="11" fill="#374151">&#x25B6; Picks random next Q</text>
+  <text x="290" y="459" font-size="11" fill="#6b7280">(run via Railway cron)</text>
+
+  <!-- ── MySQL DB box ── -->
+  <rect x="495" y="225" width="205" height="250" rx="10" fill="white" stroke="#0ea5e9" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="495" y="225" width="205" height="30" rx="10" fill="#0ea5e9"/>
+  <rect x="495" y="240" width="205" height="15" fill="#0ea5e9"/>
+  <text x="597" y="246" text-anchor="middle" font-size="13" font-weight="700" fill="white">MySQL Database</text>
+  <text x="515" y="273" font-size="11" fill="#374151">&#x1F5C4; users</text>
+  <text x="515" y="291" font-size="11" fill="#374151">&#x1F5C4; questions</text>
+  <text x="515" y="309" font-size="11" fill="#374151">&#x1F5C4; games</text>
+  <text x="515" y="327" font-size="11" fill="#374151">&#x1F5C4; game_users</text>
+  <text x="515" y="345" font-size="11" fill="#374151">&#x1F5C4; game_questions</text>
+  <text x="515" y="363" font-size="11" fill="#374151">&#x1F5C4; game_answers</text>
+  <text x="515" y="381" font-size="11" fill="#374151">&#x1F5C4; sessions</text>
+  <line x1="510" y1="392" x2="688" y2="392" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="515" y="408" font-size="10" fill="#6b7280">Pool: 10 connections</text>
+  <text x="515" y="424" font-size="10" fill="#6b7280">TCP or Unix socket</text>
+  <text x="515" y="440" font-size="10" fill="#6b7280">Session expiry: 30 days</text>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- EXTERNAL SERVICES                                   -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <!-- Browser / PWA -->
+  <rect x="20" y="95" width="170" height="115" rx="10" fill="white" stroke="#8b5cf6" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="20" y="95" width="170" height="30" rx="10" fill="#8b5cf6"/>
+  <rect x="20" y="110" width="170" height="15" fill="#8b5cf6"/>
+  <text x="105" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="white">Browser / PWA</text>
+  <text x="40" y="143" font-size="11" fill="#374151">&#x25B6; Dashboard &amp; game UI</text>
+  <text x="40" y="160" font-size="11" fill="#374151">&#x25B6; Mobile-optimized</text>
+  <text x="40" y="177" font-size="11" fill="#374151">&#x25B6; Polls API for updates</text>
+
+  <!-- Google OAuth -->
+  <rect x="20" y="255" width="170" height="80" rx="10" fill="white" stroke="#ef4444" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="20" y="255" width="170" height="30" rx="10" fill="#ef4444"/>
+  <rect x="20" y="270" width="170" height="15" fill="#ef4444"/>
+  <text x="105" y="276" text-anchor="middle" font-size="13" font-weight="700" fill="white">Google OAuth 2.0</text>
+  <text x="40" y="303" font-size="11" fill="#374151">&#x25B6; User authentication</text>
+  <text x="40" y="320" font-size="11" fill="#374151">&#x25B6; Profile + avatar sync</text>
+
+  <!-- j-archive.com -->
+  <rect x="20" y="375" width="170" height="80" rx="10" fill="white" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="20" y="375" width="170" height="30" rx="10" fill="#10b981"/>
+  <rect x="20" y="390" width="170" height="15" fill="#10b981"/>
+  <text x="105" y="396" text-anchor="middle" font-size="13" font-weight="700" fill="white">j-archive.com</text>
+  <text x="40" y="423" font-size="11" fill="#374151">&#x25B6; Seasons 28–41</text>
+  <text x="40" y="440" font-size="11" fill="#374151">&#x25B6; Q&amp;A HTML scrape</text>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ARROWS                                              -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <!-- Browser <-> Web Server (REST API + pages) -->
+  <line x1="190" y1="140" x2="264" y2="140" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <line x1="264" y1="155" x2="190" y2="155" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="227" y="134" text-anchor="middle" font-size="9" fill="#8b5cf6">API / pages</text>
+
+  <!-- Browser <-> Google OAuth -->
+  <line x1="105" y1="210" x2="105" y2="253" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="118" y1="253" x2="118" y2="210" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="137" y="238" font-size="9" fill="#ef4444">OAuth flow</text>
+
+  <!-- Web Server <-> Google OAuth -->
+  <line x1="266" y1="178" x2="192" y2="280" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="196" y="225" font-size="9" fill="#ef4444">callback</text>
+
+  <!-- Web Server -> MySQL -->
+  <line x1="461" y1="150" x2="493" y2="280" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="492" y="215" font-size="9" fill="#0ea5e9">queries</text>
+
+  <!-- DB Seed -> MySQL -->
+  <line x1="461" y1="300" x2="493" y2="320" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)"/>
+
+  <!-- Cron -> MySQL -->
+  <line x1="461" y1="415" x2="493" y2="390" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <text x="466" y="413" font-size="9" fill="#f59e0b">update</text>
+
+  <!-- DB Seed -> j-archive -->
+  <line x1="266" y1="340" x2="192" y2="400" stroke="#10b981" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-green)"/>
+  <text x="188" y="363" font-size="9" fill="#10b981">scrape</text>
+
+  <!-- Startup arrow: Web Server spawns DB Seed -->
+  <line x1="363" y1="205" x2="363" y2="223" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="369" y="218" font-size="9" fill="#10b981">spawns on startup</text>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- LEGEND                                              -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <rect x="230" y="503" width="440" height="62" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="450" y="520" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">Legend</text>
+  <line x1="250" y1="535" x2="280" y2="535" stroke="#6366f1" stroke-width="2"/>
+  <text x="285" y="539" font-size="10" fill="#374151">HTTP request/response</text>
+  <line x1="380" y1="535" x2="410" y2="535" stroke="#10b981" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="415" y="539" font-size="10" fill="#374151">External data fetch</text>
+  <line x1="530" y1="535" x2="560" y2="535" stroke="#f59e0b" stroke-width="2"/>
+  <text x="565" y="539" font-size="10" fill="#374151">DB write (cron)</text>
+  <line x1="250" y1="553" x2="280" y2="553" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="285" y="557" font-size="10" fill="#374151">DB query (web server)</text>
+  <line x1="380" y1="553" x2="410" y2="553" stroke="#10b981" stroke-width="2"/>
+  <text x="415" y="557" font-size="10" fill="#374151">DB write (seed)</text>
+  <rect x="530" y="546" width="12" height="12" rx="2" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="547" y="557" font-size="10" fill="#374151">Railway PaaS boundary</text>
+</svg>
