@@ -878,8 +878,10 @@
       30%  { transform: skewX(-15deg) translateX(350%); opacity: 0; }
       100% { transform: skewX(-15deg) translateX(350%); opacity: 0; }
     }
+    #view-modal .player-score-coin,
+    #view-modal .player-score-label { opacity: 0; }
     #view-modal .player-score-coin.coin-landing,
-    #view-modal .player-score-label.coin-landing { animation: vm-coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
+    #view-modal .player-score-label.coin-landing { animation: vm-coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) 0.4s both; }
     #view-modal .player-score-coin.coin-landing { will-change: transform; }
     #view-modal .player-score-coin.coin-landing::after {
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
