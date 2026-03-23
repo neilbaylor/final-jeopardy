@@ -548,8 +548,10 @@
       30%  { transform: skewX(-15deg) translateX(350%); opacity: 0; }
       100% { transform: skewX(-15deg) translateX(350%); opacity: 0; }
     }
+    #answer-responses .player-score-coin[data-coin-landing],
+    #answer-responses .player-score-label[data-coin-landing] { opacity: 0; will-change: transform, opacity; }
     #answer-responses .player-score-coin.coin-landing,
-    #answer-responses .player-score-label.coin-landing { animation: coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
+    #answer-responses .player-score-label.coin-landing { animation: coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) 0.4s both; }
     #answer-responses .player-score-coin.coin-landing { will-change: transform; }
     #answer-responses .player-score-coin.coin-landing::after {
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
