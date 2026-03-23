@@ -305,7 +305,7 @@
     }
     #answer-btn, #next-question-btn {
       position: absolute;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 15px);
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 40px);
@@ -403,14 +403,14 @@
     @supports (-webkit-touch-callout: none) {
       #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
       @media (display-mode: standalone) {
-        #answer-btn, #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); }
+        #answer-btn, #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 15px); }
         #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) - 4px); }
       }
     }
-    body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); }
+    body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 15px); }
     body.android #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
     @media (display-mode: standalone) {
-      body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); }
+      body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 15px); }
       body.android #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom) + 20px); }
     }
 
