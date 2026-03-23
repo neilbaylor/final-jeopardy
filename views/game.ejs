@@ -520,6 +520,7 @@
       pointer-events: none;
     }
     #answer-responses.visible { opacity: 0.88; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    #answer-responses.coin-animating { overflow: visible; }
     .answer-response-row { display: flex; align-items: center; padding: 9.5px 14px; gap: 13px; }
     #answer-responses .game-row-summary { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px 7px; font-size: 0.8rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.87; }
     #answer-responses .game-row-summary strong { font-weight: 600; }
@@ -1175,13 +1176,17 @@
                     else if (arPlayers.length === 2) answerResponsesEl.classList.add('count-2');
                     answerResponsesEl.classList.add('visible');
                     // Defer coin-landing animation until after first paint to avoid stutter
-                    requestAnimationFrame(() => {
-                      setTimeout(() => {
-                        requestAnimationFrame(() => {
-                          answerResponsesEl.querySelectorAll('[data-coin-landing]').forEach(el => el.classList.add('coin-landing'));
-                        });
-                      }, 50);
-                    });
+                    if (answerResponsesEl.querySelector('[data-coin-landing]')) {
+                      answerResponsesEl.classList.add('coin-animating');
+                      requestAnimationFrame(() => {
+                        setTimeout(() => {
+                          requestAnimationFrame(() => {
+                            answerResponsesEl.querySelectorAll('[data-coin-landing]').forEach(el => el.classList.add('coin-landing'));
+                            setTimeout(() => answerResponsesEl.classList.remove('coin-animating'), 1500);
+                          });
+                        }, 50);
+                      });
+                    }
                     if (shouldShowNextBtn) {
                       const gameId = new URLSearchParams(location.search).get('id');
                       if (gameId && !document.querySelector(`link[rel="prefetch"][data-next-prefetch]`)) {
