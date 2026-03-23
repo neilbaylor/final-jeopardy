@@ -59,7 +59,7 @@ function normalizeAnswer(str) {
 // Common English first names used to detect "FirstName LastName" patterns.
 const COMMON_FIRST_NAMES = new Set([
   // Male
-  'aaron','adam','alan','albert','alexander','alfred','andrew','anthony','arthur','austin',
+  'aaron','adam','alan','albert','alexander','alfred','andrew','anthony','arthur','austin','ayn',
   'barry','ben','benjamin','bill','billy','bob','bobby','brad','brandon','brian','bruce','bryan',
   'carl','carlos','chad','charles','chris','christopher','chuck','clark','clifford','craig','dale',
   'dan','daniel','david','dean','dennis','dick','donald','douglas','drew','dustin','dylan',

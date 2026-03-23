@@ -53,7 +53,7 @@ function normalizeAnswer(str) {
 // Common English first names used to detect "FirstName LastName" patterns.
 const COMMON_FIRST_NAMES = new Set([
   // Male
-  'aaron','adam','alan','albert','alexander','alfred','andrew','anthony','arthur','austin',
+  'aaron','adam','alan','albert','alexander','alfred','andrew','anthony','arthur','austin','ayn',
   'barry','ben','benjamin','bill','billy','bob','bobby','brad','brandon','brian','bruce','bryan',
   'carl','carlos','chad','charles','chris','christopher','chuck','clark','clifford','craig','dale',
   'dan','daniel','david','dean','dennis','dick','donald','douglas','drew','dustin','dylan',
@@ -245,6 +245,11 @@ const tests = [
   { correct: '(1 of 3) Mercury & Venus & Mars',          user: 'Mercury',         expect: true,  note: '(1 of 3) — valid single pick ⚠️ unhandled format' },
   { correct: '(1 of 3) Mercury & Venus & Mars',          user: 'Pluto',           expect: false, note: '(1 of 3) — wrong pick' },
   { correct: '(2 of 4) North & South & East & West',     user: 'North & South',   expect: true,  note: '(2 of 4) — valid 2 picks ⚠️ unhandled format' },
+
+  // ── Ayn Rand edge cases ───────────────────────────────────────────────────
+  { correct: 'Ayn Rand',               user: 'Rand',              expect: true,  note: 'Ayn Rand — last name only' },
+  { correct: 'Ayn Rand',               user: 'Ann Rand',          expect: true,  note: 'Ayn Rand — "Ayn" fuzzy matches "Ann"' },
+  { correct: 'Ayn Rand',               user: 'Ayn Rand',          expect: true,  note: 'Ayn Rand — exact match' },
 
   // ── Last-name-only: single person ─────────────────────────────────────────
   { correct: 'John Thompson',          user: 'Thompson',            expect: true,  note: 'last-name — single person, last name only' },
