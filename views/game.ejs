@@ -544,18 +544,18 @@
     }
     @keyframes coin-shimmer-pass {
       0%   { transform: skewX(-15deg) translateX(0); opacity: 0; }
-      20%  { opacity: 1; }
-      80%  { opacity: 1; }
+      5%   { opacity: 1; }
+      30%  { transform: skewX(-15deg) translateX(350%); opacity: 0; }
       100% { transform: skewX(-15deg) translateX(350%); opacity: 0; }
     }
     #answer-responses .player-score-coin.coin-landing,
-    #answer-responses .player-score-label.coin-landing { animation: coin-fall-3d 0.65s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
+    #answer-responses .player-score-label.coin-landing { animation: coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
     #answer-responses .player-score-coin.coin-landing { overflow: hidden; }
     #answer-responses .player-score-coin.coin-landing::after {
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
       opacity: 0; pointer-events: none;
-      animation: coin-shimmer-pass 0.5s ease-in-out 0.75s 2 forwards;
+      animation: coin-shimmer-pass 2.8s ease-in-out 1.1s infinite;
     }
 
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
