@@ -865,28 +865,6 @@
     #view-modal .player-answered-badge { bottom: 0px; width: 16px; height: 16px; border-width: 1.75px; }
     #view-modal .player-score-coin { top: 3px; left: -1px; width: 18px; height: 18px; }
     #view-modal .player-score-label { width: 18.5px; line-height: 21.8px; top: 0.7px; font-size: 0.7rem; left: -1.6px; }
-    @keyframes vm-coin-fall-3d {
-      0%   { transform: perspective(250px) translateY(-60px) rotateX(540deg) scale(0.35); opacity: 0; }
-      20%  { transform: perspective(250px) translateY(-30px) rotateX(300deg) scale(0.6); opacity: 1; }
-      65%  { transform: perspective(250px) translateY(4px) rotateX(12deg) scale(1.08); opacity: 1; animation-timing-function: ease-out; }
-      82%  { transform: perspective(250px) translateY(-2px) rotateX(-3deg) scale(0.97); animation-timing-function: ease-in-out; }
-      100% { transform: perspective(250px) translateY(0) rotateX(0deg) scale(1); }
-    }
-    @keyframes vm-coin-shimmer-pass {
-      0%   { transform: skewX(-15deg) translateX(0); opacity: 0; }
-      5%   { opacity: 1; }
-      30%  { transform: skewX(-15deg) translateX(350%); opacity: 0; }
-      100% { transform: skewX(-15deg) translateX(350%); opacity: 0; }
-    }
-    #view-modal .player-score-coin.coin-landing,
-    #view-modal .player-score-label.coin-landing { animation: vm-coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
-    #view-modal .player-score-coin.coin-landing { will-change: transform; }
-    #view-modal .player-score-coin.coin-landing::after {
-      content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
-      opacity: 0; pointer-events: none;
-      animation: vm-coin-shimmer-pass 2.8s ease-in-out 1.1s infinite;
-    }
     #view-modal-footer { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 7px 10.5px 8px; font-size: 0.77rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 16px 16px; }
     #view-modal-footer strong { font-weight: 600; }
 
