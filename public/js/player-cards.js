@@ -109,9 +109,8 @@ function buildPlayerCardHtml(p, opts) {
     badge = incorrectBadge;
   }
   const score = p.score || 0;
-  const coinLandingAttr = (p._isMe && p._isCorrect) ? ' data-coin-landing="1"' : '';
   const coinBadge = score > 0
-    ? `<div class="coin player-score-coin"${coinLandingAttr}></div><span class="player-score-label"${coinLandingAttr}>${Math.min(score, 99)}</span>`
+    ? `<div class="coin player-score-coin"></div><span class="player-score-label">${Math.min(score, 99)}</span>`
     : '';
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}${coinBadge}</div>`;
   const unansweredAsWrong = !hasAnswer && opts && opts.unansweredIncorrect;
