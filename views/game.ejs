@@ -550,7 +550,7 @@
     }
     #answer-responses .player-score-coin.coin-landing,
     #answer-responses .player-score-label.coin-landing { animation: coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
-    #answer-responses .player-score-coin.coin-landing { overflow: hidden; }
+    #answer-responses .player-score-coin.coin-landing { will-change: transform; }
     #answer-responses .player-score-coin.coin-landing::after {
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
