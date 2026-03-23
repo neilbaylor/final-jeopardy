@@ -527,7 +527,7 @@
     #answer-responses .player-answered-badge { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid #43a047; display: flex; align-items: center; justify-content: center; }
     #answer-responses .player-answered-badge.incorrect { background: #fff; border-color: #e53935; }
     #answer-responses .player-answered-badge svg { display: block; width: 10px; height: 10px; }
-    #answer-responses .player-avatar-wrap { position: relative; flex-shrink: 0; width: 34.2px; height: 34.2px; }
+    #answer-responses .player-avatar-wrap { position: relative; flex-shrink: 0; width: 34.2px; height: 34.2px; perspective: 250px; }
     #answer-responses .player-avatar { width: 34.2px; height: 34.2px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
     #answer-responses .player-avatar-placeholder { width: 34.2px; height: 34.2px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.91rem; }
     #answer-responses .game-player-info { display: flex; flex-direction: column; gap: 0; }
@@ -536,11 +536,11 @@
     #answer-responses .player-score-label { position: absolute; left: -4.25px; top: 2.25px; width: 20.5px; text-align: center; font-size: 0.7rem; letter-spacing: -0.5px; font-weight: 700; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(50, 20, 0, 1), 0 2px 7px rgba(50, 20, 0, 1); line-height: 21.8px; }
     @supports (-webkit-touch-callout: none) { #answer-responses .player-score-label { margin-top: 1.3px; } }
     @keyframes coin-fall-3d {
-      0%   { transform: perspective(250px) translateY(-60px) rotateX(540deg) scale(0.35); opacity: 0; }
-      20%  { transform: perspective(250px) translateY(-30px) rotateX(300deg) scale(0.6); opacity: 1; }
-      65%  { transform: perspective(250px) translateY(4px) rotateX(12deg) scale(1.08); opacity: 1; animation-timing-function: ease-out; }
-      82%  { transform: perspective(250px) translateY(-2px) rotateX(-3deg) scale(0.97); opacity: 1; animation-timing-function: ease-in-out; }
-      100% { transform: perspective(250px) translateY(0) rotateX(0deg) scale(1); opacity: 1; }
+      0%   { transform: translate3d(0, -60px, 0) rotateX(540deg) scale(0.35); opacity: 0; }
+      20%  { transform: translate3d(0, -30px, 0) rotateX(300deg) scale(0.6); opacity: 1; }
+      65%  { transform: translate3d(0, 4px, 0) rotateX(12deg) scale(1.08); opacity: 1; animation-timing-function: ease-out; }
+      82%  { transform: translate3d(0, -2px, 0) rotateX(-3deg) scale(0.97); opacity: 1; animation-timing-function: ease-in-out; }
+      100% { transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); opacity: 1; }
     }
     @keyframes coin-shimmer-pass {
       0%   { transform: skewX(-15deg) translateX(0); opacity: 0; }
@@ -551,8 +551,7 @@
     #answer-responses .player-score-coin[data-coin-landing],
     #answer-responses .player-score-label[data-coin-landing] { opacity: 0; will-change: transform, opacity; }
     #answer-responses .player-score-coin.coin-landing,
-    #answer-responses .player-score-label.coin-landing { animation: coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) 0.4s both; }
-    #answer-responses .player-score-coin.coin-landing { will-change: transform; }
+    #answer-responses .player-score-label.coin-landing { animation: coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) 0.4s both; will-change: transform, opacity; }
     #answer-responses .player-score-coin.coin-landing::after {
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
