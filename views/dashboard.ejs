@@ -867,9 +867,9 @@
     #view-modal .player-score-label { width: 18.5px; line-height: 21.8px; top: 0.7px; font-size: 0.7rem; left: -1.6px; }
     @keyframes vm-coin-fall-3d {
       0%   { transform: perspective(250px) translateY(-60px) rotateX(540deg) scale(0.35); opacity: 0; }
-      20%  { opacity: 1; }
-      65%  { transform: perspective(250px) translateY(4px) rotateX(12deg) scale(1.08); opacity: 1; }
-      82%  { transform: perspective(250px) translateY(-2px) rotateX(-3deg) scale(0.97); }
+      20%  { transform: perspective(250px) translateY(-30px) rotateX(300deg) scale(0.6); opacity: 1; }
+      65%  { transform: perspective(250px) translateY(4px) rotateX(12deg) scale(1.08); opacity: 1; animation-timing-function: ease-out; }
+      82%  { transform: perspective(250px) translateY(-2px) rotateX(-3deg) scale(0.97); animation-timing-function: ease-in-out; }
       100% { transform: perspective(250px) translateY(0) rotateX(0deg) scale(1); }
     }
     @keyframes vm-coin-shimmer-pass {
