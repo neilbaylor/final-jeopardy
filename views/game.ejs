@@ -872,7 +872,7 @@
         questionEl.textContent = currentQuestion;
         const as = categoryStyle(currentAnswer);
         answerTextEl.style.fontSize = as.fontSize;
-        answerTextEl.textContent = currentAnswer;
+        answerTextEl.textContent = toTitleCase(currentAnswer);
 
         categoryEl.offsetHeight; // force reflow
         gamePlayersEl.style.top = (categoryEl.getBoundingClientRect().bottom + 30) + 'px';
