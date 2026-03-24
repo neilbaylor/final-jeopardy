@@ -109,8 +109,9 @@ function buildPlayerCardHtml(p, opts) {
     badge = incorrectBadge;
   }
   const score = p.score || 0;
+  const coinShimmer = (hasAnswer && isCorrect && !(opts && opts.unansweredIncorrect)) ? ' coin-shimmer' : '';
   const coinBadge = score > 0
-    ? `<div class="coin player-score-coin">${Math.min(score, 99)}</div>`
+    ? `<div class="coin player-score-coin${coinShimmer}">${Math.min(score, 99)}</div>`
     : '';
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}${coinBadge}</div>`;
   const unansweredAsWrong = !hasAnswer && opts && opts.unansweredIncorrect;
