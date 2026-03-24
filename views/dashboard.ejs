@@ -870,7 +870,7 @@
       100% { transform: skewX(-15deg) translateX(350%); opacity: 0; }
     }
     .game-row:not(.game-row-previous) .player-answered-badge:not(.incorrect)::after,
-    #view-modal .player-answered-badge:not(.incorrect)::after {
+    #view-modal.current-question .player-answered-badge:not(.incorrect)::after {
       content: ''; position: absolute; top: -10%; left: -50%; width: 60%; height: 120%;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
       opacity: 0; pointer-events: none;
