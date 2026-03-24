@@ -529,11 +529,11 @@
     #answer-responses .player-name { font-size: 0.90rem; font-weight: 600; color: #1a1a2e; max-width: 57px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
     #answer-responses .player-score-coin { position: absolute; top: 3px; left: -4px; width: 21px; height: 21px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; letter-spacing: -1.25px; font-weight: 600; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(50, 20, 0, 1), 0 2px 7px rgba(50, 20, 0, 1); text-indent: -1.5px; }
     @keyframes coin-fall-3d {
-      0%   { transform: translate3d(0, -60px, 0) rotateX(540deg) scale(0.35); opacity: 0; }
-      20%  { transform: translate3d(0, -30px, 0) rotateX(300deg) scale(0.6); opacity: 1; }
-      65%  { transform: translate3d(0, 4px, 0) rotateX(12deg) scale(1.08); opacity: 1; animation-timing-function: ease-out; }
-      82%  { transform: translate3d(0, -2px, 0) rotateX(-3deg) scale(0.97); opacity: 1; animation-timing-function: ease-in-out; }
-      100% { transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); opacity: 1; }
+      0%   { transform: perspective(250px) translate3d(0, -60px, 0) rotateX(540deg) scale(0.35); opacity: 0; }
+      20%  { transform: perspective(250px) translate3d(0, -30px, 0) rotateX(300deg) scale(0.6); opacity: 1; }
+      65%  { transform: perspective(250px) translate3d(0, 4px, 0) rotateX(12deg) scale(1.08); opacity: 1; animation-timing-function: ease-out; }
+      82%  { transform: perspective(250px) translate3d(0, -2px, 0) rotateX(-3deg) scale(0.97); opacity: 1; animation-timing-function: ease-in-out; }
+      100% { transform: perspective(250px) translate3d(0, 0, 0) rotateX(0deg) scale(1); opacity: 1; }
     }
     @keyframes coin-shimmer-pass {
       0%   { transform: skewX(-15deg) translateX(0); opacity: 0; }
@@ -541,8 +541,8 @@
       30%  { transform: skewX(-15deg) translateX(350%); opacity: 0; }
       100% { transform: skewX(-15deg) translateX(350%); opacity: 0; }
     }
-    #answer-responses .player-score-coin[data-coin-landing] { opacity: 0; will-change: transform, opacity; }
-    #answer-responses .player-score-coin.coin-landing { animation: coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) 0.4s both; will-change: transform, opacity; }
+    #answer-responses .player-score-coin[data-coin-landing] { opacity: 0; will-change: transform, opacity; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+    #answer-responses .player-score-coin.coin-landing { animation: coin-fall-3d 1s cubic-bezier(0.33, 1, 0.68, 1) 0.4s both; will-change: transform, opacity; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
     #answer-responses .player-score-coin.coin-landing::after {
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
