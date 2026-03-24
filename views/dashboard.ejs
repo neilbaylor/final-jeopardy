@@ -1464,7 +1464,7 @@
           badge = incorrectBadge;
         }
         const score = p.score || 0;
-        const coinShimmer = (p._isCorrect && !relativeTo) ? ' coin-shimmer' : '';
+        const coinShimmer = p._isCorrect ? ' coin-shimmer' : '';
         const coinBadge = score > 0
           ? `<div class="coin player-score-coin${coinShimmer}">${Math.min(score, 99)}</div>`
           : '';
