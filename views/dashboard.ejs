@@ -732,7 +732,7 @@
       position: relative;
     }
     .coin { border-radius: 50%; position: relative; background: radial-gradient(circle at 35% 35%, #fae792 0%, #ecc545 25%, #dbaa2d 50%, #c2881b 75%, #a56d0e 100%); box-shadow: inset 0 1px 3px rgba(255,255,255,0.41), inset 0 -2px 4px rgba(0,0,0,0.34), 0 4px 8px rgba(0,0,0,0.4); border: 2px solid #d8b130; letter-spacing: -1.25px; font-weight: 600; color: #FEFBC1; text-shadow: 0 -2px 7px rgba(50, 20, 0, 1), 0 2px 7px rgba(50, 20, 0, 1); font-size: 0.6rem; text-align: center; text-indent: -1.5px; }
-    .player-score-coin { position: absolute; top: -1px; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
+    .player-score-coin { position: absolute; top: -1px; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
     .player-status {
       font-size: 0.65rem;
       font-weight: 600;
@@ -861,7 +861,7 @@
     #view-modal .player-status.answered-wrong { color: #e53935; }
     #view-modal .ar-answer { font-size: 1rem; font-weight: 500; color: #333; opacity: 0.9; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; }
     #view-modal .player-answered-badge { bottom: 0px; width: 16px; height: 16px; border-width: 1.75px; }
-    #view-modal .player-score-coin { top: 3px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+    #view-modal .player-score-coin { top: 3px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; }
     @keyframes badge-shimmer-pass {
       0%   { transform: skewX(-15deg) translateX(0); opacity: 0; }
       5%   { opacity: 1; }
@@ -872,7 +872,7 @@
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
       opacity: 0; pointer-events: none;
-      animation: badge-shimmer-pass 2.8s ease-in-out 0.5s infinite;
+      animation: badge-shimmer-pass 2.8s ease-in-out var(--shimmer-delay, 0.5s) infinite;
     }
     #view-modal-footer { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 7px 10.5px 8px; font-size: 0.77rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 16px 16px; }
     #view-modal-footer strong { font-weight: 600; }
@@ -1465,8 +1465,9 @@
         }
         const score = p.score || 0;
         const coinShimmer = p._isCorrect ? ' coin-shimmer' : '';
+        const shimmerStyle = p._isCorrect ? ` style="--shimmer-delay:${(Math.random() * 2.5).toFixed(2)}s"` : '';
         const coinBadge = score > 0
-          ? `<div class="coin player-score-coin${coinShimmer}">${Math.min(score, 99)}</div>`
+          ? `<div class="coin player-score-coin${coinShimmer}"${shimmerStyle}>${Math.min(score, 99)}</div>`
           : '';
         return `<div class="answer-response-row">
           <div class="ar-player">
