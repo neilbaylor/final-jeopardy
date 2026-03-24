@@ -474,7 +474,7 @@
     #game-players .player-avatar-wrap { position: relative; flex-shrink: 0; width: 34.2px; height: 34.2px; }
     #game-players .player-avatar { width: 34.2px; height: 34.2px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.1); display: block; }
     #game-players .player-avatar-placeholder { width: 34.2px; height: 34.2px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 0.91rem; }
-    #game-players .player-answered-badge { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 1.75px solid #43a047; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    #game-players .player-answered-badge { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 1.75px solid #43a047; display: flex; align-items: center; justify-content: center; }
     #game-players .player-answered-badge:not(.incorrect)::after { content: ''; position: absolute; top: -10%; left: -50%; width: 60%; height: 120%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%); opacity: 0; pointer-events: none; animation: badge-shimmer-pass 2.8s ease-in-out 0.5s infinite; }
     #game-players .player-answered-badge.incorrect { background: #fff; border-color: #e53935; }
     #game-players .player-answered-badge svg { display: block; width: 10px; height: 10px; }
@@ -520,7 +520,7 @@
     #answer-responses .game-row-summary { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px 7px; font-size: 0.8rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.87; }
     #answer-responses .game-row-summary strong { font-weight: 600; }
     .ar-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; width: 115px; }
-    #answer-responses .player-answered-badge { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid #43a047; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    #answer-responses .player-answered-badge { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid #43a047; display: flex; align-items: center; justify-content: center; }
     #answer-responses .player-answered-badge:not(.incorrect)::after { content: ''; position: absolute; top: -10%; left: -50%; width: 60%; height: 120%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%); opacity: 0; pointer-events: none; animation: badge-shimmer-pass 2.8s ease-in-out 0.5s infinite; }
     #answer-responses .player-answered-badge.incorrect { background: #fff; border-color: #e53935; }
     #answer-responses .player-answered-badge svg { display: block; width: 10px; height: 10px; }
