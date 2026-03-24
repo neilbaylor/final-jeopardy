@@ -114,7 +114,7 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   if (a === b) return true;
   if (natural.JaroWinklerDistance(a, b) >= 0.88) return true;
 
-  const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|&)\s*/i).map(p => p.trim()).filter(Boolean);
+  const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|[&,])\s*/i).map(p => p.trim()).filter(Boolean);
   const correctParts = splitConnectors(correctAnswer);
   if (correctParts.length > 1) {
     let userParts = splitConnectors(userAnswer);
@@ -330,6 +330,16 @@ const tests = [
   // When user gives no connector, correct has 2 parts — space split used
   { correct: 'W and JFK',          user: 'JFK W',           expect: true,  note: 'multi-part — space-split fallback, reversed order' },
   { correct: 'Tom and Jerry',      user: 'Jerry Tom',        expect: true,  note: 'multi-part — space-split fallback, reversed' },
+
+  // ── Comma-separated correct answers ───────────────────────────────────────
+  // Commas in the DB answer are treated as part separators, same as "and" / "&"
+  { correct: 'Jamaica, Jordan, and Japan',  user: 'Jordan Jamaica Japan',      expect: true,  note: 'comma — 3 countries, space-split no connector, any order' },
+  { correct: 'Jamaica, Jordan, and Japan',  user: 'Jamaica, Jordan, and Japan', expect: true,  note: 'comma — exact match' },
+  { correct: 'Jamaica, Jordan, and Japan',  user: 'Jamaica and Jordan and Japan', expect: true, note: 'comma — "and" separator in user input' },
+  { correct: 'Jamaica, Jordan, and Japan',  user: 'Japan Jordan Jamaica',      expect: true,  note: 'comma — different order, space-split' },
+  { correct: 'Red, White, and Blue',        user: 'White Blue Red',            expect: true,  note: 'comma — 3 colors, space-split no connector' },
+  { correct: 'Red, White, and Blue',        user: 'Red, White, and Blue',      expect: true,  note: 'comma — 3 colors, exact match' },
+  { correct: 'Faith, Hope, and Charity',    user: 'Hope Faith Charity',        expect: true,  note: 'comma — 3 words, space-split any order' },
 
   // ── Optional parentheses — content stripped or included ───────────────────
   { correct: 'Mt. Everest (Nepal)',  user: 'Mt. Everest',         expect: true,  note: 'optional parens — suffix hint stripped' },

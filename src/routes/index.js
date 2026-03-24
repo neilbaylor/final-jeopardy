@@ -127,7 +127,7 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   // Order-independent match for answers joined by "and" / "or" / "&"
   // e.g. "Neil Taylor and Joe Ross" accepts "Joe Ross & Neil Taylor"
   // Also accepts just last names: "Taylor and Ross" for "Neil Taylor and Joe Ross"
-  const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|&)\s*/i).map(p => p.trim()).filter(Boolean);
+  const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|[&,])\s*/i).map(p => p.trim()).filter(Boolean);
   const correctParts = splitConnectors(correctAnswer);
   if (correctParts.length > 1) {
     let userParts = splitConnectors(userAnswer);
