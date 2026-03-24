@@ -1465,7 +1465,7 @@
         }
         const score = p.score || 0;
         const coinShimmer = p._isCorrect ? ' coin-shimmer' : '';
-        const shimmerStyle = p._isCorrect ? ` style="--shimmer-delay:${(Math.random() * 2.5).toFixed(2)}s"` : '';
+        const shimmerStyle = p._isCorrect ? ` style="--shimmer-delay:${(Math.random() * 1.25).toFixed(2)}s"` : '';
         const coinBadge = score > 0
           ? `<div class="coin player-score-coin${coinShimmer}"${shimmerStyle}>${Math.min(score, 99)}</div>`
           : '';

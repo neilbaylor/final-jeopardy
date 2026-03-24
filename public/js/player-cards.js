@@ -110,7 +110,7 @@ function buildPlayerCardHtml(p, opts) {
   }
   const score = p.score || 0;
   const coinShimmer = (hasAnswer && isCorrect) ? ' coin-shimmer' : '';
-  const shimmerStyle = (hasAnswer && isCorrect) ? ` style="--shimmer-delay:${(Math.random() * 2.5).toFixed(2)}s"` : '';
+  const shimmerStyle = (hasAnswer && isCorrect) ? ` style="--shimmer-delay:${(Math.random() * 1.25).toFixed(2)}s"` : '';
   const coinBadge = score > 0
     ? `<div class="coin player-score-coin${coinShimmer}"${shimmerStyle}>${Math.min(score, 99)}</div>`
     : '';
