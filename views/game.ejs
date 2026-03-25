@@ -298,6 +298,27 @@
     }
     #header-category.visible { opacity: 0.7; }
 
+    /* Air date (fades in after header-category finishes) */
+    #header-aired {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 59px);
+      left: calc(env(safe-area-inset-left, 0px) + 47px);
+      right: calc(env(safe-area-inset-left, 0px) + 47px);
+      font-size: 1rem;
+      font-weight: 400;
+      font-family: inherit;
+      color: rgba(255,255,255,0.55);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      will-change: opacity;
+      z-index: 10;
+    }
+    #header-aired.visible { opacity: 1; }
+
     /* Answer button */
     @keyframes answerPulse {
       0%   { box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 0   rgba(255,213,0,0.55); }
@@ -630,6 +651,7 @@
   </button>
 
   <div id="header-category"></div>
+  <div id="header-aired"></div>
   <div id="progress-bar"><div id="progress-bar-fill"></div></div>
   <div id="spinner" class="pre-enter"></div>
   <div id="category-label">And the Category is<span id="dots" class="dots"></span></div>
@@ -687,6 +709,7 @@
     const loadErrorEl   = document.getElementById('load-error');
     const gamePlayersEl    = document.getElementById('game-players');
     const headerCategoryEl = document.getElementById('header-category');
+    const headerAiredEl    = document.getElementById('header-aired');
     const inputBadgeEl       = document.getElementById('input-badge');
     const inputSpinnerEl     = document.getElementById('input-spinner');
     const answerResponsesEl  = document.getElementById('answer-responses');
@@ -714,6 +737,7 @@
     const toTitleCase = str => str.toLowerCase().replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase());
     let gamePlayers = [];
     let currentCategory = '';
+    let currentOriginallyAsked = null;
     let currentUserAvatarUrl = null;
     let currentMyScore = 0;
     let answerBtnClickHandled = false;
@@ -834,6 +858,7 @@
         currentQuestion      = game.current_question.question;
         currentAnswer        = game.current_question.answer;
         currentCategory      = category;
+        currentOriginallyAsked = game.current_question.originally_asked || null;
         currentGameAskedAt = game.current_question ? game.current_question.asked_at || '' : '';
         currentUserAvatarUrl = game.current_user?.avatar_url || null;
         currentMyScore = game.my_score || 0;
@@ -981,9 +1006,12 @@
       dotsEl.textContent = '';
       headerCategoryEl.classList.remove('visible');
       headerCategoryEl.textContent = '';
+      headerAiredEl.classList.remove('visible');
+      headerAiredEl.textContent = '';
       currentQuestion      = '';
       currentAnswer        = '';
       currentCategory      = '';
+      currentOriginallyAsked = null;
       currentGameAskedAt = '';
       gamePlayers          = [];
       currentGameQuestionId = null;
@@ -1027,6 +1055,15 @@
         headerCategoryEl.textContent = currentCategory;
         headerCategoryEl.classList.add('visible');
       }, 470);
+
+      // Fade in air date after header-category finishes transitioning (~1220ms)
+      _setTimeout(() => {
+        if (currentOriginallyAsked) {
+          const d = new Date(currentOriginallyAsked + 'T12:00:00');
+          headerAiredEl.textContent = 'Originally aired ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+          headerAiredEl.classList.add('visible');
+        }
+      }, 1220);
 
       // After reading time, slide in progress bar, then show timer message 400ms later
       _setTimeout(() => {

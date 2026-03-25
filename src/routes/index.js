@@ -373,6 +373,7 @@ router.get('/api/games', async (req, res) => {
            (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_question,
            (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_answer,
            (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_category,
+           (SELECT q.originally_asked FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1) AS cq_originally_asked,
            (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'user_id', ga.user_id, 'game_question_id', ga.game_question_id,
                                              'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
             FROM game_answers ga
@@ -385,6 +386,7 @@ router.get('/api/games', async (req, res) => {
            (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_question,
            (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_answer,
            (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_category,
+           (SELECT q.originally_asked FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_originally_asked,
            (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'user_id', ga.user_id, 'game_question_id', ga.game_question_id,
                                              'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
             FROM game_answers ga
@@ -416,6 +418,7 @@ router.get('/api/games', async (req, res) => {
           question: row.cq_question,
           answer: title(stripOneOf(row.cq_answer)),
           category: title(row.cq_category),
+          originally_asked: row.cq_originally_asked || null,
         } : null,
         answers: parse(row.answers) || [],
         my_score: row.my_score || 0,
@@ -426,6 +429,7 @@ router.get('/api/games', async (req, res) => {
           question: row.pq_question,
           answer: title(stripOneOf(row.pq_answer)),
           category: title(row.pq_category),
+          originally_asked: row.pq_originally_asked || null,
         } : null,
         previous_answers: parse(row.previous_answers) || [],
       });
