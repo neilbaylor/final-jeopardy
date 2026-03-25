@@ -861,7 +861,7 @@
         currentOriginallyAsked = game.current_question.originally_asked || null;
         if (currentOriginallyAsked) {
           const d = new Date(currentOriginallyAsked + 'T12:00:00');
-          headerAiredEl.textContent = 'Originally aired ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+          headerAiredEl.textContent = 'From ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
         }
         currentGameAskedAt = game.current_question ? game.current_question.asked_at || '' : '';
         currentUserAvatarUrl = game.current_user?.avatar_url || null;
