@@ -301,13 +301,13 @@
     /* Air date (fades in after header-category finishes) */
     #header-aired {
       position: absolute;
-      top: calc(env(safe-area-inset-top, 0px) + 59px);
+      top: calc(env(safe-area-inset-top, 0px) + 45px);
       left: calc(env(safe-area-inset-left, 0px) + 47px);
       right: calc(env(safe-area-inset-left, 0px) + 47px);
-      font-size: 1rem;
+      font-size: 0.8rem;
       font-weight: 400;
       font-family: inherit;
-      color: rgba(255,255,255,0.55);
+      color: rgba(255,255,255,0.45);
       text-align: center;
       white-space: nowrap;
       overflow: hidden;
@@ -1060,10 +1060,10 @@
         headerCategoryEl.classList.add('visible');
       }, 470);
 
-      // Fade in air date after header-category finishes transitioning (~1220ms)
+      // Fade in air date after header-category finishes transitioning (~1320ms)
       _setTimeout(() => {
         if (currentOriginallyAsked) headerAiredEl.classList.add('visible');
-      }, 1220);
+      }, 1320);
 
       // After reading time, slide in progress bar, then show timer message 400ms later
       _setTimeout(() => {
