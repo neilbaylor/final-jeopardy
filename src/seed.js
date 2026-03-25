@@ -62,7 +62,7 @@ async function getEpisodeLinks(season) {
     const full = href.startsWith('http') ? href : `https://j-archive.com/${href}`;
     if (seenUrls.has(full)) return;
     seenUrls.add(full);
-    const airDate = parseAirDate($(el).attr('title'));
+    const airDate = parseAirDate($(el).text());
     if (airDate && seenDates.has(airDate)) return;
     if (airDate) seenDates.add(airDate);
     links.push({ url: full, airDate });
