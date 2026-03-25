@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
- * Scrapes Final Jeopardy questions from j-archive.com Season 41
- * and seeds the questions table.
+ * Scrapes Final Jeopardy questions from j-archive.com and seeds the questions table.
+ * - First run (empty table): seeds all seasons in SEASONS.
+ * - Subsequent runs: checks MAX(originally_asked) and crawls the latest season
+ *   for any episodes newer than that date.
  * Usage: node src/seed.js
  */
 
@@ -13,7 +15,8 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-const SEASONS = [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41];
+const SEASONS = [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42];
+const LATEST_SEASON = 42;
 
 function fetchPage(url, redirectCount = 0) {
   return new Promise((resolve, reject) => {
@@ -90,47 +93,77 @@ async function main() {
 
   console.log('Connected to database.');
 
-  // Skip seeding entirely if the table already has data (unless forced)
   const [[{ cnt }]] = await db.execute('SELECT COUNT(*) AS cnt FROM questions');
-  if (cnt > 0 && !process.env.FORCE_RESEED) {
-    console.log(`DB already has ${cnt} questions — skipping seed.`);
-    await db.end();
-    return;
-  }
-
-  // Fetch all episode links first — only wipe the table if scraping is actually working
-  const linksBySeason = [];
-  for (const season of SEASONS) {
-    const links = await getEpisodeLinks(season);
-    console.log(`Season ${season}: found ${links.length} episode links.`);
-    linksBySeason.push({ season, links });
-  }
-  const totalLinks = linksBySeason.reduce((n, s) => n + s.links.length, 0);
-  if (totalLinks === 0) throw new Error('No episode links found — aborting to preserve existing data');
-
-  await db.execute('DELETE FROM questions');
-  console.log('Cleared existing questions.');
 
   let inserted = 0;
   let skipped = 0;
 
-  for (const { season, links } of linksBySeason) {
-    console.log(`\nProcessing Season ${season}...`);
-    for (const { url, airDate } of links) {
+  if (cnt === 0 || process.env.FORCE_RESEED) {
+    // Full seed: fetch all seasons, wipe and repopulate
+    const linksBySeason = [];
+    for (const season of SEASONS) {
+      const links = await getEpisodeLinks(season);
+      console.log(`Season ${season}: found ${links.length} episode links.`);
+      linksBySeason.push({ season, links });
+    }
+    const totalLinks = linksBySeason.reduce((n, s) => n + s.links.length, 0);
+    if (totalLinks === 0) throw new Error('No episode links found — aborting to preserve existing data');
+
+    await db.execute('DELETE FROM questions');
+    console.log('Cleared existing questions.');
+
+    for (const { season, links } of linksBySeason) {
+      console.log(`\nProcessing Season ${season}...`);
+      for (const { url, airDate } of links) {
+        try {
+          const data = await extractFinalJeopardy(url);
+          if (!data) { console.log(`  SKIP (no data): ${url}`); skipped++; continue; }
+          await db.execute(
+            'INSERT INTO questions (question, answer, category, originally_asked) VALUES (?, ?, ?, ?)',
+            [data.question, data.answer, data.category, airDate || null]
+          );
+          console.log(`  OK [${data.category}] ${airDate || 'no-date'} ${data.question.substring(0, 60)}...`);
+          inserted++;
+          await new Promise(r => setTimeout(r, 500));
+        } catch (err) {
+          console.error(`  ERROR ${url}: ${err.message}`);
+          skipped++;
+        }
+      }
+    }
+  } else {
+    // Incremental update: find episodes in the latest season newer than MAX(originally_asked)
+    const [[{ latest }]] = await db.execute('SELECT MAX(originally_asked) AS latest FROM questions');
+    if (!latest) {
+      console.log('No dated questions found — run with FORCE_RESEED=1 to do a full seed.');
+      await db.end();
+      return;
+    }
+    const latestDate = latest instanceof Date ? latest.toISOString().slice(0, 10) : String(latest).slice(0, 10);
+    console.log(`Latest originally_asked in DB: ${latestDate}`);
+    console.log(`Checking Season ${LATEST_SEASON} for newer episodes...`);
+
+    const links = await getEpisodeLinks(LATEST_SEASON);
+    console.log(`Season ${LATEST_SEASON}: found ${links.length} episode links.`);
+
+    const newLinks = links.filter(l => l.airDate && l.airDate > latestDate);
+    console.log(`Episodes newer than ${latestDate}: ${newLinks.length}`);
+
+    for (const { url, airDate } of newLinks) {
       try {
         const data = await extractFinalJeopardy(url);
-        if (!data) {
-          console.log(`  SKIP (no data): ${url}`);
-          skipped++;
-          continue;
-        }
+        if (!data) { console.log(`  SKIP (no data): ${url}`); skipped++; continue; }
+        // Skip if this exact question already exists (e.g. duplicate air date)
+        const [[{ dupe }]] = await db.execute(
+          'SELECT COUNT(*) AS dupe FROM questions WHERE originally_asked = ?', [airDate]
+        );
+        if (dupe > 0) { console.log(`  SKIP (already exists): ${airDate}`); skipped++; continue; }
         await db.execute(
           'INSERT INTO questions (question, answer, category, originally_asked) VALUES (?, ?, ?, ?)',
-          [data.question, data.answer, data.category, airDate || null]
+          [data.question, data.answer, data.category, airDate]
         );
-        console.log(`  OK [${data.category}] ${airDate || 'no-date'} ${data.question.substring(0, 60)}...`);
+        console.log(`  NEW [${data.category}] ${airDate} ${data.question.substring(0, 60)}...`);
         inserted++;
-        // polite delay
         await new Promise(r => setTimeout(r, 500));
       } catch (err) {
         console.error(`  ERROR ${url}: ${err.message}`);
