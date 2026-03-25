@@ -118,9 +118,10 @@ async function initDB() {
   for (const sql of tables) await conn.query(sql);
 
   // Add originally_asked column if not present (idempotent migration)
-  await conn.query(
-    `ALTER TABLE questions ADD COLUMN IF NOT EXISTS originally_asked DATE NULL`
-  );
+  const [cols] = await conn.query(`SHOW COLUMNS FROM questions LIKE 'originally_asked'`);
+  if (cols.length === 0) {
+    await conn.query(`ALTER TABLE questions ADD COLUMN originally_asked DATE NULL`);
+  }
 
   conn.release();
   console.log('Database tables ready');
