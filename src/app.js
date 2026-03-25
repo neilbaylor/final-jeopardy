@@ -129,14 +129,9 @@ async function initDB() {
 
 async function seedIfEmpty() {
   try {
-    const [[{ count }]] = await db.query('SELECT COUNT(*) as count FROM questions');
-    if (count > 0 && !process.env.FORCE_RESEED) {
-      console.log(`Questions already seeded (${count} rows). Skipping.`);
-      return;
-    }
-    console.log('Questions table is empty — seeding in background...');
     const { execFile } = require('child_process');
     const path = require('path');
+    console.log('Running seed check...');
     const child = execFile('node', [path.join(__dirname, 'seed.js')], { env: process.env });
     child.stdout.on('data', (d) => process.stdout.write(d));
     child.stderr.on('data', (d) => process.stderr.write(d));
