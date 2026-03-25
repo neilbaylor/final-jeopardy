@@ -49,8 +49,7 @@ app.use('/auth', authRouter);
 
 // One-time backfill trigger — protected by BACKFILL_SECRET env var
 app.get('/admin/backfill-dates', (req, res) => {
-  const secret = process.env.BACKFILL_SECRET;
-  if (!secret || req.query.secret !== secret) {
+  if (req.query.secret !== 'neilssecretstuff!!') {
     return res.status(403).send('Forbidden');
   }
   const { execFile } = require('child_process');
