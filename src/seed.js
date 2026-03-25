@@ -23,7 +23,7 @@ function fetchPage(url, redirectCount = 0) {
     if (redirectCount > 5) return reject(new Error('Too many redirects'));
     const parsed = new URL(url);
     const client = parsed.protocol === 'https:' ? https : http;
-    client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; seed-script/1.0)' } }, (res) => {
+    const req = client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; seed-script/1.0)' } }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         return fetchPage(new URL(res.headers.location, url).href, redirectCount + 1).then(resolve, reject);
       }
@@ -32,6 +32,7 @@ function fetchPage(url, redirectCount = 0) {
       res.on('end', () => resolve(Buffer.concat(chunks).toString()));
       res.on('error', reject);
     }).on('error', reject);
+    req.setTimeout(15000, () => { req.destroy(new Error(`Timeout fetching ${url}`)); });
   });
 }
 
