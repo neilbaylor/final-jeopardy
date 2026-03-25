@@ -301,7 +301,7 @@
     /* Air date (fades in after header-category finishes) */
     #header-aired {
       position: absolute;
-      top: calc(env(safe-area-inset-top, 0px) + 45px);
+      top: calc(env(safe-area-inset-top, 0px) + 47px);
       left: calc(env(safe-area-inset-left, 0px) + 47px);
       right: calc(env(safe-area-inset-left, 0px) + 47px);
       font-size: 0.8rem;
@@ -1058,7 +1058,7 @@
       // Fade in air date after header-category finishes transitioning (~1220ms)
       _setTimeout(() => {
         if (currentOriginallyAsked) headerAiredEl.classList.add('visible');
-      }, 970);
+      }, 870);
 
       // After reading time, slide in progress bar, then show timer message 400ms later
       _setTimeout(() => {
