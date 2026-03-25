@@ -1158,6 +1158,7 @@
                 questionEl.style.transition = 'opacity 1.33s ease 215ms, transform 0.7s ease 215ms';
                 questionEl.style.transform = 'translateY(-10px)';
                 questionEl.style.opacity = '0.7';
+                headerAiredEl.classList.remove('visible');
                 // Fade answer in below translated question
                 _setTimeout(() => {
                   answerTextEl.classList.add('visible');
