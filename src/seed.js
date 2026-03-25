@@ -54,11 +54,16 @@ async function getEpisodeLinks(season) {
   const html = await fetchPage(`https://j-archive.com/showseason.php?season=${season}`);
   const $ = cheerio.load(html);
   const links = [];
+  const seenUrls = new Set();
+  const seenDates = new Set();
   $('a[href*="showgame.php"]').each((_, el) => {
     const href = $(el).attr('href');
     const full = href.startsWith('http') ? href : `https://j-archive.com/${href}`;
-    if (links.find(l => l.url === full)) return;
+    if (seenUrls.has(full)) return;
+    seenUrls.add(full);
     const airDate = parseAirDate($(el).attr('title'));
+    if (airDate && seenDates.has(airDate)) return;
+    if (airDate) seenDates.add(airDate);
     links.push({ url: full, airDate });
   });
   return links;
@@ -146,7 +151,13 @@ async function main() {
     const links = await getEpisodeLinks(LATEST_SEASON);
     console.log(`Season ${LATEST_SEASON}: found ${links.length} episode links.`);
 
-    const newLinks = links.filter(l => l.airDate && l.airDate > latestDate);
+    const seen = new Set();
+    const newLinks = links.filter(l => {
+      if (!l.airDate || l.airDate <= latestDate) return false;
+      if (seen.has(l.airDate)) return false;
+      seen.add(l.airDate);
+      return true;
+    });
     console.log(`Episodes newer than ${latestDate}: ${newLinks.length}`);
 
     for (const { url, airDate } of newLinks) {
