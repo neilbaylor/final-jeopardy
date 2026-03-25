@@ -859,6 +859,10 @@
         currentAnswer        = game.current_question.answer;
         currentCategory      = category;
         currentOriginallyAsked = game.current_question.originally_asked || null;
+        if (currentOriginallyAsked) {
+          const d = new Date(currentOriginallyAsked + 'T12:00:00');
+          headerAiredEl.textContent = 'Originally aired ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        }
         currentGameAskedAt = game.current_question ? game.current_question.asked_at || '' : '';
         currentUserAvatarUrl = game.current_user?.avatar_url || null;
         currentMyScore = game.my_score || 0;
@@ -1058,11 +1062,7 @@
 
       // Fade in air date after header-category finishes transitioning (~1220ms)
       _setTimeout(() => {
-        if (currentOriginallyAsked) {
-          const d = new Date(currentOriginallyAsked + 'T12:00:00');
-          headerAiredEl.textContent = 'Originally aired ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-          headerAiredEl.classList.add('visible');
-        }
+        if (currentOriginallyAsked) headerAiredEl.classList.add('visible');
       }, 1220);
 
       // After reading time, slide in progress bar, then show timer message 400ms later
