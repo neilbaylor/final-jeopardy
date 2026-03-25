@@ -872,7 +872,7 @@
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
       opacity: 0; pointer-events: none;
-      animation: badge-shimmer-pass 2.8s ease-in-out var(--shimmer-delay, 0.5s) infinite;
+      animation: badge-shimmer-pass 2.8s ease-in-out infinite;
     }
     #view-modal-footer { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 7px 10.5px 8px; font-size: 0.77rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 16px 16px; }
     #view-modal-footer strong { font-weight: 600; }
@@ -1465,9 +1465,8 @@
         }
         const score = p.score || 0;
         const coinShimmer = p._isCorrect ? ' coin-shimmer' : '';
-        const shimmerStyle = p._isCorrect ? ` style="--shimmer-delay:${(Math.random() * 1.25).toFixed(2)}s"` : '';
         const coinBadge = score > 0
-          ? `<div class="coin player-score-coin${coinShimmer}"${shimmerStyle}>${Math.min(score, 99)}</div>`
+          ? `<div class="coin player-score-coin${coinShimmer}">${Math.min(score, 99)}</div>`
           : '';
         return `<div class="answer-response-row">
           <div class="ar-player">

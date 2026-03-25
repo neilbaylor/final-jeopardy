@@ -538,7 +538,7 @@
       content: ''; position: absolute; top: -10%; left: -50%; width: 45%; height: 120%;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.72) 50%, transparent 100%);
       opacity: 0; pointer-events: none;
-      animation: coin-shimmer-pass 2.8s ease-in-out var(--shimmer-delay, 0.5s) infinite;
+      animation: coin-shimmer-pass 2.8s ease-in-out infinite;
     }
 
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -792,9 +792,8 @@
         const answerText = p._answerText || '';
         const score = p.score || 0;
         const coinShimmer = p._isCorrect ? ' coin-shimmer' : '';
-        const shimmerStyle = p._isCorrect ? ` style="--shimmer-delay:${(Math.random() * 1.25).toFixed(2)}s"` : '';
         const coinBadge = score > 0
-          ? `<div class="coin player-score-coin${coinShimmer}"${shimmerStyle}>${Math.min(score, 99)}</div>`
+          ? `<div class="coin player-score-coin${coinShimmer}">${Math.min(score, 99)}</div>`
           : '';
         return `<div class="answer-response-row">
           <div class="ar-player">

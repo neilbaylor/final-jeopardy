@@ -110,9 +110,8 @@ function buildPlayerCardHtml(p, opts) {
   }
   const score = p.score || 0;
   const coinShimmer = (hasAnswer && isCorrect) ? ' coin-shimmer' : '';
-  const shimmerStyle = (hasAnswer && isCorrect) ? ` style="--shimmer-delay:${(Math.random() * 1.25).toFixed(2)}s"` : '';
   const coinBadge = score > 0
-    ? `<div class="coin player-score-coin${coinShimmer}"${shimmerStyle}>${Math.min(score, 99)}</div>`
+    ? `<div class="coin player-score-coin${coinShimmer}">${Math.min(score, 99)}</div>`
     : '';
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}${coinBadge}</div>`;
   const unansweredAsWrong = !hasAnswer && opts && opts.unansweredIncorrect;
