@@ -47,6 +47,21 @@ app.use(passport.session());
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 
+// One-time backfill trigger — protected by BACKFILL_SECRET env var
+app.get('/admin/backfill-dates', (req, res) => {
+  const secret = process.env.BACKFILL_SECRET;
+  if (!secret || req.query.secret !== secret) {
+    return res.status(403).send('Forbidden');
+  }
+  const { execFile } = require('child_process');
+  const path = require('path');
+  const child = execFile('node', [path.join(__dirname, 'backfill-dates.js')], { env: process.env });
+  child.stdout.on('data', (d) => process.stdout.write(d));
+  child.stderr.on('data', (d) => process.stderr.write(d));
+  child.on('exit', (code) => console.log(`Backfill exited with code ${code}`));
+  res.send('Backfill started — check Railway logs for progress.');
+});
+
 async function initDB() {
   const conn = await db.getConnection();
   const tables = [
@@ -102,6 +117,11 @@ async function initDB() {
     )`,
   ];
   for (const sql of tables) await conn.query(sql);
+
+  // Add originally_asked column if not present (idempotent migration)
+  await conn.query(
+    `ALTER TABLE questions ADD COLUMN IF NOT EXISTS originally_asked DATE NULL`
+  );
 
   conn.release();
   console.log('Database tables ready');

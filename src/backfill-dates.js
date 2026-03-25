@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /**
- * Scrapes Final Jeopardy questions from j-archive.com Season 41
- * and seeds the questions table.
- * Usage: node src/seed.js
+ * One-time backfill: sets originally_asked on every existing question by
+ * re-scraping the air date from j-archive season pages.
+ *
+ * Trigger via: GET /admin/backfill-dates?secret=<BACKFILL_SECRET>
+ * Or manually: node src/backfill-dates.js
  */
 
 const https = require('https');
@@ -34,10 +36,8 @@ function fetchPage(url, redirectCount = 0) {
 
 function parseAirDate(title) {
   if (!title) return null;
-  // ISO format: "Show #8580, aired 2021-09-13"
   const isoMatch = title.match(/(\d{4}-\d{2}-\d{2})/);
   if (isoMatch) return isoMatch[1];
-  // Long format: "aired September 13, 2021"
   const months = { January:'01', February:'02', March:'03', April:'04', May:'05', June:'06',
                    July:'07', August:'08', September:'09', October:'10', November:'11', December:'12' };
   const longMatch = title.match(/(\w+) (\d{1,2}), (\d{4})/);
@@ -47,6 +47,7 @@ function parseAirDate(title) {
   return null;
 }
 
+// Returns [{ url, airDate }, ...]
 async function getEpisodeLinks(season) {
   const html = await fetchPage(`https://j-archive.com/showseason.php?season=${season}`);
   const $ = cheerio.load(html);
@@ -61,21 +62,13 @@ async function getEpisodeLinks(season) {
   return links;
 }
 
-async function extractFinalJeopardy(url) {
+// Returns the Final Jeopardy question text for a game page
+async function extractQuestion(url) {
   const html = await fetchPage(url);
   const $ = cheerio.load(html);
-
   const finalRound = $('.final_round');
   if (!finalRound.length) return null;
-
-  const category = finalRound.find('.category_name').first().text().trim();
-  const question = finalRound.find('#clue_FJ').text().trim();
-  // The correct_response is inside a hidden toggle — it's in the onmouseover or in a <em> inside correct_response
-  const answer = finalRound.find('.correct_response').first().text().trim();
-
-  if (!category || !question || !answer) return null;
-
-  return { category, question, answer };
+  return finalRound.find('#clue_FJ').text().trim() || null;
 }
 
 async function main() {
@@ -88,62 +81,72 @@ async function main() {
     database: process.env.DB_NAME || 'final_jeopardy',
   });
 
-  console.log('Connected to database.');
+  console.log('[backfill] Connected to database.');
 
-  // Skip seeding entirely if the table already has data (unless forced)
-  const [[{ cnt }]] = await db.execute('SELECT COUNT(*) AS cnt FROM questions');
-  if (cnt > 0 && !process.env.FORCE_RESEED) {
-    console.log(`DB already has ${cnt} questions — skipping seed.`);
-    await db.end();
-    return;
-  }
-
-  // Fetch all episode links first — only wipe the table if scraping is actually working
-  const linksBySeason = [];
-  for (const season of SEASONS) {
-    const links = await getEpisodeLinks(season);
-    console.log(`Season ${season}: found ${links.length} episode links.`);
-    linksBySeason.push({ season, links });
-  }
-  const totalLinks = linksBySeason.reduce((n, s) => n + s.links.length, 0);
-  if (totalLinks === 0) throw new Error('No episode links found — aborting to preserve existing data');
-
-  await db.execute('DELETE FROM questions');
-  console.log('Cleared existing questions.');
-
-  let inserted = 0;
+  let updated = 0;
   let skipped = 0;
 
-  for (const { season, links } of linksBySeason) {
-    console.log(`\nProcessing Season ${season}...`);
+  for (const season of SEASONS) {
+    console.log(`\n[backfill] Season ${season}...`);
+    let links;
+    try {
+      links = await getEpisodeLinks(season);
+      console.log(`[backfill]   ${links.length} episode links found.`);
+    } catch (err) {
+      console.error(`[backfill]   ERROR fetching season ${season}: ${err.message}`);
+      continue;
+    }
+
     for (const { url, airDate } of links) {
+      if (!airDate) {
+        console.log(`[backfill]   SKIP (no date in title): ${url}`);
+        skipped++;
+        continue;
+      }
+
       try {
-        const data = await extractFinalJeopardy(url);
-        if (!data) {
-          console.log(`  SKIP (no data): ${url}`);
+        const questionText = await extractQuestion(url);
+        if (!questionText) {
+          console.log(`[backfill]   SKIP (no FJ clue): ${url}`);
           skipped++;
+          await new Promise(r => setTimeout(r, 500));
           continue;
         }
-        await db.execute(
-          'INSERT INTO questions (question, answer, category, originally_asked) VALUES (?, ?, ?, ?)',
-          [data.question, data.answer, data.category, airDate || null]
+
+        const [result] = await db.execute(
+          'UPDATE questions SET originally_asked = ? WHERE question = ? AND originally_asked IS NULL',
+          [airDate, questionText]
         );
-        console.log(`  OK [${data.category}] ${airDate || 'no-date'} ${data.question.substring(0, 60)}...`);
-        inserted++;
-        // polite delay
+
+        if (result.affectedRows > 0) {
+          console.log(`[backfill]   UPDATED ${airDate}: ${questionText.substring(0, 60)}...`);
+          updated++;
+        } else {
+          // Already set, or question not found
+          const [[{ cnt }]] = await db.execute(
+            'SELECT COUNT(*) AS cnt FROM questions WHERE question = ?', [questionText]
+          );
+          if (cnt === 0) {
+            console.log(`[backfill]   NOT FOUND in DB: ${questionText.substring(0, 60)}...`);
+          } else {
+            console.log(`[backfill]   ALREADY SET: ${questionText.substring(0, 60)}...`);
+          }
+          skipped++;
+        }
+
         await new Promise(r => setTimeout(r, 500));
       } catch (err) {
-        console.error(`  ERROR ${url}: ${err.message}`);
+        console.error(`[backfill]   ERROR ${url}: ${err.message}`);
         skipped++;
       }
     }
   }
 
-  console.log(`\nDone. Inserted: ${inserted}, Skipped: ${skipped}`);
+  console.log(`\n[backfill] Done. Updated: ${updated}, Skipped/not-found: ${skipped}`);
   await db.end();
 }
 
 main().catch(err => {
-  console.error('Fatal:', err);
+  console.error('[backfill] Fatal:', err);
   process.exit(1);
 });
