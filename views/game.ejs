@@ -997,6 +997,9 @@
       // Disable transitions for instant DOM reset (prevents bfcache snapshot flicker)
       categoryEl.style.transition = 'none';
       labelEl.style.transition = 'none';
+      questionEl.style.transition = 'none';
+      questionEl.style.transform = '';
+      questionEl.style.opacity = '';
       spinner.classList.remove('hidden');
       labelEl.classList.remove('visible');
       categoryEl.classList.remove('visible', 'dismissing');
@@ -1058,6 +1061,7 @@
         requestAnimationFrame(() => requestAnimationFrame(() => {
           categoryEl.style.transition = '';
           labelEl.style.transition = '';
+          questionEl.style.transition = '';
           gamePlayersEl.style.transition = '';
         }));
         loadGame();
