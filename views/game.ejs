@@ -587,7 +587,7 @@
       78%  { transform: scale(1.1); }
       100% { opacity: 1; transform: scale(1); }
     }
-    .player-score-coin.coin-pop { animation: coin-pop-in 1s ease-out forwards; }
+    .player-score-coin.coin-pop { animation: coin-pop-in 1.2s ease-out forwards; }
 
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #answer-responses .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
@@ -845,7 +845,7 @@
         let any = false;
         for (const p of pieces) {
           p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.rot += p.vrot;
-          if (p.y > H * 0.6) p.alpha -= 0.025;
+          if (p.y > H * 0.68) p.alpha -= 0.025;
           if (p.alpha <= 0) continue;
           any = true;
           ctx.save();
