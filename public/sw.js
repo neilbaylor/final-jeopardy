@@ -1,6 +1,7 @@
-// v6 - stale-while-revalidate for static assets + dashboard/game HTML
-// game page is cached by path only (query string ignored)
-const CACHE = 'fjwf-static-v6';
+// v7 - stale-while-revalidate for static assets + dashboard/game HTML
+//      cache-first (no revalidation) for /api/me
+//      game page keyed by path only (query string ignored)
+const CACHE = 'fjwf-static-v7';
 
 // Activate immediately without waiting for old tabs to close
 self.addEventListener('install', () => self.skipWaiting());
@@ -14,12 +15,25 @@ self.addEventListener('activate', event => {
   );
 });
 
+// On CLEAR_API_ME message: delete all /api/me entries (any query string)
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'CLEAR_API_ME') {
+    caches.open(CACHE).then(cache =>
+      cache.keys().then(keys =>
+        Promise.all(keys.filter(k => new URL(k.url).pathname === '/api/me').map(k => cache.delete(k)))
+      )
+    );
+  }
+});
+
 function shouldCache(url) {
   if (url.origin !== self.location.origin) return false;
   // Static assets
   if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf|eot)$/i.test(url.pathname)) return true;
   // Server-rendered pages (but not login)
   if (url.pathname === '/dashboard' || url.pathname === '/game') return true;
+  // API
+  if (url.pathname === '/api/me') return true;
   return false;
 }
 
@@ -30,6 +44,7 @@ function cacheKey(url) {
 }
 
 // Stale-while-revalidate: serve from cache instantly, update cache in background
+// Exception: /api/me is cache-first with no background revalidation
 self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET') return;
@@ -38,6 +53,21 @@ self.addEventListener('fetch', event => {
 
   const key = cacheKey(url);
 
+  // /api/me: cache-first, no background revalidation
+  if (url.pathname === '/api/me') {
+    event.respondWith(
+      caches.open(CACHE).then(async cache => {
+        const cached = await cache.match(key);
+        if (cached) return cached;
+        const response = await fetch(request);
+        if (response.ok) cache.put(key, response.clone());
+        return response;
+      })
+    );
+    return;
+  }
+
+  // Everything else: stale-while-revalidate
   event.respondWith(
     caches.open(CACHE).then(async cache => {
       const cached = await cache.match(key);
@@ -47,11 +77,9 @@ self.addEventListener('fetch', event => {
       }).catch(() => null);
 
       if (cached) {
-        // Return cached immediately; keep SW alive to finish background update
         event.waitUntil(networkFetch);
         return cached;
       }
-      // Nothing cached yet — wait for network and cache the result
       return networkFetch;
     })
   );

@@ -405,6 +405,7 @@
             document.getElementById('btn-play').style.display = '';
           } else {
             localStorage.removeItem('userId');
+            navigator.serviceWorker.controller?.postMessage({ type: 'CLEAR_API_ME' });
             document.getElementById('btn-google').style.display = '';
           }
         })

@@ -1300,6 +1300,7 @@
     });
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('userId');
+      navigator.serviceWorker.controller?.postMessage({ type: 'CLEAR_API_ME' });
       location.replace('/');
     });
 
