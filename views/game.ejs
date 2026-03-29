@@ -844,7 +844,7 @@
         let any = false;
         for (const p of pieces) {
           p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.rot += p.vrot;
-          if (p.y > H * 0.68) p.alpha -= 0.025;
+          if (p.y > H * 0.68) p.alpha -= 0.019;
           if (p.alpha <= 0) continue;
           any = true;
           ctx.save();
