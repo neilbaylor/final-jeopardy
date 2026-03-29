@@ -691,7 +691,7 @@
   <div id="answer-responses"></div>
   <button id="answer-btn">Answer Question</button>
   <button id="next-question-btn" onclick="const s=document.createElement('div');s.id='next-question-spinner';this.appendChild(s);this.style.pointerEvents='none';sessionStorage.setItem('vt-from-game','1');location.replace('/game?id='+new URLSearchParams(location.search).get('id')+'&seed='+(this.dataset.seed||Math.random()))">Next Question</button>
-  <button id="go-home-btn" onclick="window.location.href='/dashboard'">Go Home</button>
+  <button id="go-home-btn" onclick="const s=document.createElement('div');s.id='next-question-spinner';this.appendChild(s);this.style.pointerEvents='none';window.location.href='/dashboard'">Go Home</button>
 
   <div id="error-modal-backdrop">
     <div id="error-modal">
