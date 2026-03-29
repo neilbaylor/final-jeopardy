@@ -1258,10 +1258,10 @@
 
         // Check both the class (set by pagereveal, Safari 18.2+) and sessionStorage
         // directly as a fallback for older Safari where pagereveal doesn't fire.
+        // Do NOT remove sessionStorage here — pagereveal must read it to set the
+        // CSS transition class, and body script can race ahead of pagereveal.
         const fromGame  = document.documentElement.classList.contains('vt-from-game')  || !!sessionStorage.getItem('vt-from-game');
         const fromLogin = document.documentElement.classList.contains('vt-from-login') || !!sessionStorage.getItem('vt-from-login');
-        if (fromGame)  sessionStorage.removeItem('vt-from-game');
-        if (fromLogin) sessionStorage.removeItem('vt-from-login');
         const cacheDelay = fromGame ? 1880 : fromLogin ? 1880 : 350;
         Promise.all([mePromise, new Promise(res => setTimeout(res, cacheDelay))]).then(() => {
           cacheTimerFired = true;
