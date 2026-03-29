@@ -17,9 +17,12 @@ if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 async function sendPush(userId, payload) {
   try {
     const [[row]] = await db.query('SELECT subscription FROM push_subscriptions WHERE user_id = ?', [userId]);
-    if (!row) return;
+    if (!row) { console.log(`[push] no subscription for user ${userId}`); return; }
+    console.log(`[push] sending to user ${userId}`);
     await webpush.sendNotification(JSON.parse(row.subscription), JSON.stringify(payload));
+    console.log(`[push] sent ok to user ${userId}`);
   } catch (err) {
+    console.error(`[push] failed for user ${userId}:`, err.statusCode, err.message);
     if (err.statusCode === 410 || err.statusCode === 404) {
       // Subscription expired or gone — clean it up
       await db.query('DELETE FROM push_subscriptions WHERE user_id = ?', [userId]).catch(() => {});
@@ -404,23 +407,21 @@ router.post('/api/games', async (req, res) => {
     res.json({ gameId });
 
     // Send push notifications to all players except the creator (fire-and-forget)
+    console.log('[push] VAPID configured:', !!process.env.VAPID_PUBLIC_KEY);
     if (process.env.VAPID_PUBLIC_KEY) {
       try {
         const [[creator]] = await db.query('SELECT display_name FROM users WHERE id = ?', [Number(userId)]);
         const creatorName = pushDisplayName(creator?.display_name || '');
-        const friendCount = allUserIds.length - 2; // total players minus creator minus recipient
+        const friendCount = allUserIds.length - 2;
         const withOthers = friendCount > 0 ? ` with ${friendCount} other${friendCount > 1 ? 's' : ''}` : '';
         const body = `${creatorName} started a new game — tap to answer your first question${withOthers}`;
-        const notifPayload = {
-          title: 'New Final Jeopardy!',
-          body,
-          url: `/game?id=${gameId}`,
-        };
+        const notifPayload = { title: 'New Final Jeopardy!', body, url: `/game?id=${gameId}` };
+        console.log('[push] sending to friend ids:', friendIds);
         for (const uid of friendIds.map(Number)) {
           sendPush(uid, notifPayload);
         }
       } catch (err) {
-        console.error('Push notification error:', err);
+        console.error('[push] error:', err);
       }
     }
   } catch (err) {
