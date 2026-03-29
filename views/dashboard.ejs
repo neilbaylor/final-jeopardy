@@ -1259,8 +1259,8 @@
         // Run mePromise and the delay timer in parallel so cacheDelay is always the
         // minimum wait — previously /api/me network time padded this naturally, but
         // now that it resolves instantly from SW cache we need to guarantee the delay.
-        const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 680
-                         : document.documentElement.classList.contains('vt-from-login') ? 680
+        const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 1500
+                         : document.documentElement.classList.contains('vt-from-login') ? 1500
                          : 350;
         Promise.all([mePromise, new Promise(res => setTimeout(res, cacheDelay))]).then(() => {
           cacheTimerFired = true;
