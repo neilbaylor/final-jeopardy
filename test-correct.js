@@ -176,6 +176,17 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
     if (natural.JaroWinklerDistance(a, withoutOptional) >= 0.88) return true;
   }
 
+  // "X or Y [or Z]" — pure "or" connector means any one alternative is acceptable.
+  // Only applies when there are no "and" / "&" connectors (those require all parts).
+  if (!/^\(\d+\s+of/i.test(correctAnswer) && /\bor\b/i.test(correctAnswer) && !/\band\b|&/.test(correctAnswer)) {
+    const orParts = correctAnswer.split(/\s+or\s+/i).map(p => p.trim()).filter(Boolean);
+    if (orParts.length > 1) {
+      for (const part of orParts) {
+        if (matchesPart(a, normalizeAnswer(part), part)) return true;
+      }
+    }
+  }
+
   // Last-name-only: single "FirstName LastName" correct answer — also accept just the last name.
   const singleLn = extractLastName(correctAnswer);
   if (singleLn !== null) {
@@ -391,6 +402,32 @@ const tests = [
   { correct: 'New York City',                 user: 'City',                    expect: false, note: 'suffix — single word rejected' },
   { correct: 'New York City',                 user: 'New York',                expect: true,  note: 'suffix — not a suffix, but JW=0.923 ⚠️ fuzzy over-accept' },
   { correct: 'Springfield',                   user: 'field',                   expect: false, note: 'suffix — no space boundary, single word anyway' },
+
+  // ── "X or Y" — pure "or" connector: accept either alternative ────────────
+  { correct: 'Neil or Joe',              user: 'Neil',              expect: true,  note: '"X or Y" — first option accepted' },
+  { correct: 'Neil or Joe',              user: 'Joe',               expect: true,  note: '"X or Y" — second option accepted' },
+  { correct: 'Neil or Joe',              user: 'Bob',               expect: false, note: '"X or Y" — non-option rejected' },
+  { correct: 'Neil or Joe',             user: 'Neil and Joe',       expect: true,  note: '"X or Y" — both parts still accepted (multi-part path)' },
+  { correct: 'Neil or Joe',             user: 'Joe or Neil',        expect: true,  note: '"X or Y" — reversed order still accepted' },
+  { correct: 'Paris or London',          user: 'Paris',             expect: true,  note: '"X or Y" — first city' },
+  { correct: 'Paris or London',          user: 'London',            expect: true,  note: '"X or Y" — second city' },
+  { correct: 'Paris or London',          user: 'Berlin',            expect: false, note: '"X or Y" — wrong city rejected' },
+  { correct: 'Paris or London',          user: 'Londun',            expect: true,  note: '"X or Y" — fuzzy match on alternative' },
+  { correct: 'True or False',            user: 'True',              expect: true,  note: '"X or Y" — first of two simple words' },
+  { correct: 'True or False',            user: 'False',             expect: true,  note: '"X or Y" — second of two simple words' },
+  { correct: 'A or B or C',             user: 'B',                 expect: true,  note: '"X or Y or Z" — middle option accepted' },
+  { correct: 'A or B or C',             user: 'C',                 expect: true,  note: '"X or Y or Z" — last option accepted' },
+  { correct: 'A or B or C',             user: 'D',                 expect: false, note: '"X or Y or Z" — non-option rejected' },
+  // "and" / "&" connectors still require all parts
+  // Note: short prefix like "Neil" JW-matches "neil joe" (≈0.9) — known JW over-accept ⚠️
+  { correct: 'Neil and Joe',            user: 'Neil',              expect: true,  note: '"X and Y" — JW prefix over-accept ⚠️ known' },
+  { correct: 'Neil and Joe',            user: 'Joe',               expect: false, note: '"X and Y" — second half alone rejected' },
+  { correct: 'Neil & Joe',              user: 'Neil',              expect: true,  note: '"X & Y" — JW prefix over-accept ⚠️ known' },
+  // Last-name matching on or-alternatives
+  { correct: 'Neil Taylor or Joe Ross', user: 'Taylor',            expect: true,  note: '"X or Y" names — last name of first option' },
+  { correct: 'Neil Taylor or Joe Ross', user: 'Ross',              expect: true,  note: '"X or Y" names — last name of second option' },
+  { correct: 'Neil Taylor or Joe Ross', user: 'Neil Taylor',       expect: true,  note: '"X or Y" names — full first option accepted' },
+  { correct: 'Neil Taylor or Joe Ross', user: 'Smith',             expect: false, note: '"X or Y" names — wrong last name rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

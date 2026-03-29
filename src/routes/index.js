@@ -200,6 +200,17 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
     if (natural.JaroWinklerDistance(a, withoutOptional) >= 0.88) return true;
   }
 
+  // "X or Y [or Z]" — pure "or" connector means any one alternative is acceptable.
+  // Only applies when there are no "and" / "&" connectors (those require all parts).
+  if (!/^\(\d+\s+of/i.test(correctAnswer) && /\bor\b/i.test(correctAnswer) && !/\band\b|&/.test(correctAnswer)) {
+    const orParts = correctAnswer.split(/\s+or\s+/i).map(p => p.trim()).filter(Boolean);
+    if (orParts.length > 1) {
+      for (const part of orParts) {
+        if (matchesPart(a, normalizeAnswer(part), part)) return true;
+      }
+    }
+  }
+
   // Last-name-only: if the correct answer is a single "FirstName LastName", also accept
   // just the last name. Multi-person answers are handled above in the multi-part section.
   const singleLn = extractLastName(correctAnswer);
