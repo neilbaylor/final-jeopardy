@@ -348,6 +348,30 @@
     #next-question-btn { pointer-events: none; }
     #next-question-btn.visible { opacity: 1; pointer-events: auto; }
     #next-question-btn.pulse { animation: answerPulse 1.4s ease-out infinite; }
+    #go-home-btn {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      background: linear-gradient(to top, rgba(200, 200, 200, 0.75), rgba(220, 220, 220, 0.75));
+      color: #07102e;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.4);
+      border: 1px solid #ddd;
+      border-radius: 999px;
+      padding: 15px 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.12s ease;
+    }
+    #go-home-btn.visible { opacity: 1; pointer-events: auto; }
+    #go-home-btn:active { transform: translateX(-50%) scale(0.96); }
     #next-question-spinner {
       position: absolute;
       right: 18px;
@@ -420,14 +444,14 @@
     @supports (-webkit-touch-callout: none) {
       #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
       @media (display-mode: standalone) {
-        #answer-btn, #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
+        #answer-btn, #next-question-btn, #go-home-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
         #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) - 4px); }
       }
     }
-    body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
+    body.android #answer-btn, body.android #next-question-btn, body.android #go-home-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
     body.android #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
     @media (display-mode: standalone) {
-      body.android #answer-btn, body.android #next-question-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
+      body.android #answer-btn, body.android #next-question-btn, body.android #go-home-btn { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
       body.android #answer-input-wrap { bottom: calc(env(safe-area-inset-bottom) + 20px); }
     }
 
@@ -667,6 +691,7 @@
   <div id="answer-responses"></div>
   <button id="answer-btn">Answer Question</button>
   <button id="next-question-btn" onclick="const s=document.createElement('div');s.id='next-question-spinner';this.appendChild(s);this.style.pointerEvents='none';sessionStorage.setItem('vt-from-game','1');location.replace('/game?id='+new URLSearchParams(location.search).get('id')+'&seed='+(this.dataset.seed||Math.random()))">Next Question</button>
+  <button id="go-home-btn" onclick="window.location.href='/dashboard'">Go Home</button>
 
   <div id="error-modal-backdrop">
     <div id="error-modal">
@@ -700,6 +725,7 @@
     const answerInputWrap = document.getElementById('answer-input-wrap');
     const answerInput     = document.getElementById('answer-input');
     const nextQuestionBtn = document.getElementById('next-question-btn');
+    const goHomeBtn       = document.getElementById('go-home-btn');
     const backBtn         = document.getElementById('back-btn');
 
     const loadErrorEl   = document.getElementById('load-error');
@@ -999,6 +1025,7 @@
       gamePlayersEl.classList.remove('visible', 'count-1', 'count-2');
       gamePlayersEl.innerHTML = '';
       nextQuestionBtn.classList.remove('visible', 'pulse');
+      goHomeBtn.classList.remove('visible');
       backBtn.classList.remove('disabled', 'navigating');
       backBtn.innerHTML = '<svg width="13" height="22" viewBox="0 0 10 17" fill="none"><path d="M9 1L1.5 8.5L9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       loadErrorEl.classList.remove('visible');
@@ -1026,6 +1053,7 @@
     // Re-run the full flow when restored from bfcache (back/forward navigation)
     window.addEventListener('pageshow', e => {
       if (e.persisted) {
+        resetUI();
         // Re-enable CSS transitions after the instant-hidden state has painted
         requestAnimationFrame(() => requestAnimationFrame(() => {
           categoryEl.style.transition = '';
@@ -1081,6 +1109,9 @@
           answerInputWrap.classList.add('visible');
 
           {
+            progressFill.style.transform = '';
+            progressFill.style.animation = 'none';
+            progressFill.offsetHeight; // force reflow so animation restarts from 0
             progressFill.style.animation = 'progressFill 30s linear forwards';
 
             let expiryFired = false;
@@ -1204,6 +1235,8 @@
                         nextQuestionBtn.classList.add('visible');
                         _setTimeout(() => nextQuestionBtn.classList.add('pulse'), 1400);
                       }, 1175);
+                    } else {
+                      _setTimeout(() => goHomeBtn.classList.add('visible'), 1175);
                     }
                   }, 1700);
                   _setTimeout(() => backBtn.classList.remove('disabled'), 400);
