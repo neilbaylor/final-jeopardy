@@ -139,6 +139,6 @@ const toTitleCase = (() => {
     .replace(/\b[IVXLCDMivxlcdm]{2,}\b/g, (m, offset) => {
       const orig = str.slice(offset, offset + m.length);
       const u = m.toUpperCase();
-      return /^[IVXLCDM]+$/.test(orig) && _rRe.test(u) && _rtn(u) <= 100 ? u : m;
+      return /^[IVXLCDMivxlcdm]+$/.test(orig) && _rRe.test(u) && _rtn(u) <= 100 ? u : m;
     });
 })();
