@@ -1,4 +1,4 @@
-// Caching disabled for development
+// v2 - force SW update to clear stale caches
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => {
   event.waitUntil(
