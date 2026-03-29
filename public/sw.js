@@ -1,5 +1,5 @@
-// v4 - stale-while-revalidate for static assets + game/dashboard HTML
-const CACHE = 'fjwf-static-v4';
+// v5 - stale-while-revalidate for static assets + dashboard HTML
+const CACHE = 'fjwf-static-v5';
 
 // Activate immediately without waiting for old tabs to close
 self.addEventListener('install', () => self.skipWaiting());
@@ -18,7 +18,7 @@ function shouldCache(url) {
   // Static assets
   if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf|eot)$/i.test(url.pathname)) return true;
   // Server-rendered pages (but not login)
-  if (url.pathname === '/dashboard' || url.pathname === '/game') return true;
+  if (url.pathname === '/dashboard') return true;
   return false;
 }
 
