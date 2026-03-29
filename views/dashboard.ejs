@@ -1250,7 +1250,6 @@
         .catch(() => location.replace('/'));
 
       const cachedGames = getCachedGames();
-      console.log('[dashboard] cachedGames:', cachedGames ? `${cachedGames.length} games` : 'null', '| vt-from-game:', document.documentElement.classList.contains('vt-from-game'), '| vt-from-login:', document.documentElement.classList.contains('vt-from-login'));
       if (cachedGames) {
         // If fresh data arrives before the cache delay fires, render it directly (no double flash).
         // If it arrives after, re-render normally as a background refresh.
@@ -1263,9 +1262,7 @@
         const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 1880
                          : document.documentElement.classList.contains('vt-from-login') ? 1880
                          : 350;
-        console.log('[dashboard] cached path — cacheDelay:', cacheDelay);
         Promise.all([mePromise, new Promise(res => setTimeout(res, cacheDelay))]).then(() => {
-          console.log('[dashboard] cached path timer fired — rendering');
           cacheTimerFired = true;
           renderGames(pendingGames || cachedGames);
           const fab = document.getElementById('new-game');
@@ -1286,7 +1283,6 @@
           .catch(() => {});
       } else {
         const fromGame = document.documentElement.classList.contains('vt-from-game');
-        console.log('[dashboard] no-cache path — fromGame:', fromGame);
         if (fromGame) {
           loadGames(true);
         } else {
