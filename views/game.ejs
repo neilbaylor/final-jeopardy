@@ -581,6 +581,13 @@
       opacity: 0; pointer-events: none;
       animation: coin-shimmer-pass 2.8s ease-in-out infinite;
     }
+    @keyframes coin-pop-in {
+      0%   { opacity: 0; transform: scale(2.4); }
+      55%  { opacity: 1; transform: scale(0.88); }
+      78%  { transform: scale(1.1); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .player-score-coin.coin-pop { animation: coin-pop-in 0.52s ease-out forwards; }
 
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #answer-responses .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
@@ -813,6 +820,48 @@
     let currentAnswer      = '';
     let currentGameAskedAt = '';
 
+    function launchConfetti() {
+      const canvas = document.createElement('canvas');
+      canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9000;';
+      document.body.appendChild(canvas);
+      const W = canvas.width = window.innerWidth;
+      const H = canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+      const colors = ['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#A78BFA','#34D399','#F97316','#EC4899'];
+      const pieces = Array.from({length: 55}, () => ({
+        x: Math.random() * W,
+        y: -20 - Math.random() * 60,
+        vx: (Math.random() - 0.5) * 4,
+        vy: 2.5 + Math.random() * 3.5,
+        rot: Math.random() * Math.PI * 2,
+        vrot: (Math.random() - 0.5) * 0.15,
+        w: 6 + Math.random() * 5,
+        h: 3 + Math.random() * 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+      }));
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        let any = false;
+        for (const p of pieces) {
+          p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.rot += p.vrot;
+          if (p.y > H * 0.55) p.alpha -= 0.025;
+          if (p.alpha <= 0) continue;
+          any = true;
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        }
+        if (any) requestAnimationFrame(draw);
+        else canvas.remove();
+      }
+      requestAnimationFrame(draw);
+    }
+
     function buildAnswerResponsesHtml(players, nextReady) {
       const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       const sorted = [...players].sort((a, b) => (b._isMe ? 1 : 0) - (a._isMe ? 1 : 0));
@@ -837,9 +886,11 @@
         }
         const answerText = p._answerText || '';
         const score = p.score || 0;
-        const coinShimmer = p._isCorrect ? ' coin-shimmer' : '';
+        // For the current user's correct answer, skip shimmer upfront — it's added after the pop animation
+        const coinShimmer = p._isCorrect && !p._isMe ? ' coin-shimmer' : '';
+        const myCorrect = p._isMe && p._isCorrect && score > 0 ? ' my-correct-coin' : '';
         const coinBadge = score > 0
-          ? `<div class="coin player-score-coin${coinShimmer}">${Math.min(score, 99)}</div>`
+          ? `<div class="coin player-score-coin${coinShimmer}${myCorrect}">${Math.min(score, 99)}</div>`
           : '';
         return `<div class="answer-response-row">
           <div class="ar-player">
@@ -1224,6 +1275,14 @@
                     if (arPlayers.length === 1) answerResponsesEl.classList.add('count-1');
                     else if (arPlayers.length === 2) answerResponsesEl.classList.add('count-2');
                     answerResponsesEl.classList.add('visible');
+                    if (meEntry._isCorrect) {
+                      const myCoin = answerResponsesEl.querySelector('.my-correct-coin');
+                      if (myCoin) {
+                        myCoin.classList.add('coin-pop');
+                        myCoin.addEventListener('animationend', () => myCoin.classList.add('coin-shimmer'), { once: true });
+                        launchConfetti();
+                      }
+                    }
                     if (shouldShowNextBtn) {
                       const gameId = new URLSearchParams(location.search).get('id');
                       if (gameId && !document.querySelector(`link[rel="prefetch"][data-next-prefetch]`)) {
