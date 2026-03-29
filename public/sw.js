@@ -1,5 +1,5 @@
-// v3 - stale-while-revalidate for static assets
-const CACHE = 'fjwf-static-v3';
+// v4 - stale-while-revalidate for static assets + game/dashboard HTML
+const CACHE = 'fjwf-static-v4';
 
 // Activate immediately without waiting for old tabs to close
 self.addEventListener('install', () => self.skipWaiting());
@@ -13,14 +13,21 @@ self.addEventListener('activate', event => {
   );
 });
 
+function shouldCache(url) {
+  if (url.origin !== self.location.origin) return false;
+  // Static assets
+  if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf|eot)$/i.test(url.pathname)) return true;
+  // Server-rendered pages (but not login)
+  if (url.pathname === '/dashboard' || url.pathname === '/game') return true;
+  return false;
+}
+
 // Stale-while-revalidate: serve from cache instantly, update cache in background
 self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-  // Only cache same-origin static assets
-  if (url.origin !== self.location.origin) return;
-  if (!/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf|eot|jpeg)$/i.test(url.pathname)) return;
+  if (!shouldCache(url)) return;
 
   event.respondWith(
     caches.open(CACHE).then(async cache => {
