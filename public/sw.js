@@ -1,5 +1,6 @@
-// v5 - stale-while-revalidate for static assets + dashboard HTML
-const CACHE = 'fjwf-static-v5';
+// v6 - stale-while-revalidate for static assets + dashboard/game HTML
+// game page is cached by path only (query string ignored)
+const CACHE = 'fjwf-static-v6';
 
 // Activate immediately without waiting for old tabs to close
 self.addEventListener('install', () => self.skipWaiting());
@@ -18,8 +19,14 @@ function shouldCache(url) {
   // Static assets
   if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf|eot)$/i.test(url.pathname)) return true;
   // Server-rendered pages (but not login)
-  if (url.pathname === '/dashboard') return true;
+  if (url.pathname === '/dashboard' || url.pathname === '/game') return true;
   return false;
+}
+
+// For /game, use path-only as cache key so all ?id=... share one entry
+function cacheKey(url) {
+  if (url.pathname === '/game') return new Request(url.origin + url.pathname);
+  return new Request(url.href);
 }
 
 // Stale-while-revalidate: serve from cache instantly, update cache in background
@@ -29,11 +36,13 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (!shouldCache(url)) return;
 
+  const key = cacheKey(url);
+
   event.respondWith(
     caches.open(CACHE).then(async cache => {
-      const cached = await cache.match(request);
+      const cached = await cache.match(key);
       const networkFetch = fetch(request).then(response => {
-        if (response.ok) cache.put(request, response.clone());
+        if (response.ok) cache.put(key, response.clone());
         return response;
       }).catch(() => null);
 
