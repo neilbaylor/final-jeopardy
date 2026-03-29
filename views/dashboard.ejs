@@ -1256,17 +1256,17 @@
         let cacheTimerFired = false;
         let pendingGames = null;
 
-        mePromise.then(() => {
-          // Delay varies by source: game→dashboard 380ms, login→dashboard 290ms, direct load 100ms
-          const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 380
-                           : document.documentElement.classList.contains('vt-from-login') ? 350
-                           : 100;
-          setTimeout(() => {
-            cacheTimerFired = true;
-            renderGames(pendingGames || cachedGames);
-            const fab = document.getElementById('new-game');
-            setTimeout(() => { fab.style.opacity = '1'; }, 600);
-          }, cacheDelay);
+        // Run mePromise and the delay timer in parallel so cacheDelay is always the
+        // minimum wait — previously /api/me network time padded this naturally, but
+        // now that it resolves instantly from SW cache we need to guarantee the delay.
+        const cacheDelay = document.documentElement.classList.contains('vt-from-game') ? 380
+                         : document.documentElement.classList.contains('vt-from-login') ? 350
+                         : 350;
+        Promise.all([mePromise, new Promise(res => setTimeout(res, cacheDelay))]).then(() => {
+          cacheTimerFired = true;
+          renderGames(pendingGames || cachedGames);
+          const fab = document.getElementById('new-game');
+          setTimeout(() => { fab.style.opacity = '1'; }, 600);
         });
         // Background refresh — new games get the green fade-in via new-row class
         fetch(`/api/games?userId=${encodeURIComponent(userId)}&test=1`)
