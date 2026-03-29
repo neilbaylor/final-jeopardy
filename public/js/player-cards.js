@@ -129,3 +129,16 @@ function buildPlayerCardHtml(p, opts) {
     </div>
   </div>`;
 }
+
+const toTitleCase = (() => {
+  const _rRe = /^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+  const _rv = {I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
+  const _rtn = s => { let n=0; for (let i=0;i<s.length;i++) { const c=_rv[s[i]],x=_rv[s[i+1]]; n+=c<x?-c:c; } return n; };
+  return str => str.toLowerCase()
+    .replace(/(?<!['\u2019])\b\w/g, c => c.toUpperCase())
+    .replace(/\b[IVXLCDMivxlcdm]{2,}\b/g, (m, offset) => {
+      const orig = str.slice(offset, offset + m.length);
+      const u = m.toUpperCase();
+      return /^[IVXLCDM]+$/.test(orig) && _rRe.test(u) && _rtn(u) <= 100 ? u : m;
+    });
+})();
