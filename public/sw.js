@@ -1,7 +1,7 @@
-// v8 - stale-while-revalidate for static assets + dashboard/game HTML
+// v9 - stale-while-revalidate for static assets + dashboard/game HTML
 //      cache-first (no revalidation) for /api/me
 //      game page keyed by path only (query string ignored)
-const CACHE = 'fjwf-static-v8';
+const CACHE = 'fjwf-static-v9';
 
 // Activate immediately without waiting for old tabs to close
 self.addEventListener('install', () => self.skipWaiting());
