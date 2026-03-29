@@ -2,7 +2,38 @@ const express = require('express');
 const db = require('../config/database');
 const natural = require('natural');
 const title = require('title').default;
+const webpush = require('web-push');
 const router = express.Router();
+
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    process.env.VAPID_MAILTO || 'mailto:admin@fjwf.today',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+}
+
+// Send a push notification to a single stored subscription; silently remove if expired/invalid
+async function sendPush(userId, payload) {
+  try {
+    const [[row]] = await db.query('SELECT subscription FROM push_subscriptions WHERE user_id = ?', [userId]);
+    if (!row) return;
+    await webpush.sendNotification(JSON.parse(row.subscription), JSON.stringify(payload));
+  } catch (err) {
+    if (err.statusCode === 410 || err.statusCode === 404) {
+      // Subscription expired or gone — clean it up
+      await db.query('DELETE FROM push_subscriptions WHERE user_id = ?', [userId]).catch(() => {});
+    }
+  }
+}
+
+function pushDisplayName(displayName) {
+  const parts = (displayName || '').trim().split(' ');
+  const first = parts[0] || '';
+  if (first.length <= 6) return first;
+  const last = parts[parts.length - 1] || '';
+  return (first[0] + (last[0] || '')).toUpperCase();
+}
 
 const _ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
                'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
@@ -252,6 +283,23 @@ router.get('/api/me', async (req, res) => {
   }
 });
 
+// API: save or update push subscription for a user
+router.post('/api/push-subscription', async (req, res) => {
+  const { userId, subscription } = req.body;
+  if (!userId || !subscription) return res.status(400).json({ error: 'Missing fields' });
+  try {
+    await db.query(
+      `INSERT INTO push_subscriptions (user_id, subscription)
+       VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE subscription = VALUES(subscription)`,
+      [Number(userId), JSON.stringify(subscription)]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // API: fetch all users except the requesting user
 router.get('/api/users', async (req, res) => {
   const { userId } = req.query;
@@ -354,6 +402,27 @@ router.post('/api/games', async (req, res) => {
 
     await conn.commit();
     res.json({ gameId });
+
+    // Send push notifications to all players except the creator (fire-and-forget)
+    if (process.env.VAPID_PUBLIC_KEY) {
+      try {
+        const [[creator]] = await db.query('SELECT display_name FROM users WHERE id = ?', [Number(userId)]);
+        const creatorName = pushDisplayName(creator?.display_name || '');
+        const friendCount = allUserIds.length - 2; // total players minus creator minus recipient
+        const withOthers = friendCount > 0 ? ` with ${friendCount} other${friendCount > 1 ? 's' : ''}` : '';
+        const body = `${creatorName} started a new game — tap to answer your first question${withOthers}`;
+        const notifPayload = {
+          title: 'New Final Jeopardy!',
+          body,
+          url: `/game?id=${gameId}`,
+        };
+        for (const uid of friendIds.map(Number)) {
+          sendPush(uid, notifPayload);
+        }
+      } catch (err) {
+        console.error('Push notification error:', err);
+      }
+    }
   } catch (err) {
     await conn.rollback();
     console.error('Create game error:', err);

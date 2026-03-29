@@ -359,6 +359,35 @@
       navigator.serviceWorker.register('/sw.js');
     }
 
+    // On Let's Play click: request push permission in PWA mode, then navigate
+    document.getElementById('btn-play').addEventListener('click', async function(e) {
+      // Only request push permission in standalone (Add to Home Screen) PWA mode
+      if (!window.navigator.standalone) return; // let the default href navigate proceed
+      e.preventDefault();
+      const userId = localStorage.getItem('userId');
+      try {
+        if (userId && 'Notification' in window && 'PushManager' in window && Notification.permission === 'default') {
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            const sw = await navigator.serviceWorker.ready;
+            const sub = await sw.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: '<%= process.env.VAPID_PUBLIC_KEY || "" %>',
+            });
+            fetch('/api/push-subscription', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId, subscription: sub }),
+            }).catch(() => {});
+          }
+        }
+      } catch (err) {
+        // Permission denied or subscribe failed — proceed to navigate anyway
+      }
+      sessionStorage.setItem('vt-from-login', '1');
+      location.href = '/dashboard';
+    });
+
     // After OAuth redirect: store userId in localStorage, show welcome, then navigate
     const params = new URLSearchParams(location.search);
     const uid = params.get('uid');

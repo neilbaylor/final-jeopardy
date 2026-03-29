@@ -1,7 +1,8 @@
-// v12 - stale-while-revalidate for static assets + dashboard/game HTML
+// v13 - stale-while-revalidate for static assets + dashboard/game HTML
 //       cache-first (no revalidation) for /api/me
 //       game page keyed by path only (query string ignored)
-const CACHE = 'fjwf-static-v12';
+//       push notification support
+const CACHE = 'fjwf-static-v13';
 
 // Activate immediately without waiting for old tabs to close
 self.addEventListener('install', () => self.skipWaiting());
@@ -81,6 +82,36 @@ self.addEventListener('fetch', event => {
         return cached;
       }
       return networkFetch;
+    })
+  );
+});
+
+// Push notification received
+self.addEventListener('push', event => {
+  const data = event.data ? event.data.json() : {};
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Final Jeopardy!', {
+      body: data.body || '',
+      icon: '/images/apple-touch-icon.png',
+      badge: '/images/favicon-32x32.png',
+      data: { url: data.url || '/dashboard' },
+    })
+  );
+});
+
+// Notification tapped — open or focus the game/dashboard tab
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = event.notification.data?.url || '/dashboard';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const client of list) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(target);
+          return client.focus();
+        }
+      }
+      return clients.openWindow(target);
     })
   );
 });
