@@ -3,6 +3,17 @@ const db = require('../config/database');
 const { pushDisplayName, sendPush } = require('../utils/push');
 
 async function advanceStaleQuestions() {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS question_reminders (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      game_id INT NOT NULL,
+      game_question_id INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY uniq_user_question (user_id, game_question_id),
+      INDEX idx_created_at (created_at)
+    )
+  `);
   const conn = await db.getConnection();
   try {
     // Find all games where the latest question's asked_at is more than 24 hours ago
@@ -18,6 +29,23 @@ async function advanceStaleQuestions() {
     );
 
     console.log(`Found ${staleGames.length} stale game(s)`);
+
+    // Check 90-minute reminders
+    const [reminders] = await conn.execute(
+      `SELECT qr.user_id, qr.game_id, qr.game_question_id,
+              ga.id AS answered
+       FROM question_reminders qr
+       LEFT JOIN game_answers ga ON ga.user_id = qr.user_id AND ga.game_question_id = qr.game_question_id
+       WHERE qr.created_at < NOW() - INTERVAL 90 MINUTE`
+    );
+    console.log(`Found ${reminders.length} expired reminder(s)`);
+    if (reminders.length > 0) {
+      const sends = reminders
+        .filter(r => !r.answered)
+        .map(r => sendPush(r.user_id, { title: "Don't Forget!", body: 'You have a new question waiting. Tap to answer.', url: `/game?id=${r.game_id}` }, db).catch(() => {}));
+      await Promise.all(sends);
+      await conn.execute('DELETE FROM question_reminders WHERE created_at < NOW() - INTERVAL 90 MINUTE');
+    }
 
     for (const { game_id } of staleGames) {
       const [[nextQuestion]] = await conn.execute(

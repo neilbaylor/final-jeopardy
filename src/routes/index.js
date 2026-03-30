@@ -397,13 +397,20 @@ router.post('/api/games', async (req, res) => {
       await conn.rollback();
       return res.status(500).json({ error: 'No questions available' });
     }
-    await conn.query(
+    const [gqResult] = await conn.query(
       'INSERT INTO game_questions (game_id, question_id, asked_at) VALUES (?, ?, NOW())',
       [gameId, question.id]
     );
+    const gameQuestionId = gqResult.insertId;
 
     await conn.commit();
     res.json({ gameId });
+
+    // Remind the creator in 90 min if they haven't answered their first question
+    db.query(
+      'INSERT IGNORE INTO question_reminders (user_id, game_id, game_question_id) VALUES (?, ?, ?)',
+      [Number(userId), gameId, gameQuestionId]
+    ).catch(() => {});
 
     // Send push notifications to all players except the creator (fire-and-forget)
     console.log('[push] VAPID configured:', !!process.env.VAPID_PUBLIC_KEY);
@@ -655,15 +662,23 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
         [gameId]
       );
       if (nextQuestion) {
-        await conn.execute(
+        const [newGqResult] = await conn.execute(
           'INSERT INTO game_questions (game_id, question_id, asked_at) VALUES (?, ?, NOW())',
           [gameId, nextQuestion.id]
         );
-        newQuestionCreated = true;
+        newQuestionCreated = newGqResult.insertId;
       }
     }
 
     await conn.commit();
+
+    // Remind the answerer in 90 min if they haven't answered the new question
+    if (newQuestionCreated) {
+      db.query(
+        'INSERT IGNORE INTO question_reminders (user_id, game_id, game_question_id) VALUES (?, ?, ?)',
+        [Number(playerId), gameId, newQuestionCreated]
+      ).catch(() => {});
+    }
 
     if (newQuestionCreated && process.env.VAPID_PUBLIC_KEY) {
       const answererId = Number(playerId);
