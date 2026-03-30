@@ -679,6 +679,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
       'SELECT COUNT(*) AS total FROM game_users WHERE game_id = ?',
       [gameId]
     );
+    let newQuestionCreated = false;
     if (answers.length >= total) {
       const [[nextQuestion]] = await conn.execute(
         `SELECT id FROM questions
@@ -691,10 +692,36 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
           'INSERT INTO game_questions (game_id, question_id, asked_at) VALUES (?, ?, NOW())',
           [gameId, nextQuestion.id]
         );
+        newQuestionCreated = true;
       }
     }
 
     await conn.commit();
+
+    if (newQuestionCreated && process.env.VAPID_PUBLIC_KEY) {
+      const answererId = Number(playerId);
+      const answererCorrect = correct;
+      const gamePlayerCount = Number(total);
+      setTimeout(async () => {
+        try {
+          const [[answerer]] = await db.query('SELECT display_name FROM users WHERE id = ?', [answererId]);
+          const answererName = pushDisplayName(answerer?.display_name || '');
+          const result = answererCorrect ? 'correctly' : 'incorrectly';
+          const othersCount = gamePlayerCount - 2;
+          const withOthers = othersCount > 0 ? ` with ${othersCount} other${othersCount > 1 ? 's' : ''}` : '';
+          const body = `${answererName} just answered ${result}. Tap here for your new question${withOthers}`;
+          const [gameUsers] = await db.query(
+            'SELECT user_id FROM game_users WHERE game_id = ? AND user_id != ?',
+            [gameId, answererId]
+          );
+          for (const { user_id } of gameUsers) {
+            sendPush(user_id, { title: 'New Question', body, url: `/game?id=${gameId}` });
+          }
+        } catch (err) {
+          console.error('[push] new question notify error:', err.message);
+        }
+      }, 0);
+    }
 
     return res.json(answers);
   } catch (err) {
