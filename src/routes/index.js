@@ -446,7 +446,7 @@ router.post('/api/games', async (req, res) => {
         const creatorName = pushDisplayName(creator?.display_name || '');
         const friendCount = allUserIds.length - 2;
         const withOthers = friendCount > 0 ? ` with ${friendCount} other friend${friendCount > 1 ? 's' : ''}` : '';
-        const body = `${creatorName} started a new game — tap to answer your first question${withOthers}`;
+        const body = `${creatorName} started a new game. Tap to answer your first question${withOthers}`;
         const notifPayload = { title: 'New Game Created', body, url: `/game?id=${gameId}` };
         setTimeout(() => {
           for (const uid of friendIds.map(Number)) {
