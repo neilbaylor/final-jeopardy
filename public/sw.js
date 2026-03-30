@@ -92,7 +92,7 @@ self.addEventListener('push', event => {
   event.waitUntil(
     self.registration.showNotification(data.title || 'Final Jeopardy!', {
       body: data.body || '',
-      icon: '/images/apple-touch-icon.png',
+      icon: data.icon || '/images/apple-touch-icon.png',
       badge: '/images/favicon-32x32.png',
       data: { url: data.url || '/dashboard' },
     })
