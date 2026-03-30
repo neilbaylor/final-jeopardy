@@ -1,5 +1,6 @@
 require('dotenv').config();
 const db = require('../config/database');
+const { pushDisplayName, sendPush } = require('../utils/push');
 
 async function advanceStaleQuestions() {
   const conn = await db.getConnection();
@@ -31,6 +32,22 @@ async function advanceStaleQuestions() {
           [game_id, nextQuestion.id]
         );
         console.log(`Advanced game ${game_id} to question ${nextQuestion.id}`);
+
+        if (process.env.VAPID_PUBLIC_KEY) {
+          const [players] = await conn.execute(
+            'SELECT u.id, u.display_name FROM game_users gu JOIN users u ON u.id = gu.user_id WHERE gu.game_id = ?',
+            [game_id]
+          );
+          const othersCount = players.length - 2;
+          for (const player of players) {
+            const others = players.filter(p => p.id !== player.id);
+            const randomFriend = others[Math.floor(Math.random() * others.length)];
+            const friendName = pushDisplayName(randomFriend?.display_name || '');
+            const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
+            const body = `Tap to answer the next question with your friend ${friendName}${withOthers}`;
+            sendPush(player.id, { title: 'New Question', body, url: `/game?id=${game_id}` }, db).catch(() => {});
+          }
+        }
       } else {
         console.log(`Game ${game_id} has no remaining questions`);
       }
