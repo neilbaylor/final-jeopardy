@@ -706,10 +706,11 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
         try {
           const [[answerer]] = await db.query('SELECT display_name, avatar_url FROM users WHERE id = ?', [answererId]);
           const answererName = pushDisplayName(answerer?.display_name || '');
-          const result = answererCorrect ? 'correctly' : 'incorrectly';
+          const result = answererCorrect ? 'Correctly' : 'Incorrectly';
+          const resultPunct = answererCorrect ? '!' : '.';
           const othersCount = gamePlayerCount - 2;
           const withOthers = othersCount > 0 ? ` with ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
-          const body = `${answererName} just answered ${result}. Tap to answer your new question${withOthers}`;
+          const body = `${answererName} just answered ${result}${resultPunct} Tap to answer your new question${withOthers}`;
           const otherUserIds = answers.filter(a => a.user_id !== answererId).map(a => a.user_id);
           for (const uid of otherUserIds) {
             sendPush(uid, { title: 'New Question', body, url: `/game?id=${gameId}`, icon: answerer?.avatar_url || null });
