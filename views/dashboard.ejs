@@ -1226,22 +1226,24 @@
       } catch { return null; }
     }
     let currentUser = null;
-    // Silently register push subscription in PWA mode on every dashboard load
+    // Register push subscription once if not already subscribed
     const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
     if (isPWA && 'Notification' in window && 'PushManager' in window && Notification.permission === 'granted') {
-      navigator.serviceWorker.ready.then(sw => sw.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: '<%= process.env.VAPID_PUBLIC_KEY || "" %>',
-      })).then(sub => {
-        const uid = localStorage.getItem('userId');
-        if (!uid) return;
-        console.log('[push] dashboard: posting subscription for userId:', uid);
-        fetch('/api/push-subscription', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: uid, subscription: sub }),
-        }).then(r => console.log('[push] dashboard: server response:', r.status)).catch(() => {});
-      }).catch(() => {});
+      navigator.serviceWorker.ready.then(sw => sw.pushManager.getSubscription().then(existing => {
+        if (existing) return; // already subscribed, DB already has it
+        return sw.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: '<%= process.env.VAPID_PUBLIC_KEY || "" %>',
+        }).then(sub => {
+          const uid = localStorage.getItem('userId');
+          if (!uid) return;
+          fetch('/api/push-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: uid, subscription: sub }),
+          }).catch(() => {});
+        });
+      })).catch(() => {});
     }
 
     if (!userId) {
