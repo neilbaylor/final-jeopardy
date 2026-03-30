@@ -1226,6 +1226,23 @@
       } catch { return null; }
     }
     let currentUser = null;
+    // Silently register push subscription in PWA mode on every dashboard load
+    if (window.navigator.standalone && 'Notification' in window && 'PushManager' in window && Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then(sw => sw.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: '<%= process.env.VAPID_PUBLIC_KEY || "" %>',
+      })).then(sub => {
+        const uid = localStorage.getItem('userId');
+        if (!uid) return;
+        console.log('[push] dashboard: posting subscription for userId:', uid);
+        fetch('/api/push-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: uid, subscription: sub }),
+        }).then(r => console.log('[push] dashboard: server response:', r.status)).catch(() => {});
+      }).catch(() => {});
+    }
+
     if (!userId) {
       location.replace('/');
     } else {

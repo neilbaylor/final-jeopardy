@@ -345,8 +345,8 @@
       }
     });
 
-    // Disable Google sign-in button after click to prevent double-taps
-    document.getElementById('btn-google').addEventListener('click', function(e) {
+    // Disable Google sign-in button after click to prevent double-taps; request push permission first in PWA
+    document.getElementById('btn-google').addEventListener('click', async function(e) {
       if (this.classList.contains('btn-clicked')) { e.preventDefault(); return; }
       this.classList.add('btn-clicked');
       this.style.opacity = '0.5';
@@ -354,43 +354,19 @@
       const spin = document.createElement('span');
       spin.className = 'btn-google-spin';
       this.appendChild(spin);
+      if (window.navigator.standalone && 'Notification' in window && Notification.permission === 'default') {
+        e.preventDefault();
+        try { await Notification.requestPermission(); } catch {}
+        location.href = '/auth/google';
+      }
     });
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js');
     }
 
-    // On Let's Play click: request push permission in PWA mode, then navigate
-    document.getElementById('btn-play').addEventListener('click', async function(e) {
-      // Only request push permission in standalone (Add to Home Screen) PWA mode
-      if (!window.navigator.standalone) return; // let the default href navigate proceed
-      e.preventDefault();
-      const userId = localStorage.getItem('userId');
-      console.log('[push] userId:', userId, 'permission:', Notification.permission, 'standalone:', window.navigator.standalone);
-      try {
-        if (userId && 'Notification' in window && 'PushManager' in window && Notification.permission !== 'denied') {
-          if (Notification.permission === 'default') {
-            await Notification.requestPermission();
-          }
-          if (Notification.permission === 'granted') {
-            const sw = await navigator.serviceWorker.ready;
-            console.log('[push] subscribing...');
-            const sub = await sw.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: '<%= process.env.VAPID_PUBLIC_KEY || "" %>',
-            });
-            console.log('[push] subscribed, posting to server...');
-            fetch('/api/push-subscription', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId, subscription: sub }),
-            }).then(r => console.log('[push] server response:', r.status)).catch(err => console.error('[push] fetch error:', err));
-          }
-        }
-      } catch (err) {
-        console.error('[push] error:', err);
-      }
+    // On Let's Play click: set transition hint and navigate
+    document.getElementById('btn-play').addEventListener('click', function() {
       sessionStorage.setItem('vt-from-login', '1');
-      location.href = '/dashboard';
     });
 
     // After OAuth redirect: store userId in localStorage, show welcome, then navigate
