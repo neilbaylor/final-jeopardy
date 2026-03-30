@@ -442,12 +442,12 @@ router.post('/api/games', async (req, res) => {
     console.log('[push] VAPID configured:', !!process.env.VAPID_PUBLIC_KEY);
     if (process.env.VAPID_PUBLIC_KEY) {
       try {
-        const [[creator]] = await db.query('SELECT display_name FROM users WHERE id = ?', [Number(userId)]);
+        const [[creator]] = await db.query('SELECT display_name, avatar_url FROM users WHERE id = ?', [Number(userId)]);
         const creatorName = pushDisplayName(creator?.display_name || '');
         const friendCount = allUserIds.length - 2;
         const withOthers = friendCount > 0 ? ` with ${friendCount} other friend${friendCount > 1 ? 's' : ''}` : '';
         const body = `${creatorName} started a new game. Tap to answer your first question${withOthers}`;
-        const notifPayload = { title: 'New Game Created', body, url: `/game?id=${gameId}` };
+        const notifPayload = { title: 'New Game Created', body, url: `/game?id=${gameId}`, image: creator?.avatar_url || null };
         setTimeout(() => {
           for (const uid of friendIds.map(Number)) {
             sendPush(uid, notifPayload);
@@ -704,7 +704,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
       const gamePlayerCount = Number(total);
       setTimeout(async () => {
         try {
-          const [[answerer]] = await db.query('SELECT display_name FROM users WHERE id = ?', [answererId]);
+          const [[answerer]] = await db.query('SELECT display_name, avatar_url FROM users WHERE id = ?', [answererId]);
           const answererName = pushDisplayName(answerer?.display_name || '');
           const result = answererCorrect ? 'Correctly' : 'Incorrectly';
           const resultPunct = answererCorrect ? '!' : '.';
@@ -713,7 +713,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
           const body = `${answererName} just answered ${result}${resultPunct} Tap to answer your new question${withOthers}`;
           const otherUserIds = answers.filter(a => a.user_id !== answererId).map(a => a.user_id);
           for (const uid of otherUserIds) {
-            sendPush(uid, { title: 'New Question', body, url: `/game?id=${gameId}` });
+            sendPush(uid, { title: 'New Question', body, url: `/game?id=${gameId}`, image: answerer?.avatar_url || null });
           }
         } catch (err) {
           console.error('[push] new question notify error:', err.message);
