@@ -448,10 +448,11 @@ router.post('/api/games', async (req, res) => {
         const withOthers = friendCount > 0 ? ` with ${friendCount} other${friendCount > 1 ? 's' : ''}` : '';
         const body = `${creatorName} started a new game — tap to answer your first question${withOthers}`;
         const notifPayload = { title: 'New Game Created', body, url: `/game?id=${gameId}` };
-        console.log('[push] sending to friend ids:', friendIds);
-        for (const uid of friendIds.map(Number)) {
-          sendPush(uid, notifPayload);
-        }
+        setTimeout(() => {
+          for (const uid of friendIds.map(Number)) {
+            sendPush(uid, notifPayload);
+          }
+        }, 0);
       } catch (err) {
         console.error('[push] error:', err);
       }
