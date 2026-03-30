@@ -365,6 +365,7 @@
       if (!window.navigator.standalone) return; // let the default href navigate proceed
       e.preventDefault();
       const userId = localStorage.getItem('userId');
+      console.log('[push] userId:', userId, 'permission:', Notification.permission, 'standalone:', window.navigator.standalone);
       try {
         if (userId && 'Notification' in window && 'PushManager' in window && Notification.permission !== 'denied') {
           if (Notification.permission === 'default') {
@@ -372,19 +373,21 @@
           }
           if (Notification.permission === 'granted') {
             const sw = await navigator.serviceWorker.ready;
+            console.log('[push] subscribing...');
             const sub = await sw.pushManager.subscribe({
               userVisibleOnly: true,
               applicationServerKey: '<%= process.env.VAPID_PUBLIC_KEY || "" %>',
             });
+            console.log('[push] subscribed, posting to server...');
             fetch('/api/push-subscription', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId, subscription: sub }),
-            }).catch(() => {});
+            }).then(r => console.log('[push] server response:', r.status)).catch(err => console.error('[push] fetch error:', err));
           }
         }
       } catch (err) {
-        // Permission denied or subscribe failed — proceed to navigate anyway
+        console.error('[push] error:', err);
       }
       sessionStorage.setItem('vt-from-login', '1');
       location.href = '/dashboard';

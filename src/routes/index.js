@@ -289,6 +289,7 @@ router.get('/api/me', async (req, res) => {
 // API: save or update push subscription for a user
 router.post('/api/push-subscription', async (req, res) => {
   const { userId, subscription } = req.body;
+  console.log('[push] POST /api/push-subscription userId:', userId, 'hasSub:', !!subscription);
   if (!userId || !subscription) return res.status(400).json({ error: 'Missing fields' });
   try {
     await db.query(
@@ -297,8 +298,10 @@ router.post('/api/push-subscription', async (req, res) => {
        ON DUPLICATE KEY UPDATE subscription = VALUES(subscription)`,
       [Number(userId), JSON.stringify(subscription)]
     );
+    console.log('[push] subscription saved for userId:', userId);
     res.json({ ok: true });
   } catch (err) {
+    console.error('[push] DB error saving subscription:', err.message);
     res.status(500).json({ error: 'Database error' });
   }
 });
