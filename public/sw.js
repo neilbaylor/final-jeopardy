@@ -93,7 +93,6 @@ self.addEventListener('push', event => {
     self.registration.showNotification(data.title || 'Final Jeopardy!', {
       body: data.body || '',
       icon: '/images/apple-touch-icon.png',
-      image: data.image || undefined,
       data: { url: data.url || '/dashboard' },
     })
   );
