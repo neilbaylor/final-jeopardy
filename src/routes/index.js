@@ -710,12 +710,9 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
           const othersCount = gamePlayerCount - 2;
           const withOthers = othersCount > 0 ? ` with ${othersCount} other${othersCount > 1 ? 's' : ''}` : '';
           const body = `${answererName} just answered ${result}. Tap here for your new question${withOthers}`;
-          const [gameUsers] = await db.query(
-            'SELECT user_id FROM game_users WHERE game_id = ? AND user_id != ?',
-            [gameId, answererId]
-          );
-          for (const { user_id } of gameUsers) {
-            sendPush(user_id, { title: 'New Question', body, url: `/game?id=${gameId}` });
+          const otherUserIds = answers.filter(a => a.user_id !== answererId).map(a => a.user_id);
+          for (const uid of otherUserIds) {
+            sendPush(uid, { title: 'New Question', body, url: `/game?id=${gameId}` });
           }
         } catch (err) {
           console.error('[push] new question notify error:', err.message);
