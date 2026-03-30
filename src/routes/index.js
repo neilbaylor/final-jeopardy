@@ -445,7 +445,7 @@ router.post('/api/games', async (req, res) => {
         const [[creator]] = await db.query('SELECT display_name FROM users WHERE id = ?', [Number(userId)]);
         const creatorName = pushDisplayName(creator?.display_name || '');
         const friendCount = allUserIds.length - 2;
-        const withOthers = friendCount > 0 ? ` with ${friendCount} other${friendCount > 1 ? 's' : ''}` : '';
+        const withOthers = friendCount > 0 ? ` with ${friendCount} other friend${friendCount > 1 ? 's' : ''}` : '';
         const body = `${creatorName} started a new game — tap to answer your first question${withOthers}`;
         const notifPayload = { title: 'New Game Created', body, url: `/game?id=${gameId}` };
         setTimeout(() => {
@@ -708,7 +708,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
           const answererName = pushDisplayName(answerer?.display_name || '');
           const result = answererCorrect ? 'correctly' : 'incorrectly';
           const othersCount = gamePlayerCount - 2;
-          const withOthers = othersCount > 0 ? ` with ${othersCount} other${othersCount > 1 ? 's' : ''}` : '';
+          const withOthers = othersCount > 0 ? ` with ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
           const body = `${answererName} just answered ${result}. Tap here for your new question${withOthers}`;
           const otherUserIds = answers.filter(a => a.user_id !== answererId).map(a => a.user_id);
           for (const uid of otherUserIds) {
