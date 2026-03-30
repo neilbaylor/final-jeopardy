@@ -365,8 +365,16 @@
       navigator.serviceWorker.register('/sw.js');
     }
 
-    // On Let's Play click: set transition hint and navigate
-    document.getElementById('btn-play').addEventListener('click', function() {
+    // On Let's Play click: request push permission if not yet granted, then navigate
+    document.getElementById('btn-play').addEventListener('click', async function(e) {
+      const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      if (isPWA && 'Notification' in window && Notification.permission === 'default') {
+        e.preventDefault();
+        try { await Notification.requestPermission(); } catch {}
+        sessionStorage.setItem('vt-from-login', '1');
+        location.href = '/dashboard';
+        return;
+      }
       sessionStorage.setItem('vt-from-login', '1');
     });
 
