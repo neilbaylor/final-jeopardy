@@ -31,6 +31,8 @@ function romanToNum(s) {
 }
 
 function normalizeAnswer(str) {
+  str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  str = str.replace(/['\u2018\u2019]/g, '');
   str = str.replace(/\b([IVXLCDMivxlcdm]+)\b/g, (m) => {
     const u = m.toUpperCase();
     if (!_romanRe.test(u)) return m;
@@ -43,7 +45,7 @@ function normalizeAnswer(str) {
     .replace(/\band\b/g, ' ')
     .replace(/\b(\d+)(?:st|nd|rd|th)\b/g, '$1')
     .replace(/\b(\d+)\b/g, (_, n) => numToWords(parseInt(n, 10)))
-    .replace(/['']/g, '')
+    .replace(/['\u2018\u2019]/g, '') // strip apostrophes (ASCII + smart quotes)
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\b(the|a|an)\b/g, ' ')
     .replace(/\s+/g, ' ')
@@ -428,6 +430,14 @@ const tests = [
   { correct: 'Neil Taylor or Joe Ross', user: 'Ross',              expect: true,  note: '"X or Y" names — last name of second option' },
   { correct: 'Neil Taylor or Joe Ross', user: 'Neil Taylor',       expect: true,  note: '"X or Y" names — full first option accepted' },
   { correct: 'Neil Taylor or Joe Ross', user: 'Smith',             expect: false, note: '"X or Y" names — wrong last name rejected' },
+
+  // Diacritic normalization
+  { correct: "CôTe D'ivoire",           user: "Cote d'Ivoire",     expect: true,  note: 'diacritics: ô matches o, case-insensitive' },
+  { correct: "CôTe D'ivoire",           user: 'cote Divoire',      expect: true,  note: 'diacritics: ô matches o, apostrophe dropped' },
+  { correct: "Côte d'Ivoire",           user: 'Ivory Coast',       expect: false, note: 'diacritics: wrong answer still rejected' },
+  { correct: 'São Paulo',               user: 'Sao Paulo',         expect: true,  note: 'diacritics: ã matches a' },
+  { correct: 'Björk',                   user: 'Bjork',             expect: true,  note: 'diacritics: ö matches o' },
+  { correct: 'Réunion',                 user: 'Reunion',           expect: true,  note: 'diacritics: é matches e' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

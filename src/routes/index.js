@@ -69,6 +69,10 @@ function romanToNum(s) {
 }
 
 function normalizeAnswer(str) {
+  // Strip diacritics and apostrophes first so they don't create spurious word
+  // boundaries that cause single letters like C/D to be misread as Roman numerals
+  str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  str = str.replace(/['\u2018\u2019]/g, '');
   // Convert Roman numerals (all-uppercase tokens) before lowercasing
   str = str.replace(/\b([IVXLCDMivxlcdm]+)\b/g, (m) => {
     const u = m.toUpperCase();
@@ -78,13 +82,12 @@ function normalizeAnswer(str) {
   });
 
   return str
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip diacritics: ô→o, é→e, etc.
     .toLowerCase()
     .replace(/[&+,]/g, ' ')        // & + , → space
     .replace(/\band\b/g, ' ')      // word "and" → space
     .replace(/\b(\d+)(?:st|nd|rd|th)\b/g, '$1') // strip ordinal suffixes: 8th → 8
     .replace(/\b(\d+)\b/g, (_, n) => numToWords(parseInt(n, 10))) // 7 → seven
-    .replace(/['']/g, '')          // strip apostrophes
+    .replace(/['\u2018\u2019]/g, '') // strip apostrophes (ASCII + smart quotes)
     .replace(/[^a-z0-9\s]/g, ' ') // non-alphanumeric → space
     .replace(/\b(the|a|an)\b/g, ' ')
     .replace(/\s+/g, ' ')
