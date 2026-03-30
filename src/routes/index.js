@@ -325,7 +325,7 @@ router.post('/api/games', async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   if (friendIds.length >= 5) {
-    return res.status(409).json({ error: 'There is a max of 6 players per game' });
+    return res.status(409).json({ error: 'There is a max of 5 players per game' });
   }
 
   const allUserIds = [Number(userId), ...friendIds.map(Number)];

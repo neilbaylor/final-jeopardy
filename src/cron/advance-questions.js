@@ -35,18 +35,20 @@ async function advanceStaleQuestions() {
 
         if (process.env.VAPID_PUBLIC_KEY) {
           const [players] = await conn.execute(
-            'SELECT u.id, u.display_name FROM game_users gu JOIN users u ON u.id = gu.user_id WHERE gu.game_id = ?',
+            'SELECT u.id, u.display_name, u.avatar_url FROM game_users gu JOIN users u ON u.id = gu.user_id WHERE gu.game_id = ?',
             [game_id]
           );
           const othersCount = players.length - 2;
+          const sends = [];
           for (const player of players) {
             const others = players.filter(p => p.id !== player.id);
             const randomFriend = others[Math.floor(Math.random() * others.length)];
             const friendName = pushDisplayName(randomFriend?.display_name || '');
             const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
             const body = `Tap to answer the next question with your friend ${friendName}${withOthers}`;
-            sendPush(player.id, { title: 'New Question', body, url: `/game?id=${game_id}` }, db).catch(() => {});
+            sends.push(sendPush(player.id, { title: 'New Question', body, url: `/game?id=${game_id}`, icon: randomFriend?.avatar_url || undefined }, db).catch(() => {}));
           }
+          await Promise.all(sends);
         }
       } else {
         console.log(`Game ${game_id} has no remaining questions`);
