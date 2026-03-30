@@ -78,6 +78,7 @@ function normalizeAnswer(str) {
   });
 
   return str
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip diacritics: ô→o, é→e, etc.
     .toLowerCase()
     .replace(/[&+,]/g, ' ')        // & + , → space
     .replace(/\band\b/g, ' ')      // word "and" → space

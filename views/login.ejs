@@ -354,7 +354,8 @@
       const spin = document.createElement('span');
       spin.className = 'btn-google-spin';
       this.appendChild(spin);
-      if (window.navigator.standalone && 'Notification' in window && Notification.permission === 'default') {
+      const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      if (isPWA && 'Notification' in window && Notification.permission === 'default') {
         e.preventDefault();
         try { await Notification.requestPermission(); } catch {}
         location.href = '/auth/google';
