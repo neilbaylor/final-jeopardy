@@ -41,7 +41,7 @@ async function advanceStaleQuestions() {
           const friendName = pushDisplayName(randomFriend?.display_name || '');
           const othersCount = players.length - 2;
           const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
-          const body = `Tap to answer the next question with your friend ${friendName}${withOthers}`;
+          const body = `Tap to answer your new question with your friend ${friendName}${withOthers}`;
           return sendPush(r.user_id, { title: 'New Question', body, url: `/game?id=${r.game_id}`, icon: randomFriend?.avatar_url || undefined }, db).catch(() => {});
         });
       await Promise.all(sends);
@@ -74,7 +74,7 @@ async function advanceStaleQuestions() {
             const randomFriend = others[Math.floor(Math.random() * others.length)];
             const friendName = pushDisplayName(randomFriend?.display_name || '');
             const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
-            const body = `Tap to answer the next question with your friend ${friendName}${withOthers}`;
+            const body = `Tap to answer your new question with your friend ${friendName}${withOthers}`;
             sends.push(sendPush(player.id, { title: 'New Question', body, url: `/game?id=${game_id}`, icon: randomFriend?.avatar_url || undefined }, db).catch(() => {}));
           }
           await Promise.all(sends);
