@@ -447,7 +447,7 @@ router.post('/api/games', async (req, res) => {
         const friendCount = allUserIds.length - 2;
         const withOthers = friendCount > 0 ? ` with ${friendCount} other${friendCount > 1 ? 's' : ''}` : '';
         const body = `${creatorName} started a new game — tap to answer your first question${withOthers}`;
-        const notifPayload = { title: 'New Final Jeopardy!', body, url: `/game?id=${gameId}` };
+        const notifPayload = { title: 'New Game Created', body, url: `/game?id=${gameId}` };
         console.log('[push] sending to friend ids:', friendIds);
         for (const uid of friendIds.map(Number)) {
           sendPush(uid, notifPayload);
