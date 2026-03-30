@@ -31,7 +31,19 @@ async function advanceStaleQuestions() {
     if (reminders.length > 0) {
       const sends = reminders
         .filter(r => !r.answered)
-        .map(r => sendPush(r.user_id, { title: "Don't Forget!", body: 'You have a new question waiting. Tap to answer.', url: `/game?id=${r.game_id}` }, db).catch(() => {}));
+        .map(async r => {
+          const [players] = await conn.execute(
+            'SELECT u.id, u.display_name, u.avatar_url FROM game_users gu JOIN users u ON u.id = gu.user_id WHERE gu.game_id = ?',
+            [r.game_id]
+          );
+          const others = players.filter(p => p.id !== r.user_id);
+          const randomFriend = others[Math.floor(Math.random() * others.length)];
+          const friendName = pushDisplayName(randomFriend?.display_name || '');
+          const othersCount = players.length - 2;
+          const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
+          const body = `Tap to answer the next question with your friend ${friendName}${withOthers}`;
+          return sendPush(r.user_id, { title: 'New Question', body, url: `/game?id=${r.game_id}`, icon: randomFriend?.avatar_url || undefined }, db).catch(() => {});
+        });
       await Promise.all(sends);
       await conn.execute('DELETE FROM question_reminders WHERE created_at < NOW() - INTERVAL 90 MINUTE');
     }
