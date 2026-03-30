@@ -710,3 +710,4 @@ router.delete('/api/games/:gameId', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.isAnswerCorrect = isAnswerCorrect;
