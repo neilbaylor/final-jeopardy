@@ -3,17 +3,6 @@ const db = require('../config/database');
 const { pushDisplayName, sendPush } = require('../utils/push');
 
 async function advanceStaleQuestions() {
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS question_reminders (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      user_id INT NOT NULL,
-      game_id INT NOT NULL,
-      game_question_id INT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE KEY uniq_user_question (user_id, game_question_id),
-      INDEX idx_created_at (created_at)
-    )
-  `);
   const conn = await db.getConnection();
   try {
     // Find all games where the latest question's asked_at is more than 24 hours ago
