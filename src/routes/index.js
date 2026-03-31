@@ -620,23 +620,20 @@ router.get('/api/stats', async (req, res) => {
       [Number(userId)]
     );
 
-    let longestStreakOverall = 0, longestStreakSingleGame = 0;
-    let currentStreak = 0, currentGameStreak = 0, lastGameId = null;
+    let longestStreakOverall = 0, currentStreak = 0;
+    const gameCurrent = new Map(), gameLongest = new Map();
     for (const a of answers) {
-      if (a.game_id !== lastGameId) {
-        longestStreakSingleGame = Math.max(longestStreakSingleGame, currentGameStreak);
-        currentGameStreak = 0;
-        lastGameId = a.game_id;
-      }
       if (a.is_correct) {
         longestStreakOverall = Math.max(longestStreakOverall, ++currentStreak);
-        longestStreakSingleGame = Math.max(longestStreakSingleGame, ++currentGameStreak);
+        const cur = (gameCurrent.get(a.game_id) || 0) + 1;
+        gameCurrent.set(a.game_id, cur);
+        gameLongest.set(a.game_id, Math.max(gameLongest.get(a.game_id) || 0, cur));
       } else {
         currentStreak = 0;
-        currentGameStreak = 0;
+        gameCurrent.set(a.game_id, 0);
       }
     }
-    longestStreakSingleGame = Math.max(longestStreakSingleGame, currentGameStreak);
+    const longestStreakSingleGame = gameLongest.size > 0 ? Math.max(...gameLongest.values()) : 0;
 
     const [gameRows] = await db.query(
       `SELECT gq.game_id,
