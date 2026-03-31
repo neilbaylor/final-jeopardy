@@ -609,9 +609,66 @@ router.get('/api/stats', async (req, res) => {
        WHERE gu.user_id = ?`,
       [Number(userId)]
     );
+
+    // Fetch all answers ordered by game and question id for streak calculations
+    const [answers] = await db.query(
+      `SELECT ga.is_correct, gq.game_id
+       FROM game_users gu
+       JOIN game_questions gq ON gq.game_id = gu.game_id
+       JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
+       WHERE gu.user_id = ?
+       ORDER BY gq.game_id, gq.id`,
+      [Number(userId)]
+    );
+
+    let longestStreakOverall = 0;
+    let longestStreakSingleGame = 0;
+    let currentStreak = 0;
+    let currentGameStreak = 0;
+    let lastGameId = null;
+    for (const a of answers) {
+      if (a.game_id !== lastGameId) {
+        longestStreakSingleGame = Math.max(longestStreakSingleGame, currentGameStreak);
+        currentGameStreak = 0;
+        lastGameId = a.game_id;
+      }
+      if (a.is_correct) {
+        currentStreak++;
+        currentGameStreak++;
+        longestStreakOverall = Math.max(longestStreakOverall, currentStreak);
+        longestStreakSingleGame = Math.max(longestStreakSingleGame, currentGameStreak);
+      } else {
+        currentStreak = 0;
+        currentGameStreak = 0;
+      }
+    }
+    longestStreakSingleGame = Math.max(longestStreakSingleGame, currentGameStreak);
+
+    const [gameRows] = await db.query(
+      `SELECT gq.game_id,
+              COUNT(ga.id)        AS question_count,
+              MIN(gq.asked_at)    AS first_question_date
+       FROM game_users gu
+       JOIN game_questions gq ON gq.game_id = gu.game_id
+       JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
+       WHERE gu.user_id = ?
+       GROUP BY gq.game_id
+       ORDER BY question_count DESC
+       LIMIT 1`,
+      [Number(userId)]
+    );
+    const longestGame = gameRows.length > 0 ? {
+      game_id: gameRows[0].game_id,
+      first_question_date: gameRows[0].first_question_date,
+      question_count: Number(gameRows[0].question_count),
+    } : null;
+
     res.json({
-      total_questions:  Number(row.total_questions  || 0),
-      correct_answers:  Number(row.correct_answers  || 0),
+      total_questions:            Number(row.total_questions  || 0),
+      correct_answers:            Number(row.correct_answers  || 0),
+      longest_streak_overall:     longestStreakOverall,
+      longest_streak_single_game: longestStreakSingleGame,
+      longest_game:               longestGame,
     });
   } catch (err) {
     res.status(500).json({ error: 'Database error' });
