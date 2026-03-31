@@ -1497,8 +1497,8 @@
             ? Math.round((Date.now() - new Date(lg.first_question_date).getTime()) / 86400000)
             : null;
           longestGameStr = days !== null
-            ? `${lg.question_count} question${lg.question_count !== 1 ? 's' : ''} over ${days} day${days !== 1 ? 's' : ''}`
-            : `${lg.question_count} question${lg.question_count !== 1 ? 's' : ''}`;
+            ? `${lg.question_count} Questions / ${days} Days`
+            : `${lg.question_count} Questions`;
         }
         streaksEl.innerHTML = [
           `<div class="stats-streak-row">Correct streak: <strong>${stats.longest_streak_overall || 0}</strong></div>`,
