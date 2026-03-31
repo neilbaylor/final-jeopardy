@@ -1181,6 +1181,7 @@
             progressFill.style.animation = 'none';
             progressFill.offsetHeight; // force reflow so animation restarts from 0
             progressFill.style.animation = 'progressFill 30s linear forwards';
+            if (window._vvStart) window._vvStart();
 
             let expiryFired = false;
             let expiryTimerId;
@@ -1189,6 +1190,7 @@
               if (expiryFired) return;
               expiryFired = true;
               clearTimeout(expiryTimerId);
+              if (window._vvStop) window._vvStop();
 
               answerInput.disabled = true;
               answerInput.blur();
@@ -1359,7 +1361,7 @@
       let kbOffset = 0;
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
-      window.visualViewport.addEventListener('resize', () => {
+      const onVVResize = () => {
         const newOffset = Math.max(0, baseVVH - window.visualViewport.height);
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
@@ -1377,15 +1379,15 @@
           if (answerInput.disabled) {
             el.style.transition = 'none';
             el.style.opacity = '0';
-            el.offsetHeight; // force paint so transition:none takes effect
+            el.offsetHeight;
             el.style.transform = shift;
             el.style.opacity = '1';
-            el.offsetHeight; // force paint before clearing inline transition
+            el.offsetHeight;
             el.style.transition = '';
           } else {
             el.style.transition = 'none';
             el.style.opacity = '0';
-            el.offsetHeight; // reflow so opacity snaps instantly
+            el.offsetHeight;
             el.style.transform = shift;
             el.style.transition = `opacity ${kbOffset > 0 ? '375ms ease-out' : '400ms ease-in'}`;
             el.style.opacity = '1';
@@ -1396,7 +1398,17 @@
             });
           }
         });
-      });
+      };
+      window._vvStart = () => {
+        baseVVH = window.visualViewport.height;
+        window.visualViewport.addEventListener('resize', onVVResize);
+      };
+      window._vvStop = () => {
+        window.visualViewport.removeEventListener('resize', onVVResize);
+        document.removeEventListener('touchmove', blockScroll);
+        window.removeEventListener('scroll', resetScroll);
+        kbOffset = 0;
+      };
     }
   </script>
 </div>
