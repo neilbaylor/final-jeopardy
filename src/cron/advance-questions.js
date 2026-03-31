@@ -37,12 +37,30 @@ async function advanceStaleQuestions() {
             [r.game_id]
           );
           const others = players.filter(p => p.id !== r.user_id);
-          const randomFriend = others[Math.floor(Math.random() * others.length)];
-          const friendName = pushDisplayName(randomFriend?.display_name || '');
           const othersCount = players.length - 2;
           const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
-          const body = `Tap to answer your new question with your friend ${friendName}${withOthers}`;
-          return sendPush(r.user_id, { title: 'New Question', body, url: `/game?id=${r.game_id}`, icon: randomFriend?.avatar_url || undefined }, db).catch(() => {});
+
+          // Check if any friend has already answered this question
+          const [friendAnswers] = await conn.execute(
+            `SELECT ga.user_id, ga.is_correct FROM game_answers ga
+             WHERE ga.game_question_id = ? AND ga.user_id != ?`,
+            [r.game_question_id, r.user_id]
+          );
+          let body, icon;
+          if (friendAnswers.length > 0) {
+            const fa = friendAnswers[Math.floor(Math.random() * friendAnswers.length)];
+            const answeredFriend = others.find(p => p.id === fa.user_id) || others[0];
+            const friendName = pushDisplayName(answeredFriend?.display_name || '');
+            const result = fa.is_correct ? 'Correctly' : 'Incorrectly';
+            body = `${friendName} already answered ${result}. Tap to answer your new question${withOthers}`;
+            icon = answeredFriend?.avatar_url || undefined;
+          } else {
+            const randomFriend = others[Math.floor(Math.random() * others.length)];
+            const friendName = pushDisplayName(randomFriend?.display_name || '');
+            body = `Tap to answer your new question with your friend ${friendName}${withOthers}`;
+            icon = randomFriend?.avatar_url || undefined;
+          }
+          return sendPush(r.user_id, { title: 'New Question', body, url: `/game?id=${r.game_id}`, icon }, db).catch(() => {});
         });
       await Promise.all(sends);
       await conn.execute('DELETE FROM question_reminders WHERE created_at < NOW() - INTERVAL 90 MINUTE');
