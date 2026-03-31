@@ -966,6 +966,20 @@
           return;
         }
 
+        const unansweredKey = `unanswered_${gameId}_${currentGameQuestionId}`;
+        if (localStorage.getItem(unansweredKey)) {
+          try { localStorage.removeItem(`fjwf_games_${userId}`); } catch {}
+          try { localStorage.removeItem(unansweredKey); } catch {}
+          loadErrorEl.textContent = 'You have already answered this question';
+          loadErrorEl.classList.add('visible');
+          fetch(`/api/games/${gameId}/answers`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerId: userId, questionId: currentQuestionId, answer: 'Left the window' }),
+          }).catch(() => {});
+          return;
+        }
+
         // Pre-calculate ALL top positions now, while elements are invisible but laid out.
         const cs = categoryStyle(category);
         categoryEl.textContent = category;
