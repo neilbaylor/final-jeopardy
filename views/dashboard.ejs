@@ -1436,19 +1436,15 @@
       const iconEl = document.getElementById('stats-btn-icon');
       iconEl.innerHTML = '<div class="stats-spin"></div>';
       try {
-        const [statsRes, meRes] = await Promise.all([
-          fetch(`/api/stats?userId=${userId}`),
-          fetch(`/api/me?userId=${userId}`),
-        ]);
+        const statsRes = await fetch(`/api/stats?userId=${userId}`);
         const stats = await statsRes.json();
-        const me = await meRes.json();
         const correct = stats.correct_answers || 0;
         const total = stats.total_questions || 0;
         const avatarEl = document.getElementById('stats-modal-avatar');
-        avatarEl.innerHTML = me.avatar_url
-          ? `<img src="${me.avatar_url}" alt="${me.display_name || ''}" />`
+        avatarEl.innerHTML = currentUser?.avatar_url
+          ? `<img src="${currentUser.avatar_url}" alt="${currentUser.display_name || ''}" />`
           : `<div id="stats-modal-avatar-placeholder">👤</div>`;
-        document.getElementById('stats-modal-name').textContent = me.display_name || '';
+        document.getElementById('stats-modal-name').textContent = currentUser?.display_name || '';
         document.getElementById('stats-modal-coin').textContent = Math.min(correct, 99);
         document.getElementById('stats-correct').textContent = correct;
         document.getElementById('stats-total').textContent = total;
