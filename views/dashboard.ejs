@@ -162,6 +162,94 @@
       -webkit-tap-highlight-color: transparent;
     }
     #logout-btn:active { background: #fdf0ef; }
+    #stats-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 9px 12px;
+      border: none;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      background: none;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #333;
+      cursor: pointer;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      -webkit-tap-highlight-color: transparent;
+    }
+    #stats-btn:active { background: #f0f4ff; }
+    #stats-btn-icon { width: 15px; height: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    #stats-btn-icon .stats-spin {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(51,51,51,0.2);
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: panelSpin 0.7s linear infinite;
+    }
+
+    #stats-modal-backdrop {
+      display: flex;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      pointer-events: none;
+      transition: background 0.27s ease;
+    }
+    #stats-modal-backdrop.open { background: rgba(0,0,0,0.45); pointer-events: auto; }
+    #stats-modal {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 340px;
+      width: 100%;
+      box-shadow: 3px 7px 6px rgba(0,0,0,0.23);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(17px);
+      transition: opacity 0.27s ease, transform 0.27s ease;
+      will-change: transform;
+      -webkit-backface-visibility: hidden;
+    }
+    #stats-modal-backdrop.open #stats-modal { opacity: 1; transform: translateY(0); }
+    #stats-modal-header {
+      background: #07102e;
+      padding: 28px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    #stats-modal-avatar-wrap { position: relative; width: 64px; height: 64px; }
+    #stats-modal-avatar-wrap img, #stats-modal-avatar-placeholder {
+      width: 64px; height: 64px; border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    #stats-modal-avatar-placeholder { background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+    #stats-modal-coin {
+      position: absolute;
+      bottom: -4px; right: -6px;
+      width: 26px; height: 26px;
+      font-size: 0.72rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #stats-modal-name { font-size: 1.05rem; font-weight: 600; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.35); }
+    #stats-modal-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 14px; }
+    .stats-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #f7f8fc;
+      border-radius: 10px;
+    }
+    .stats-row-label { font-size: 0.95rem; color: #555; font-weight: 500; }
+    .stats-row-value { font-size: 1.1rem; font-weight: 700; color: #07102e; }
 
     .topbar-greeting {
       font-size: 0.9rem;
@@ -1150,6 +1238,7 @@
         <div id="avatar-wrap"><div class="spinner"></div></div>
         <span id="topbar-greeting" class="topbar-greeting" style="display:none"></span>
         <div id="user-popover">
+          <button id="stats-btn">Stats<div id="stats-btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div></button>
           <button id="logout-btn">Logout<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
         </div>
       </div>
@@ -1197,6 +1286,28 @@
     <div id="error-modal">
       <p id="error-modal-msg"></p>
       <button id="error-modal-ok">OK</button>
+    </div>
+  </div>
+
+  <div id="stats-modal-backdrop">
+    <div id="stats-modal">
+      <div id="stats-modal-header">
+        <div id="stats-modal-avatar-wrap">
+          <div id="stats-modal-avatar"></div>
+          <div id="stats-modal-coin" class="coin player-score-coin coin-shimmer"></div>
+        </div>
+        <div id="stats-modal-name"></div>
+      </div>
+      <div id="stats-modal-body">
+        <div class="stats-row">
+          <span class="stats-row-label">Correct answers</span>
+          <span class="stats-row-value" id="stats-correct"></span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-row-label">Total answered</span>
+          <span class="stats-row-value" id="stats-total"></span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1319,6 +1430,37 @@
     document.addEventListener('click', () => {
       document.getElementById('user-popover').classList.remove('open');
     });
+    document.getElementById('stats-btn').addEventListener('click', async e => {
+      e.stopPropagation();
+      document.getElementById('user-popover').classList.remove('open');
+      const iconEl = document.getElementById('stats-btn-icon');
+      iconEl.innerHTML = '<div class="stats-spin"></div>';
+      try {
+        const [statsRes, meRes] = await Promise.all([
+          fetch(`/api/stats?userId=${userId}`),
+          fetch(`/api/me?userId=${userId}`),
+        ]);
+        const stats = await statsRes.json();
+        const me = await meRes.json();
+        const correct = stats.correct_answers || 0;
+        const total = stats.total_questions || 0;
+        const avatarEl = document.getElementById('stats-modal-avatar');
+        avatarEl.innerHTML = me.avatar_url
+          ? `<img src="${me.avatar_url}" alt="${me.display_name || ''}" />`
+          : `<div id="stats-modal-avatar-placeholder">👤</div>`;
+        document.getElementById('stats-modal-name').textContent = me.display_name || '';
+        document.getElementById('stats-modal-coin').textContent = Math.min(correct, 99);
+        document.getElementById('stats-correct').textContent = correct;
+        document.getElementById('stats-total').textContent = total;
+        document.getElementById('stats-modal-backdrop').classList.add('open');
+      } catch {}
+      iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
+    });
+    document.getElementById('stats-modal-backdrop').addEventListener('click', e => {
+      if (e.target === document.getElementById('stats-modal-backdrop'))
+        document.getElementById('stats-modal-backdrop').classList.remove('open');
+    });
+
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('userId');
       navigator.serviceWorker.controller?.postMessage({ type: 'CLEAR_API_ME' });
