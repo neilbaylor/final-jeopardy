@@ -38,7 +38,7 @@ async function advanceStaleQuestions() {
           );
           const others = players.filter(p => p.id !== r.user_id);
           const othersCount = players.length - 2;
-          const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
+          const withOthers = othersCount > 0 ? ` with ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
 
           // Check if any friend has already answered this question
           const [friendAnswers] = await conn.execute(
@@ -52,7 +52,7 @@ async function advanceStaleQuestions() {
             const answeredFriend = others.find(p => p.id === fa.user_id) || others[0];
             const friendName = pushDisplayName(answeredFriend?.display_name || '');
             const result = fa.is_correct ? 'Correctly' : 'Incorrectly';
-            body = `${friendName} already answered ${result}. Tap to answer your new question${withOthers}`;
+            body = `${friendName} answered ${result}. Tap to answer your new question${withOthers}`;
             icon = answeredFriend?.avatar_url || undefined;
           } else {
             const randomFriend = others[Math.floor(Math.random() * others.length)];
