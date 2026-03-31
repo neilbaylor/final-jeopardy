@@ -229,11 +229,26 @@
       color: rgba(0,0,0,0.42);
     }
     #stats-modal-content {
-      padding: 10px 16px 18px;
+      padding: 10px 16px 12px;
       display: flex;
       align-items: center;
       gap: 12px;
       width: 100%;
+    }
+    #stats-modal-streaks {
+      padding: 0 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stats-streak-row {
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: rgba(0,0,0,0.55);
+    }
+    .stats-streak-row strong {
+      color: #1a1a2e;
+      font-weight: 600;
     }
     #stats-modal-content .game-player-info { flex: 1; min-width: 0; }
     #stats-modal .player-avatar-wrap { width: 48px; height: 48px; }
@@ -1295,6 +1310,7 @@
           <span id="stats-modal-stat" class="player-status waiting"></span>
         </div>
       </div>
+      <div id="stats-modal-streaks"></div>
     </div>
   </div>
 
@@ -1472,6 +1488,22 @@
         document.getElementById('stats-modal-name').textContent = currentUser?.display_name || '';
         document.getElementById('stats-modal-coin').textContent = Math.min(correct, 99);
         document.getElementById('stats-modal-stat').textContent = `${correct} / ${total} (${pct}%)`;
+        const streaksEl = document.getElementById('stats-modal-streaks');
+        const lg = data.longest_game;
+        let longestGameStr = '—';
+        if (lg && lg.question_count > 0) {
+          const days = lg.first_question_date
+            ? Math.round((Date.now() - new Date(lg.first_question_date).getTime()) / 86400000)
+            : null;
+          longestGameStr = days !== null
+            ? `${lg.question_count} question${lg.question_count !== 1 ? 's' : ''} over ${days} day${days !== 1 ? 's' : ''}`
+            : `${lg.question_count} question${lg.question_count !== 1 ? 's' : ''}`;
+        }
+        streaksEl.innerHTML = [
+          `<div class="stats-streak-row">Longest correct streak: <strong>${data.longest_streak_overall || 0}</strong></div>`,
+          `<div class="stats-streak-row">Longest correct streak in a game: <strong>${data.longest_streak_single_game || 0}</strong></div>`,
+          `<div class="stats-streak-row">Longest game: <strong>${longestGameStr}</strong></div>`,
+        ].join('');
         document.getElementById('stats-modal-backdrop').classList.add('open');
       } catch {}
       iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
