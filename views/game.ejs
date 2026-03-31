@@ -1123,6 +1123,7 @@
     answerBtn.addEventListener('click', () => {
       if (answerBtnClickHandled) return;
       answerBtnClickHandled = true;
+      try { localStorage.setItem(`unanswered_${gameId}_${currentGameQuestionId}`, 'true'); } catch {}
       answerBtn.classList.remove('visible');
       answerBtn.addEventListener('transitionend', () => {
         answerBtn.style.display = 'none';
@@ -1205,6 +1206,7 @@
                     return;
                   }
                   apiAnswers = await answerRes.json();
+                  try { localStorage.removeItem(`unanswered_${gameId}_${currentGameQuestionId}`); } catch {}
                 } catch {
                   showErrorModal('Sorry, something went wrong');
                   return;
