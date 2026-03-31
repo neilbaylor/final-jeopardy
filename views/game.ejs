@@ -1201,12 +1201,12 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ playerId: userId, questionId: currentQuestionId, answer: submittedAnswer }),
                   });
+                  try { localStorage.removeItem(`unanswered_${gameId}_${currentGameQuestionId}`); } catch {}
                   if (!answerRes.ok) {
                     showErrorModal('Sorry, something went wrong');
                     return;
                   }
                   apiAnswers = await answerRes.json();
-                  try { localStorage.removeItem(`unanswered_${gameId}_${currentGameQuestionId}`); } catch {}
                 } catch {
                   showErrorModal('Sorry, something went wrong');
                   return;
