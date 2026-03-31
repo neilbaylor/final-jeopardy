@@ -232,31 +232,31 @@
       padding: 10px 16px 12px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 9px;
       width: 100%;
     }
     #stats-modal-streaks {
-      padding: 0 16px 18px;
+      padding: 4px 16px 18px;
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
     .stats-streak-row {
-      font-size: 0.84rem;
-      font-weight: 500;
+      font-size: 0.8rem;
+      font-weight: 600;
       color: rgba(0,0,0,0.55);
     }
     .stats-streak-row strong {
       color: #1a1a2e;
-      font-weight: 600;
+      font-weight: 700;
     }
     #stats-modal-content .game-player-info { flex: 1; min-width: 0; }
     #stats-modal .player-avatar-wrap { width: 48px; height: 48px; }
     #stats-modal .player-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.08); display: block; }
     #stats-modal .player-avatar-placeholder { width: 48px; height: 48px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
     #stats-modal .player-score-coin { top: 6.5px; left: 1px; width: 20px; height: 20px; font-size: 0.68rem; }
-    #stats-modal .player-name { font-size: 1rem; font-weight: 600; color: rgba(0,0,0,0.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: none; }
-    #stats-modal .player-status { font-size: 0.88rem; font-weight: 600; color: #1a1a2e; }
+    #stats-modal .player-name { font-size: 1rem; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: none; }
+    #stats-modal .player-status { font-size: 0.88rem; font-weight: 600; color: rgba(0,0,0,0.55); }
 
     .topbar-greeting {
       font-size: 0.9rem;
@@ -1500,8 +1500,8 @@
             : `${lg.question_count} question${lg.question_count !== 1 ? 's' : ''}`;
         }
         streaksEl.innerHTML = [
-          `<div class="stats-streak-row">Longest correct streak: <strong>${stats.longest_streak_overall || 0}</strong></div>`,
-          `<div class="stats-streak-row">Longest correct streak in a game: <strong>${stats.longest_streak_single_game || 0}</strong></div>`,
+          `<div class="stats-streak-row">Correct streak: <strong>${stats.longest_streak_overall || 0}</strong></div>`,
+          `<div class="stats-streak-row">Correct streak in a game: <strong>${stats.longest_streak_single_game || 0}</strong></div>`,
           `<div class="stats-streak-row">Longest game: <strong>${longestGameStr}</strong></div>`,
         ].join('');
         document.getElementById('stats-modal-backdrop').classList.add('open');
