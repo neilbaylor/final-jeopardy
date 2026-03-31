@@ -1472,13 +1472,13 @@
           } else if (leading + tied === all) {
             sub = leading === 0 ? `Tied in all ${all}`
                 : tied === 0    ? `Leading in all ${all}`
-                : `Leading in ${leading}, tied in ${tied}`;
+                : `Leading in ${leading}, Tied in ${tied}`;
           } else if (leading === 0) {
             sub = `Tied in ${tied}`;
           } else if (tied === 0) {
             sub = `Leading in ${leading}`;
           } else {
-            sub = `Leading in ${leading}, tied in ${tied}`;
+            sub = `Leading in ${leading}, Tied in ${tied}`;
           }
         }
         document.getElementById('stats-modal-subheading').textContent = sub;

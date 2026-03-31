@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../config/database');
 const natural = require('natural');
+const { computeStreaks } = require('../utils/streaks');
 const title = require('title').default;
 const router = express.Router();
 const { pushDisplayName, sendPush: _sendPush } = require('../utils/push');
@@ -620,20 +621,7 @@ router.get('/api/stats', async (req, res) => {
       [Number(userId)]
     );
 
-    let longestStreakOverall = 0, currentStreak = 0;
-    const gameCurrent = new Map(), gameLongest = new Map();
-    for (const a of answers) {
-      if (a.is_correct) {
-        longestStreakOverall = Math.max(longestStreakOverall, ++currentStreak);
-        const cur = (gameCurrent.get(a.game_id) || 0) + 1;
-        gameCurrent.set(a.game_id, cur);
-        gameLongest.set(a.game_id, Math.max(gameLongest.get(a.game_id) || 0, cur));
-      } else {
-        currentStreak = 0;
-        gameCurrent.set(a.game_id, 0);
-      }
-    }
-    const longestStreakSingleGame = gameLongest.size > 0 ? Math.max(...gameLongest.values()) : 0;
+    const { longest_streak_overall: longestStreakOverall, longest_streak_single_game: longestStreakSingleGame } = computeStreaks(answers);
 
     const [gameRows] = await db.query(
       `SELECT gq.game_id,
