@@ -594,6 +594,30 @@ router.get('/api/games', async (req, res) => {
   }
 });
 
+// API: get stats for a user
+router.get('/api/stats', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+  try {
+    const [[row]] = await db.query(
+      `SELECT
+         COUNT(ga.id)                              AS total_questions,
+         SUM(ga.is_correct = 1)                   AS correct_answers
+       FROM game_users gu
+       JOIN game_questions gq ON gq.game_id = gu.game_id
+       JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
+       WHERE gu.user_id = ?`,
+      [Number(userId)]
+    );
+    res.json({
+      total_questions:  Number(row.total_questions  || 0),
+      correct_answers:  Number(row.correct_answers  || 0),
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // API: submit an answer for a game question
 router.post('/api/games/:gameId/answers', async (req, res) => {
   const gameId = Number(req.params.gameId);
