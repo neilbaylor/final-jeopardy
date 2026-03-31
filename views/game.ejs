@@ -1361,7 +1361,7 @@
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       window.visualViewport.addEventListener('resize', () => {
         const newOffset = Math.max(0, baseVVH - window.visualViewport.height);
-        if (newOffset === kbOffset) return;
+        if (newOffset === 0) baseVVH = window.visualViewport.height;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
