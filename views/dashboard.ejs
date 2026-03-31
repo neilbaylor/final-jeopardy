@@ -234,8 +234,8 @@
     #stats-modal .player-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.08); display: block; }
     #stats-modal .player-avatar-placeholder { width: 48px; height: 48px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
     #stats-modal .player-score-coin { top: 6.5px; left: 2px; width: 20px; height: 20px; font-size: 0.68rem; }
-    #stats-modal .player-name { font-size: 1rem; font-weight: 600; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #stats-modal .player-status { font-size: 0.88rem; font-weight: 600; }
+    #stats-modal .player-name { font-size: 1rem; font-weight: 600; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: none; }
+    #stats-modal .player-status { font-size: 0.88rem; font-weight: 600; color: rgba(0,0,0,0.55); }
 
     .topbar-greeting {
       font-size: 0.9rem;
@@ -1422,7 +1422,7 @@
         const total = stats.total_questions || 0;
         const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
         const gameCount = document.querySelectorAll('.game-row-wrapper').length;
-        document.getElementById('stats-modal-header-text').textContent = `Your Stats across ${gameCount} Game${gameCount !== 1 ? 's' : ''}`;
+        document.getElementById('stats-modal-header-text').textContent = `Your Stats Over ${gameCount} Game${gameCount !== 1 ? 's' : ''}`;
         const avatarEl = document.getElementById('stats-modal-avatar');
         avatarEl.innerHTML = currentUser?.avatar_url
           ? `<img class="player-avatar" src="${currentUser.avatar_url}" alt="${currentUser.display_name || ''}" />`
