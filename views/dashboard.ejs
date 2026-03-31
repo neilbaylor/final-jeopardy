@@ -1438,6 +1438,53 @@
       if (e.target === document.getElementById('stats-modal-backdrop'))
         document.getElementById('stats-modal-backdrop').classList.remove('open');
     });
+    document.getElementById('stats-modal-backdrop').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    (function() {
+      const backdrop = document.getElementById('stats-modal-backdrop');
+      const modal    = document.getElementById('stats-modal');
+      let startY = 0, startTime = 0, currentY = 0, dragging = false;
+      function closeModal(throwY) {
+        modal.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+        modal.style.transform  = `translateY(${throwY}px)`;
+        modal.style.opacity    = '0';
+        backdrop.style.transition = 'background 0.15s ease';
+        setTimeout(() => {
+          backdrop.classList.remove('open');
+          backdrop.style.transition = '';
+          modal.style.transition = '';
+          modal.style.transform  = '';
+          modal.style.opacity    = '';
+        }, 220);
+      }
+      modal.addEventListener('touchstart', e => {
+        startY    = e.touches[0].clientY;
+        startTime = Date.now();
+        currentY  = 0;
+        dragging  = true;
+        modal.style.transition = 'none';
+      }, { passive: true });
+      modal.addEventListener('touchmove', e => {
+        if (!dragging) return;
+        currentY = e.touches[0].clientY - startY;
+        const resistance = currentY < 0 ? 0.35 : 0.45;
+        modal.style.transform = `translateY(${currentY * resistance}px)`;
+        modal.style.opacity   = String(Math.max(0, 1 - Math.abs(currentY) / 320));
+      }, { passive: true });
+      modal.addEventListener('touchend', () => {
+        if (!dragging) return;
+        dragging = false;
+        const velocity = currentY / (Date.now() - startTime);
+        const isFlick  = Math.abs(velocity) > 0.5;
+        const isDrag   = Math.abs(currentY) > 120;
+        if (isFlick || isDrag) {
+          closeModal(currentY < 0 ? -220 : 220);
+        } else {
+          modal.style.transition = 'opacity 0.27s ease, transform 0.27s ease';
+          modal.style.transform  = '';
+          modal.style.opacity    = '';
+        }
+      });
+    })();
 
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('userId');
