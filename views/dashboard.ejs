@@ -1489,7 +1489,7 @@
         document.getElementById('stats-modal-coin').textContent = Math.min(correct, 99);
         document.getElementById('stats-modal-stat').textContent = `${correct} / ${total} (${pct}%)`;
         const streaksEl = document.getElementById('stats-modal-streaks');
-        const lg = data.longest_game;
+        const lg = stats.longest_game;
         let longestGameStr = '—';
         if (lg && lg.question_count > 0) {
           const days = lg.first_question_date
@@ -1500,8 +1500,8 @@
             : `${lg.question_count} question${lg.question_count !== 1 ? 's' : ''}`;
         }
         streaksEl.innerHTML = [
-          `<div class="stats-streak-row">Longest correct streak: <strong>${data.longest_streak_overall || 0}</strong></div>`,
-          `<div class="stats-streak-row">Longest correct streak in a game: <strong>${data.longest_streak_single_game || 0}</strong></div>`,
+          `<div class="stats-streak-row">Longest correct streak: <strong>${stats.longest_streak_overall || 0}</strong></div>`,
+          `<div class="stats-streak-row">Longest correct streak in a game: <strong>${stats.longest_streak_single_game || 0}</strong></div>`,
           `<div class="stats-streak-row">Longest game: <strong>${longestGameStr}</strong></div>`,
         ].join('');
         document.getElementById('stats-modal-backdrop').classList.add('open');
