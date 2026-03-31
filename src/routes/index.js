@@ -610,9 +610,8 @@ router.get('/api/stats', async (req, res) => {
       [Number(userId)]
     );
 
-    // Two queries: one ordered by date globally (for overall streak), one grouped by game (for single-game streak)
-    const [answersGlobal] = await db.query(
-      `SELECT ga.is_correct
+    const [answers] = await db.query(
+      `SELECT ga.is_correct, gq.game_id
        FROM game_users gu
        JOIN game_questions gq ON gq.game_id = gu.game_id
        JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
@@ -621,38 +620,19 @@ router.get('/api/stats', async (req, res) => {
       [Number(userId)]
     );
 
-    const [answersPerGame] = await db.query(
-      `SELECT ga.is_correct, gq.game_id
-       FROM game_users gu
-       JOIN game_questions gq ON gq.game_id = gu.game_id
-       JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
-       WHERE gu.user_id = ?
-       ORDER BY gq.game_id, gq.asked_at, gq.id`,
-      [Number(userId)]
-    );
-
-    let longestStreakOverall = 0;
-    let currentStreak = 0;
-    for (const a of answersGlobal) {
-      if (a.is_correct) {
-        longestStreakOverall = Math.max(longestStreakOverall, ++currentStreak);
-      } else {
-        currentStreak = 0;
-      }
-    }
-
-    let longestStreakSingleGame = 0;
-    let currentGameStreak = 0;
-    let lastGameId = null;
-    for (const a of answersPerGame) {
+    let longestStreakOverall = 0, longestStreakSingleGame = 0;
+    let currentStreak = 0, currentGameStreak = 0, lastGameId = null;
+    for (const a of answers) {
       if (a.game_id !== lastGameId) {
         longestStreakSingleGame = Math.max(longestStreakSingleGame, currentGameStreak);
         currentGameStreak = 0;
         lastGameId = a.game_id;
       }
       if (a.is_correct) {
+        longestStreakOverall = Math.max(longestStreakOverall, ++currentStreak);
         longestStreakSingleGame = Math.max(longestStreakSingleGame, ++currentGameStreak);
       } else {
+        currentStreak = 0;
         currentGameStreak = 0;
       }
     }
