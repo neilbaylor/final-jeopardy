@@ -1404,10 +1404,12 @@
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
-        window.visualViewport.removeEventListener('resize', onVVResize);
-        document.removeEventListener('touchmove', blockScroll);
-        window.removeEventListener('scroll', resetScroll);
-        kbOffset = 0;
+        setTimeout(() => {
+          window.visualViewport.removeEventListener('resize', onVVResize);
+          document.removeEventListener('touchmove', blockScroll);
+          window.removeEventListener('scroll', resetScroll);
+          kbOffset = 0;
+        }, 1000);
       };
     }
   </script>
