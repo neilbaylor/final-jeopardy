@@ -1416,7 +1416,10 @@
       const iconEl = document.getElementById('stats-btn-icon');
       iconEl.innerHTML = '<div class="stats-spin"></div>';
       try {
-        const statsRes = await fetch(`/api/stats?userId=${userId}`);
+        const [statsRes] = await Promise.all([
+          fetch(`/api/stats?userId=${userId}`),
+          new Promise(r => setTimeout(r, 500)),
+        ]);
         const stats = await statsRes.json();
         const correct = stats.correct_answers || 0;
         const total = stats.total_questions || 0;
