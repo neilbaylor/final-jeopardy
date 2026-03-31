@@ -117,7 +117,7 @@ async function advanceStaleQuestions() {
       if (total > 1) {
         const others = total - 1;
         title = `${total} New Questions`;
-        body = `${body}. Plus ${others} other question${others !== 1 ? 's' : ''}`;
+        body = `${body}. Plus ${others} other new question${others !== 1 ? 's' : ''}`;
       }
       sends.push(sendPush(userId, { title, body, icon, url }, db).catch(() => {}));
     }
