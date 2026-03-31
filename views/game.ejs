@@ -1367,7 +1367,7 @@
         if (kbOffset > 0) {
           document.addEventListener('touchmove', blockScroll, { passive: false });
           if (window.navigator.standalone) {
-            setTimeout(() => window.addEventListener('scroll', resetScroll, { passive: true }), 500);
+            setTimeout(() => window.addEventListener('scroll', resetScroll, { passive: true }), 600);
           }
         } else {
           document.removeEventListener('touchmove', blockScroll);
