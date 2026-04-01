@@ -1343,11 +1343,15 @@
     }
     let currentUser = null;
     let currentGames = [];
-    // Register push subscription once if not already subscribed
+    // Register push subscription; renew once per day
     const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
     if (isPWA && 'Notification' in window && 'PushManager' in window && Notification.permission === 'granted') {
+      const PUSH_RENEWED_KEY = `push_renewed_${userId}`;
+      const lastRenewed = localStorage.getItem(PUSH_RENEWED_KEY);
+      const oneDayAgo = Date.now() - 86400000;
+      const needsRenewal = !lastRenewed || Number(lastRenewed) < oneDayAgo;
       navigator.serviceWorker.ready.then(sw => sw.pushManager.getSubscription().then(existing => {
-        if (existing) return; // already subscribed, DB already has it
+        if (existing && !needsRenewal) return; // subscribed and fresh
         return sw.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: '<%= process.env.VAPID_PUBLIC_KEY || "" %>',
@@ -1358,6 +1362,8 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: uid, subscription: sub }),
+          }).then(() => {
+            localStorage.setItem(PUSH_RENEWED_KEY, String(Date.now()));
           }).catch(() => {});
         });
       })).catch(() => {});
