@@ -1436,9 +1436,11 @@
     document.addEventListener('click', () => {
       document.getElementById('user-popover').classList.remove('open');
     });
+    let statsFetching = false;
     document.getElementById('stats-btn').addEventListener('click', async e => {
       e.stopPropagation();
-      document.getElementById('user-popover').classList.remove('open');
+      if (statsFetching) return;
+      statsFetching = true;
       const iconEl = document.getElementById('stats-btn-icon');
       iconEl.innerHTML = '<div class="stats-spin"></div>';
       try {
@@ -1509,6 +1511,8 @@
         document.getElementById('stats-modal-backdrop').classList.add('open');
       } catch {}
       iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
+      document.getElementById('user-popover').classList.remove('open');
+      statsFetching = false;
     });
     document.getElementById('stats-modal-backdrop').addEventListener('click', e => {
       if (e.target === document.getElementById('stats-modal-backdrop'))
