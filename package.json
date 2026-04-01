@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "node src/utils/streaks.test.js"
+    "test": "node src/utils/streaks.test.js && node test-correct.js"
   },
   "dependencies": {
     "dotenv": "^16.3.1",

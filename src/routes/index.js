@@ -75,19 +75,19 @@ const COMMON_FIRST_NAMES = new Set([
   'dale','dallas','dan','daniel','danny','darrell','darren','dave','david','dean','dennis',
   'derek','dick','diego','dominic','donald','douglas','drew','dustin','dylan',
   'earl','eddie','edgar','edward','eli','elijah','elton','elvis','eric','ernest','ethan','eugene','evan',
-  'felix','floyd','frank','franklin','fred','freddie','frederick',
+  'felix','floyd','frank','franklin','fred','freddie','frederic','frederick',
   'gabriel','gary','gene','geoffrey','george','gerald','gilbert','glen','gordon','graham','grant','gregory',
   'harold','harry','harvey','henry','herbert','homer','howard','hugo',
   'ian','ivan',
   'jack','jacob','jake','james','jason','javier','jay','jeff','jeffrey','jeremy','jerome',
   'jerry','jesse','jim','jimmy','joe','joel','john','johnny','jon','jonathan','jordan','jorge',
-  'jose','joseph','joshua','juan','julian','justin',
+  'jose','joseph','joshua','juan','julian','julius','justin',
   'karl','keith','ken','kenneth','kevin','kurt','kyle',
   'lance','larry','lawrence','leo','leon','leonard','liam','lloyd','logan','louis','luc','lucas','luke',
   'malcolm','marcus','mario','mark','martin','mason','matt','matthew','max','michael','miguel','mike','miles',
   'mitchell','morris',
   'nathan','neil','nelson','nicholas','nick','noah','noel','norman',
-  'oliver','omar','oscar','owen',
+  'oliver','omar','oscar','otto','owen',
   'patrick','paul','pedro','pete','peter','phillip','preston',
   'ralph','ray','raymond','reginald','richard','rick','robert','robin','roger','roland','ronald',
   'ross','roy','ruben','russell','ryan',
@@ -95,6 +95,26 @@ const COMMON_FIRST_NAMES = new Set([
   'ted','terry','theodore','thomas','timothy','tom','tony','travis','trevor','troy','tyler',
   'victor','vincent','wade','walter','warren','wayne','wesley','william','winston','wyatt',
   'zachary','zach',
+  // Male — French
+  'claude','emile','etienne','francois','gustave','jean','jules','pierre','rene',
+  // Male — German/Austrian
+  'dieter','ernst','franz','gottfried','gunther','hans','heinrich','helmut','joachim',
+  'leopold','ludwig','reinhold','rudolf','ulrich','walther','wilhelm','wolfgang',
+  // Male — Italian
+  'cesare','giacomo','giovanni','giuseppe','guglielmo','luigi','matteo','michelangelo','raffaello',
+  // Male — Russian/Slavic
+  'aleksei','alexei','boris','dmitri','fyodor','igor','mikhail','nikolai','pyotr','sergei',
+  'stanislav','vasily','vladimir','yuri',
+  // Male — Spanish/Portuguese
+  'alejandro','enrique','pablo','rodrigo','salvador','xavier',
+  // Male — Scandinavian
+  'bjorn','edvard','gunnar','henrik','ingmar','lars','leif','magnus','niels','olaf','sven','thor',
+  // Male — Dutch/Flemish
+  'jan','piet','rembrandt','willem',
+  // Male — Hungarian
+  'attila','bela','laszlo','zoltan',
+  // Male — Other
+  'akira','ignaz','napoleon','nikola',
   // Female
   'abigail','ada','adele','adriana','agnes','alexa','alexandra','alexis','alice','alicia','alison',
   'allison','alma','alyssa','amanda','amber','amelia','amy','ana','andrea','angela','anita',
@@ -123,6 +143,20 @@ const COMMON_FIRST_NAMES = new Set([
   'tammy','teresa','tiffany','tina','tonya','tracey','tracy',
   'vanessa','vera','veronica','victoria','violet','virginia','vivian','wendy','whitney',
   'yolanda','yvonne','zoe','zoey',
+  // Female — French
+  'amelie','cecile','colette','delphine','elise','genevieve','heloise','madeleine','margot','mathilde','simone',
+  // Female — German/Austrian
+  'elke','frida','hannelore','hedwig','hildegard','ingrid','lotte','ulrike','wilhelmina',
+  // Female — Italian
+  'chiara','giulia','lucia','luisa','paola',
+  // Female — Russian/Slavic
+  'irina','nadia','natalia','olga','svetlana','tatiana','valentina','yelena',
+  // Female — Scandinavian
+  'astrid','birgit','dagmar','freya','sigrid','solveig',
+  // Female — Spanish/Portuguese
+  'carmen','fatima','pilar','rosario',
+  // Female — Other
+  'giselle','isolde',
 ]);
 
 // If `namePart` is "FirstName LastName" (exactly 2 words, first is a known first name),

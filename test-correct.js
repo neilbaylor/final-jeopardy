@@ -239,6 +239,36 @@ const tests = [
   { correct: 'São Paulo',               user: 'Sao Paulo',         expect: true,  note: 'diacritics: ã matches a' },
   { correct: 'Björk',                   user: 'Bjork',             expect: true,  note: 'diacritics: ö matches o' },
   { correct: 'Réunion',                 user: 'Reunion',           expect: true,  note: 'diacritics: é matches e' },
+
+  // ── Non-English first names — last name shorthand ─────────────────────────
+  // French
+  { correct: 'Frederic Chopin',         user: 'Chopin',            expect: true,  note: 'non-English: Frederic Chopin → Chopin' },
+  { correct: 'Frederic Chopin',         user: 'Frederic Chopin',   expect: true,  note: 'non-English: Frederic Chopin full name' },
+  { correct: 'Claude Monet',            user: 'Monet',             expect: true,  note: 'non-English: Claude Monet → Monet' },
+  { correct: 'Jules Verne',             user: 'Verne',             expect: true,  note: 'non-English: Jules Verne → Verne' },
+  { correct: 'Pierre Curie',            user: 'Curie',             expect: true,  note: 'non-English: Pierre Curie → Curie' },
+  // German/Austrian
+  { correct: 'Wolfgang Mozart',         user: 'Mozart',            expect: true,  note: 'non-English: Wolfgang Mozart → Mozart' },
+  { correct: 'Ludwig Beethoven',        user: 'Beethoven',         expect: true,  note: 'non-English: Ludwig Beethoven → Beethoven' },
+  { correct: 'Franz Schubert',          user: 'Schubert',          expect: true,  note: 'non-English: Franz Schubert → Schubert' },
+  // Italian
+  { correct: 'Giuseppe Verdi',          user: 'Verdi',             expect: true,  note: 'non-English: Giuseppe Verdi → Verdi' },
+  { correct: 'Giacomo Puccini',         user: 'Puccini',           expect: true,  note: 'non-English: Giacomo Puccini → Puccini' },
+  // Russian/Slavic
+  { correct: 'Fyodor Dostoevsky',       user: 'Dostoevsky',        expect: true,  note: 'non-English: Fyodor Dostoevsky → Dostoevsky' },
+  { correct: 'Nikolai Gogol',           user: 'Gogol',             expect: true,  note: 'non-English: Nikolai Gogol → Gogol' },
+  { correct: 'Vladimir Lenin',          user: 'Lenin',             expect: true,  note: 'non-English: Vladimir Lenin → Lenin' },
+  // Spanish
+  { correct: 'Pablo Picasso',           user: 'Picasso',           expect: true,  note: 'non-English: Pablo Picasso → Picasso' },
+  { correct: 'Salvador Dali',           user: 'Dali',              expect: true,  note: 'non-English: Salvador Dali → Dali' },
+  // Scandinavian
+  { correct: 'Henrik Ibsen',            user: 'Ibsen',             expect: true,  note: 'non-English: Henrik Ibsen → Ibsen' },
+  { correct: 'Edvard Munch',            user: 'Munch',             expect: true,  note: 'non-English: Edvard Munch → Munch' },
+  // Female non-English
+  { correct: 'Ingrid Bergman',          user: 'Bergman',           expect: true,  note: 'non-English: Ingrid Bergman → Bergman' },
+  { correct: 'Simone Beauvoir',         user: 'Beauvoir',          expect: true,  note: 'non-English: Simone Beauvoir → Beauvoir' },
+  { correct: 'Frida Kahlo',             user: 'Kahlo',             expect: true,  note: 'non-English: Frida Kahlo → Kahlo' },
+  { correct: 'Olga Korbut',             user: 'Korbut',            expect: true,  note: 'non-English: Olga Korbut → Korbut' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
