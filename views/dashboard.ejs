@@ -224,6 +224,7 @@
     }
     #stats-modal-subheading {
       padding: 0 16px 0;
+      margin-top: -1px;
       font-size: 0.88rem;
       font-weight: 500;
       color: rgba(0,0,0,0.42);
@@ -1466,19 +1467,19 @@
           if (leading === 0 && tied === 0) {
             sub = "Leading or tied in none";
           } else if (leading === all) {
-            sub = "Leading in all";
+            sub = `Leading in all ${all} Games`;
           } else if (tied === all) {
-            sub = "Tied in all";
+            sub = `Tied in all ${all} Games`;
           } else if (leading + tied === all) {
-            sub = leading === 0 ? `Tied in all ${all}`
-                : tied === 0    ? `Leading in all ${all}`
-                : `Leading in ${leading}, Tied in ${tied}`;
+            sub = leading === 0 ? `Tied in ${all} Games`
+                : tied === 0    ? `Leading in ${all} Games`
+                : `Leading in ${leading} Games, Tied in ${tied}`;
           } else if (leading === 0) {
-            sub = `Tied in ${tied}`;
+            sub = `Tied in ${tied} Game${tied !== 1 ? 's' : ''}`;
           } else if (tied === 0) {
-            sub = `Leading in ${leading}`;
+            sub = `Leading in ${leading} Game${leading !== 1 ? 's' : ''}`;
           } else {
-            sub = `Leading in ${leading}, Tied in ${tied}`;
+            sub = `Leading in ${leading} Games, Tied in ${tied}`;
           }
         }
         document.getElementById('stats-modal-subheading').textContent = sub;
