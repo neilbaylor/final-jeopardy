@@ -1362,6 +1362,7 @@
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const onVVResize = () => {
+        if (window.visualViewport.height < 150) { setTimeout(onVVResize, 100); return; }
         const newOffset = Math.max(0, baseVVH - window.visualViewport.height);
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
