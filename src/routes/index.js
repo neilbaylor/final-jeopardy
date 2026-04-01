@@ -745,7 +745,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
           const resultPunct = answererCorrect ? '!' : '.';
           const othersCount = gamePlayerCount - 2;
           const withOthers = othersCount > 0 ? ` with ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
-          const body = `${answererName} answered a question ${result}${resultPunct} Tap to answer your new question${withOthers}`;
+          const body = `${answererName} answered a question ${result}${resultPunct} A new question has been unlocked, tap to answer${withOthers}`;
           const otherUserIds = answers.filter(a => a.user_id !== answererId).map(a => a.user_id);
           for (const uid of otherUserIds) {
             sendPush(uid, { title: 'New Question', body, url: `/game?id=${gameId}`, icon: answerer?.avatar_url || undefined });
