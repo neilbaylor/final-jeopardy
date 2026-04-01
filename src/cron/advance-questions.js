@@ -94,8 +94,8 @@ async function advanceStaleQuestions() {
             const others = players.filter(p => p.id !== player.id);
             const randomFriend = others[Math.floor(Math.random() * others.length)];
             const friendName = pushDisplayName(randomFriend?.display_name || '');
-            const withOthers = othersCount > 0 ? ` with ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
-            const body = `Tap to answer your new question with your friend ${friendName}${withOthers}`;
+            const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
+            const body = `A new question has been unlocked. Tap to answer with ${friendName}${withOthers}`;
             queueNotif(player.id, 'stale', { title: 'New Question', body, icon: randomFriend?.avatar_url || undefined, url: `/game?id=${game_id}` });
           }
         }
