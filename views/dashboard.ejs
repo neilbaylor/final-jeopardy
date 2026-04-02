@@ -2442,6 +2442,15 @@
       content.addEventListener('touchcancel', () => { mode = null; snapBack(); });
     })();
 
+    window.addEventListener('pagehide', function(e) {
+      if (e.persisted) {
+        // Clear game rows before the bfcache snapshot is taken so that when the
+        // page is restored the snapshot shows a clean spinner, not stale rows.
+        document.getElementById('games-list').innerHTML = '';
+        document.getElementById('games-spinner').classList.remove('hidden');
+      }
+    });
+
     window.addEventListener('pageshow', function(e) {
       if (e.persisted) {
         document.querySelectorAll('.answer-btn.loading').forEach(btn => {
@@ -2449,9 +2458,7 @@
           btn.style.width = '';
           btn.innerHTML = 'Answer';
         });
-        document.getElementById('games-spinner').classList.add('hidden');
         prevGameIds = null;
-        document.getElementById('games-list').innerHTML = '';
         setTimeout(loadGames, 400);
       }
     });
