@@ -1415,10 +1415,15 @@
         });
       };
       const onVVResize = () => {
-        // Debounce: iOS fires multiple resize events during keyboard animation.
-        // Wait for the viewport to settle before applying the shift.
+        // Only debounce when keyboard is opening (viewport shrinking) — iOS fires multiple
+        // intermediate resize events during the animation. Apply immediately on close.
+        const prospective = Math.max(0, baseVVH - window.visualViewport.height);
         clearTimeout(vvDebounce);
-        vvDebounce = setTimeout(applyVVShift, 120);
+        if (prospective > kbOffset) {
+          vvDebounce = setTimeout(applyVVShift, 120);
+        } else {
+          applyVVShift();
+        }
       };
       window._vvStart = () => {
         baseVVH = window.visualViewport.height;
