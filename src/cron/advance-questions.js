@@ -44,7 +44,8 @@ async function advanceStaleQuestions() {
         );
         const others = players.filter(p => p.id !== r.user_id);
         const othersCount = players.length - 2;
-        const withOthers = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
+        const withOthers = othersCount > 0 ? ` with ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
+        const andOthers  = othersCount > 0 ? ` and ${othersCount} other friend${othersCount > 1 ? 's' : ''}` : '';
 
         const [friendAnswers] = await conn.execute(
           `SELECT ga.user_id, ga.is_correct FROM game_answers ga
@@ -62,7 +63,7 @@ async function advanceStaleQuestions() {
         } else {
           const randomFriend = others[Math.floor(Math.random() * others.length)];
           const friendName = pushDisplayName(randomFriend?.display_name || '');
-          body = `Don't forget about the new question you unlocked, tap to answer with ${friendName}${withOthers}`;
+          body = `Don't forget about the new question you unlocked, tap to answer with ${friendName}${andOthers}`;
           icon = randomFriend?.avatar_url || undefined;
         }
         queueNotif(r.user_id, 'reminder', { title: 'New Question', body, icon, url: `/game?id=${r.game_id}` });
