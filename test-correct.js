@@ -240,6 +240,12 @@ const tests = [
   { correct: 'Björk',                   user: 'Bjork',             expect: true,  note: 'diacritics: ö matches o' },
   { correct: 'Réunion',                 user: 'Reunion',           expect: true,  note: 'diacritics: é matches e' },
 
+  // ── Abbreviation dot handling ─────────────────────────────────────────────
+  { correct: 'E.T.',                user: 'ET',                expect: true,  note: 'abbrev: ET matches E.T.' },
+  { correct: 'ET',                  user: 'E.T.',              expect: true,  note: 'abbrev: E.T. matches ET' },
+  { correct: 'U.S.A.',              user: 'USA',               expect: true,  note: 'abbrev: USA matches U.S.A.' },
+  { correct: 'J.F.K.',              user: 'JFK',               expect: true,  note: 'abbrev: JFK matches J.F.K.' },
+
   // ── Non-English first names — last name shorthand ─────────────────────────
   // French
   { correct: 'Frederic Chopin',         user: 'Chopin',            expect: true,  note: 'non-English: Frederic Chopin → Chopin' },

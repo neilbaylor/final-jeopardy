@@ -57,6 +57,7 @@ function normalizeAnswer(str) {
     .replace(/\b(\d+)(?:st|nd|rd|th)\b/g, '$1') // strip ordinal suffixes: 8th → 8
     .replace(/\b(\d+)\b/g, (_, n) => numToWords(parseInt(n, 10))) // 7 → seven
     .replace(/['\u2018\u2019]/g, '') // strip apostrophes (ASCII + smart quotes)
+    .replace(/([a-z])\.([a-z])/g, '$1$2') // collapse abbreviation dots: e.t. → et, u.s.a. → usa
     .replace(/[^a-z0-9\s]/g, ' ') // non-alphanumeric → space
     .replace(/\b(the|a|an)\b/g, ' ')
     .replace(/\s+/g, ' ')
