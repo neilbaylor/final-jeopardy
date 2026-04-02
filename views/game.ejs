@@ -1375,8 +1375,6 @@
       const applyVVShift = () => {
         if (window.visualViewport.height < 150) { setTimeout(applyVVShift, 100); return; }
         const vvh = window.visualViewport.height;
-        // Re-anchor baseVVH if viewport grows — handles drift in standalone mode
-        if (vvh > baseVVH) baseVVH = vvh;
         const newOffset = Math.max(0, baseVVH - vvh);
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
