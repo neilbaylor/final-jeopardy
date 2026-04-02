@@ -62,7 +62,7 @@ async function advanceStaleQuestions() {
         } else {
           const randomFriend = others[Math.floor(Math.random() * others.length)];
           const friendName = pushDisplayName(randomFriend?.display_name || '');
-          body = `Tap to answer your new question with your friend ${friendName}${withOthers}`;
+          body = `Don't forget about the new question you unlocked with your friend ${friendName}${withOthers}`;
           icon = randomFriend?.avatar_url || undefined;
         }
         queueNotif(r.user_id, 'reminder', { title: 'New Question', body, icon, url: `/game?id=${r.game_id}` });

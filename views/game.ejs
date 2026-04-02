@@ -1360,10 +1360,11 @@
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseVVH = window.visualViewport.height;
       let kbOffset = 0;
+      let vvDebounce;
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
-      const onVVResize = () => {
-        if (window.visualViewport.height < 150) { setTimeout(onVVResize, 100); return; }
+      const applyVVShift = () => {
+        if (window.visualViewport.height < 150) { setTimeout(applyVVShift, 100); return; }
         const vvh = window.visualViewport.height;
         // Re-anchor baseVVH if viewport grows — handles drift in standalone mode
         if (vvh > baseVVH) baseVVH = vvh;
@@ -1404,12 +1405,19 @@
           }
         });
       };
+      const onVVResize = () => {
+        // Debounce: iOS fires multiple resize events during keyboard animation.
+        // Wait for the viewport to settle before applying the shift.
+        clearTimeout(vvDebounce);
+        vvDebounce = setTimeout(applyVVShift, 120);
+      };
       window._vvStart = () => {
         baseVVH = window.visualViewport.height;
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
         setTimeout(() => {
+          clearTimeout(vvDebounce);
           window.visualViewport.removeEventListener('resize', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
