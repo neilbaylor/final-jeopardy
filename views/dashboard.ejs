@@ -2458,6 +2458,10 @@
           btn.style.width = '';
           btn.innerHTML = 'Answer';
         });
+        // Belt-and-suspenders: pagehide should have already cleared this in the
+        // snapshot, but if it didn't fire we clear it here so rows don't persist.
+        document.getElementById('games-list').innerHTML = '';
+        document.getElementById('games-spinner').classList.remove('hidden');
         prevGameIds = null;
         setTimeout(loadGames, 400);
       }

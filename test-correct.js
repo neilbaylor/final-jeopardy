@@ -245,6 +245,7 @@ const tests = [
   { correct: 'ET',                  user: 'E.T.',              expect: true,  note: 'abbrev: E.T. matches ET' },
   { correct: 'U.S.A.',              user: 'USA',               expect: true,  note: 'abbrev: USA matches U.S.A.' },
   { correct: 'J.F.K.',              user: 'JFK',               expect: true,  note: 'abbrev: JFK matches J.F.K.' },
+  { correct: 'Born in the U.S.A.',  user: 'born in USA',       expect: true,  note: 'abbrev: mid-string dots in phrase' },
 
   // ── Non-English first names — last name shorthand ─────────────────────────
   // French
