@@ -847,12 +847,16 @@
           life: 250 + Math.random() * 40,
         };
       });
-      function draw() {
+      let lastTs;
+      function draw(ts) {
+        const dt = lastTs == null ? 16.67 : Math.min(ts - lastTs, 50);
+        lastTs = ts;
+        const tick = dt / 16.67; // scale factor: 1.0 at 60fps, 2.0 at 30fps
         ctx.clearRect(0, 0, W, H);
         let any = false;
         for (const p of pieces) {
-          p.age++;
-          p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.rot += p.vrot;
+          p.age += tick;
+          p.x += p.vx * tick; p.y += p.vy * tick; p.vy += 0.12 * tick; p.rot += p.vrot * tick;
           const alpha = Math.max(0, 1 - p.age / p.life);
           if (alpha <= 0 || p.y > H + 20) continue;
           any = true;
