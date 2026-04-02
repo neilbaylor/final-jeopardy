@@ -829,7 +829,7 @@
       const H = canvas.height = window.innerHeight;
       const ctx = canvas.getContext('2d');
       const colors = ['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#A78BFA','#34D399','#F97316','#EC4899'];
-      const cx = W / 2, cy = H * 0.35;
+      const cx = W / 2, cy = H * 0.25;
       const pieces = Array.from({length: 130}, () => {
         const angle = Math.random() * Math.PI * 2;
         const speed = 2 + Math.random() * 9;
@@ -844,7 +844,7 @@
           h: 3 + Math.random() * 3,
           color: colors[Math.floor(Math.random() * colors.length)],
           age: 0,
-          life: 200 + Math.random() * 60,
+          life: 280 + Math.random() * 80,
         };
       });
       function draw() {
@@ -1415,13 +1415,13 @@
       const onVVResize = () => {
         const prospective = Math.max(0, baseVVH - window.visualViewport.height);
         if (prospective > kbOffset) {
-          // Keyboard opening: apply immediately for responsiveness, then re-apply
-          // after 120ms once the viewport has settled to correct any intermediate value.
-          applyVVShift();
+          // Keyboard opening: debounce so we wait for viewport to settle before
+          // shifting — intermediate resize events report partial heights that would
+          // overshoot the shift and push elements off screen.
           clearTimeout(vvDebounce);
           vvDebounce = setTimeout(applyVVShift, 120);
         } else {
-          // Keyboard closing: apply immediately, no debounce needed.
+          // Keyboard closing: apply immediately.
           clearTimeout(vvDebounce);
           applyVVShift();
         }
