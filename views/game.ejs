@@ -1422,14 +1422,6 @@
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
-          // In standalone mode iOS sometimes doesn't fire a resize on keyboard dismiss —
-          // force-reset transforms so elements don't stay shifted.
-          [progressBar, headerCategoryEl, questionEl].forEach(el => {
-            el.style.transition = 'none';
-            el.style.transform = '';
-            el.offsetHeight;
-            el.style.transition = '';
-          });
         }, 1000);
       };
     }
