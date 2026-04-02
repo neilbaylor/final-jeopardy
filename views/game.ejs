@@ -1364,7 +1364,10 @@
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const onVVResize = () => {
         if (window.visualViewport.height < 150) { setTimeout(onVVResize, 100); return; }
-        const newOffset = Math.max(0, baseVVH - window.visualViewport.height);
+        const vvh = window.visualViewport.height;
+        // Re-anchor baseVVH if viewport grows — handles drift in standalone mode
+        if (vvh > baseVVH) baseVVH = vvh;
+        const newOffset = Math.max(0, baseVVH - vvh);
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
@@ -1411,6 +1414,14 @@
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
+          // In standalone mode iOS sometimes doesn't fire a resize on keyboard dismiss —
+          // force-reset transforms so elements don't stay shifted.
+          [progressBar, headerCategoryEl, questionEl].forEach(el => {
+            el.style.transition = 'none';
+            el.style.transform = '';
+            el.offsetHeight;
+            el.style.transition = '';
+          });
         }, 1000);
       };
     }
