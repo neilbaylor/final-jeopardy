@@ -153,6 +153,8 @@ async function initDB() {
     await conn.query(`ALTER TABLE game_answers ADD INDEX idx_game_answers_user_id (user_id)`);
   if (!idxSet.has('game_questions.idx_game_questions_game_id_id'))
     await conn.query(`ALTER TABLE game_questions ADD INDEX idx_game_questions_game_id_id (game_id, id)`);
+  if (!idxSet.has('game_questions.idx_game_questions_asked_at'))
+    await conn.query(`ALTER TABLE game_questions ADD INDEX idx_game_questions_asked_at (asked_at)`);
 
   conn.release();
   console.log('Database tables ready');
