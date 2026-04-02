@@ -140,6 +140,20 @@ async function initDB() {
     await conn.query(`ALTER TABLE questions ADD COLUMN originally_asked DATE NULL`);
   }
 
+  // Idempotent index additions
+  const [existingIndexes] = await conn.query(`
+    SELECT CONCAT(TABLE_NAME, '.', INDEX_NAME) AS idx
+    FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+  `);
+  const idxSet = new Set(existingIndexes.map(r => r.idx));
+  if (!idxSet.has('game_users.idx_game_users_user_id'))
+    await conn.query(`ALTER TABLE game_users ADD INDEX idx_game_users_user_id (user_id)`);
+  if (!idxSet.has('game_answers.idx_game_answers_user_id'))
+    await conn.query(`ALTER TABLE game_answers ADD INDEX idx_game_answers_user_id (user_id)`);
+  if (!idxSet.has('game_questions.idx_game_questions_game_id_id'))
+    await conn.query(`ALTER TABLE game_questions ADD INDEX idx_game_questions_game_id_id (game_id, id)`);
+
   conn.release();
   console.log('Database tables ready');
 }
