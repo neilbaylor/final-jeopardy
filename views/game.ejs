@@ -1415,13 +1415,16 @@
         });
       };
       const onVVResize = () => {
-        // Only debounce when keyboard is opening (viewport shrinking) — iOS fires multiple
-        // intermediate resize events during the animation. Apply immediately on close.
         const prospective = Math.max(0, baseVVH - window.visualViewport.height);
-        clearTimeout(vvDebounce);
         if (prospective > kbOffset) {
+          // Keyboard opening: apply immediately for responsiveness, then re-apply
+          // after 120ms once the viewport has settled to correct any intermediate value.
+          applyVVShift();
+          clearTimeout(vvDebounce);
           vvDebounce = setTimeout(applyVVShift, 120);
         } else {
+          // Keyboard closing: apply immediately, no debounce needed.
+          clearTimeout(vvDebounce);
           applyVVShift();
         }
       };
