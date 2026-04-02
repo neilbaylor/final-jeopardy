@@ -1304,9 +1304,11 @@
                     if (meEntry._isCorrect) {
                       const myCoin = answerResponsesEl.querySelector('.my-correct-coin');
                       if (myCoin) {
-                        myCoin.classList.add('coin-pop');
-                        myCoin.addEventListener('animationend', () => myCoin.classList.add('coin-shimmer'), { once: true });
-                        setTimeout(() => launchConfetti(), 50);
+                        launchConfetti();
+                        setTimeout(() => {
+                          myCoin.classList.add('coin-pop');
+                          myCoin.addEventListener('animationend', () => myCoin.classList.add('coin-shimmer'), { once: true });
+                        }, 600);
                       }
                     }
                     if (shouldShowNextBtn) {
