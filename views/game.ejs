@@ -1437,7 +1437,7 @@
           // shifting — intermediate resize events report partial heights that would
           // overshoot the shift and push elements off screen.
           clearTimeout(vvDebounce);
-          vvDebounce = setTimeout(applyVVShift, 120);
+          vvDebounce = setTimeout(applyVVShift, 300);
         } else {
           // Keyboard closing: apply immediately.
           clearTimeout(vvDebounce);
