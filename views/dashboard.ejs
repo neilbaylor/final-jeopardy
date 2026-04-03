@@ -2384,7 +2384,6 @@
         const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         const setDeleteOpacity = show => { deleteAction.style.opacity = show ? '1' : '0'; };
         const setTx = (tx, animated) => {
-          row.style.animation = 'none'; // clear rowFadeIn fill so transform isn't overridden
           row.style.transition = animated ? ease : 'none';
           row.style.transform = tx ? `translateX(${tx}px)` : '';
           if (animated) row.addEventListener('transitionend', () => { row.style.transition = ''; }, { once: true });
@@ -2402,6 +2401,7 @@
 
         wrapper.addEventListener('touchstart', e => {
           if (e.touches.length !== 1) return;
+          row.style.animation = 'none'; // clear rowFadeIn fill before gesture so transform isn't overridden mid-move
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
           dirLocked = null;
