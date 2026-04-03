@@ -1384,7 +1384,7 @@
       }, { passive: false });
     }
 
-    if (window.visualViewport && (/iP(hone|ad|od)/.test(navigator.userAgent) || window.matchMedia('(display-mode: standalone)').matches)) {
+    if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseVVH = window.visualViewport.height;
       let kbOffset = 0;
       let vvDebounce;
