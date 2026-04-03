@@ -1302,7 +1302,7 @@
       background: #fff;
       border-radius: 16px;
       padding: 22px 20px 18px;
-      max-width: 400px;
+      max-width: 350px;
       width: 100%;
       box-shadow: 3px 7px 6px rgba(0,0,0,0.23);
       text-align: left;
@@ -1312,7 +1312,7 @@
       font-weight: 600;
       color: #333;
       line-height: 1.45;
-      margin: 0 0 16px;
+      margin: 0 0 20px;
     }
     #delete-user-modal-cancel {
       background: linear-gradient(to top, #cecece, #e8e8e8);
@@ -1623,7 +1623,9 @@
           ? `<img class="player-avatar" src="${currentUser.avatar_url}" alt="${currentUser.display_name || ''}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
         document.getElementById('stats-modal-name').textContent = currentUser?.display_name || '';
-        document.getElementById('stats-modal-coin').textContent = Math.min(correct, 99);
+        const coinEl = document.getElementById('stats-modal-coin');
+        coinEl.textContent = Math.min(correct, 99);
+        coinEl.style.display = correct === 0 ? 'none' : '';
         document.getElementById('stats-modal-stat').textContent = `${correct} / ${total} (${pct}%)`;
         const streaksEl = document.getElementById('stats-modal-streaks');
         const lg = stats.longest_game;
@@ -2379,6 +2381,7 @@
           deleteAction.style.opacity = show ? '1' : '0';
         };
         const setTx = (tx, animated) => {
+          row.style.animation = 'none'; // clear rowFadeIn fill so transform isn't overridden
           row.style.transition = animated ? ease : 'none';
           row.style.transform = tx ? `translateX(${tx}px)` : '';
           if (animated) row.addEventListener('transitionend', () => { row.style.transition = ''; }, { once: true });
