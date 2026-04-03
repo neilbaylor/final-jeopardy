@@ -1237,6 +1237,119 @@
       text-overflow: ellipsis;
     }
 
+    /* Admin swipe-to-delete on user rows */
+    .user-row-wrapper {
+      position: relative;
+    }
+    .user-row-wrapper:last-child .user-row { border-bottom: none; }
+    @media (display-mode: standalone) {
+      .user-row-wrapper:last-child .user-row { margin-bottom: 24px; }
+    }
+    .user-row-wrapper .user-row {
+      position: relative;
+      z-index: 1;
+      will-change: transform;
+      touch-action: pan-y;
+    }
+    .user-row-delete-action {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+      width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e53935;
+      opacity: 0;
+      z-index: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .delete-user-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      pointer-events: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Delete user confirmation modal */
+    #delete-user-modal-backdrop {
+      display: flex;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    #delete-user-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #delete-user-modal {
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px 20px 18px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 3px 7px 6px rgba(0,0,0,0.23);
+      text-align: left;
+    }
+    #delete-user-modal p {
+      font-size: 0.919rem;
+      font-weight: 600;
+      color: #333;
+      line-height: 1.45;
+      margin: 0 0 16px;
+    }
+    #delete-user-modal-cancel {
+      background: linear-gradient(to top, #cecece, #e8e8e8);
+      color: #555;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.4);
+      border: 1px solid #ddd;
+      border-radius: 999px;
+      padding: 9px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #delete-user-modal-confirm {
+      background: linear-gradient(to top, #c62828, #e53935);
+      color: #fff;
+      border: 1px solid rgba(180,0,0,0.3);
+      border-radius: 999px;
+      padding: 9px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    #delete-user-modal-confirm .du-spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: panelSpin 0.7s linear infinite;
+    }
+    #delete-user-modal-confirm.loading .du-spinner { display: block; }
+    #delete-user-modal-confirm.loading .du-text { display: none; }
+
 </style>
 </head>
 <body>
@@ -1287,6 +1400,16 @@
       <div class="delete-modal-buttons">
         <button id="delete-modal-cancel">Cancel</button>
         <button id="delete-modal-confirm"><span class="dm-text">Yes</span><div class="dm-spinner"></div></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-user-modal-backdrop">
+    <div id="delete-user-modal">
+      <p id="delete-user-modal-msg">Delete this user and all their games?</p>
+      <div class="delete-modal-buttons">
+        <button id="delete-user-modal-cancel">Cancel</button>
+        <button id="delete-user-modal-confirm"><span class="du-text">Delete</span><div class="du-spinner"></div></button>
       </div>
     </div>
   </div>
@@ -2202,23 +2325,28 @@
       return Promise.all([fetchUsers, delay])
         .then(([users]) => {
           if (!silent) spinner.classList.add('hidden');
+          const isAdmin = userId === '1';
           const applyUsers = () => {
             const selected = new Set([...scroller.querySelectorAll('.user-row input:checked')]
               .map(cb => cb.closest('.user-row').dataset.userId));
             const userStaggerMs = (!cached && !silent && users.length > 1) ? Math.max(22, Math.round(55 / Math.sqrt(users.length - 1))) : 0;
-            scroller.innerHTML = users.map((u, i) => `
-              <div class="user-row" data-user-id="${u.id}" onclick="this.querySelector('input').click()" style="animation-delay:${(i * userStaggerMs / 1000).toFixed(3)}s">
+            const trashIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+            scroller.innerHTML = users.map((u, i) => {
+              const rowHtml = `<div class="user-row" data-user-id="${u.id}"${isAdmin ? '' : ` onclick="this.querySelector('input').click()"`} style="animation-delay:${(i * userStaggerMs / 1000).toFixed(3)}s">
                 ${u.avatar_url
                   ? `<img src="${u.avatar_url}" alt="${u.display_name}" />`
                   : `<div class="user-avatar-placeholder">👤</div>`}
                 <span class="user-name">${u.display_name}</span>
                 <input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" />
-              </div>
-            `).join('');
+              </div>`;
+              if (!isAdmin) return rowHtml;
+              return `<div class="user-row-wrapper" data-user-id="${u.id}">${rowHtml}<div class="user-row-delete-action"><button class="delete-user-btn" aria-label="Delete user">${trashIcon}</button></div></div>`;
+            }).join('');
             scroller.querySelectorAll('.user-row').forEach(row => {
               if (selected.has(row.dataset.userId)) row.querySelector('input').checked = true;
             });
             updateCreateBtn();
+            if (isAdmin) setupUserSwipe();
           };
           if (silent && scroller.querySelector('.user-row')) {
             scroller.style.opacity = '0';
@@ -2233,6 +2361,141 @@
           scroller.innerHTML = '<p style="padding:16px;color:#888;">Could not load users.</p>';
         });
     }
+
+    function setupUserSwipe() {
+      const scroller = document.getElementById('users-list-scroller');
+      const USER_DELETE_WIDTH = 80;
+      scroller.querySelectorAll('.user-row-wrapper').forEach(wrapper => {
+        const row = wrapper.querySelector('.user-row');
+        const deleteAction = wrapper.querySelector('.user-row-delete-action');
+        let startX = 0, startY = 0, dirLocked = null, active = false, deleteRevealed = false;
+        const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        const setDeleteOpacity = show => {
+          deleteAction.style.transition = show ? 'none' : 'opacity 0s 300ms';
+          deleteAction.style.opacity = show ? '1' : '0';
+        };
+        const setTx = (tx, animated) => {
+          row.style.transition = animated ? ease : 'none';
+          row.style.transform = tx ? `translateX(${tx}px)` : '';
+          if (animated) row.addEventListener('transitionend', () => { row.style.transition = ''; }, { once: true });
+        };
+
+        row.addEventListener('click', () => {
+          if (deleteRevealed) {
+            deleteRevealed = false;
+            setDeleteOpacity(false);
+            setTx(0, true);
+          } else {
+            row.querySelector('input').click();
+          }
+        });
+
+        wrapper.addEventListener('touchstart', e => {
+          if (e.touches.length !== 1) return;
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+          dirLocked = null;
+          active = true;
+          row.style.transition = 'none';
+        }, { passive: true });
+
+        wrapper.addEventListener('touchmove', e => {
+          if (!active || e.touches.length !== 1) return;
+          const dx = e.touches[0].clientX - startX;
+          const dy = e.touches[0].clientY - startY;
+          if (!dirLocked) {
+            if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) dirLocked = 'h';
+            else if (Math.abs(dy) > 8) { dirLocked = 'v'; active = false; return; }
+            else return;
+          }
+          if (dirLocked !== 'h') return;
+          e.preventDefault();
+          if (deleteRevealed) {
+            const tx = Math.max(-USER_DELETE_WIDTH, Math.min(0, -USER_DELETE_WIDTH + dx));
+            row.style.transform = `translateX(${tx}px)`;
+            setDeleteOpacity(tx < 0);
+          } else if (dx < 0) {
+            const tx = Math.max(-USER_DELETE_WIDTH, dx);
+            row.style.transform = `translateX(${tx}px)`;
+            setDeleteOpacity(true);
+          } else {
+            row.style.transform = '';
+            setDeleteOpacity(false);
+          }
+        }, { passive: false });
+
+        const onTouchEnd = e => {
+          if (!active) return;
+          active = false;
+          if (dirLocked !== 'h') return;
+          const dx = e.changedTouches[0].clientX - startX;
+          if (deleteRevealed) {
+            if (dx > 40) { deleteRevealed = false; setDeleteOpacity(false); setTx(0, true); }
+            else { setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
+          } else {
+            if (dx < -40) { deleteRevealed = true; setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
+            else { setDeleteOpacity(false); setTx(0, true); }
+          }
+        };
+        wrapper.addEventListener('touchend', onTouchEnd, { passive: true });
+        wrapper.addEventListener('touchcancel', () => {
+          if (!active) return;
+          active = false;
+          if (deleteRevealed) { setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
+          else { setDeleteOpacity(false); setTx(0, true); }
+        }, { passive: true });
+
+        deleteAction.addEventListener('click', () => {
+          const backdrop = document.getElementById('delete-user-modal-backdrop');
+          backdrop.dataset.targetUserId = wrapper.dataset.userId;
+          const name = row.querySelector('.user-name').textContent;
+          document.getElementById('delete-user-modal-msg').textContent = `Delete ${name} and all their games?`;
+          backdrop.classList.add('open');
+        });
+      });
+    }
+
+    // Delete user modal handlers
+    document.getElementById('delete-user-modal-backdrop').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    document.getElementById('delete-user-modal-cancel').addEventListener('click', () => {
+      document.getElementById('delete-user-modal-backdrop').classList.remove('open');
+    });
+    document.getElementById('delete-user-modal-confirm').addEventListener('click', async () => {
+      const backdrop = document.getElementById('delete-user-modal-backdrop');
+      const targetUserId = backdrop.dataset.targetUserId;
+      const confirmBtn = document.getElementById('delete-user-modal-confirm');
+      const cancelBtn = document.getElementById('delete-user-modal-cancel');
+
+      confirmBtn.classList.add('loading');
+      confirmBtn.disabled = true;
+      cancelBtn.disabled = true;
+
+      let ok = false;
+      try {
+        const res = await fetch(`/api/users/${encodeURIComponent(targetUserId)}?requesterId=${encodeURIComponent(userId)}`, { method: 'DELETE' });
+        ok = res.ok;
+      } catch (e) {}
+
+      if (!ok) {
+        confirmBtn.classList.remove('loading');
+        confirmBtn.disabled = false;
+        cancelBtn.disabled = false;
+        return;
+      }
+
+      backdrop.classList.remove('open');
+      setTimeout(() => {
+        confirmBtn.classList.remove('loading');
+        confirmBtn.disabled = false;
+        cancelBtn.disabled = false;
+      }, 200);
+
+      // Remove the row from the DOM
+      const scroller = document.getElementById('users-list-scroller');
+      const wrapper = scroller.querySelector(`.user-row-wrapper[data-user-id="${targetUserId}"]`);
+      if (wrapper) wrapper.remove();
+      updateCreateBtn();
+    });
 
     // Pull-to-refresh + bottom overscroll on #users-list
     (function() {

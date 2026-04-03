@@ -817,5 +817,25 @@ router.delete('/api/games/:gameId', async (req, res) => {
   }
 });
 
+router.delete('/api/users/:targetUserId', async (req, res) => {
+  const { requesterId } = req.query;
+  if (String(requesterId) !== '1') return res.status(403).json({ error: 'Forbidden' });
+  const targetUserId = Number(req.params.targetUserId);
+  try {
+    // Delete all games the user is in (cascades game_users, game_questions, game_answers)
+    const [gameRows] = await db.query('SELECT DISTINCT game_id FROM game_users WHERE user_id = ?', [targetUserId]);
+    if (gameRows.length > 0) {
+      const ids = gameRows.map(r => r.game_id);
+      await db.query(`DELETE FROM games WHERE id IN (${ids.map(() => '?').join(',')})`, ids);
+    }
+    // Delete the user (cascades push_subscriptions, game_answers, game_users)
+    await db.query('DELETE FROM users WHERE id = ?', [targetUserId]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Delete user error:', err);
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
 module.exports = router;
 module.exports.isAnswerCorrect = isAnswerCorrect;
