@@ -1265,7 +1265,6 @@
       align-items: center;
       justify-content: center;
       background: #e53935;
-      opacity: 0;
       z-index: 0;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
@@ -2377,10 +2376,6 @@
         const deleteAction = wrapper.querySelector('.user-row-delete-action');
         let startX = 0, startY = 0, dirLocked = null, active = false, deleteRevealed = false;
         const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        const setDeleteOpacity = show => {
-          deleteAction.style.transition = show ? 'none' : 'opacity 0s 300ms';
-          deleteAction.style.opacity = show ? '1' : '0';
-        };
         const setTx = (tx, animated) => {
           row.style.animation = 'none'; // clear rowFadeIn fill so transform isn't overridden
           row.style.transition = animated ? ease : 'none';
@@ -2391,7 +2386,6 @@
         row.addEventListener('click', () => {
           if (deleteRevealed) {
             deleteRevealed = false;
-            setDeleteOpacity(false);
             setTx(0, true);
           } else {
             row.querySelector('input').click();
@@ -2421,14 +2415,11 @@
           if (deleteRevealed) {
             const tx = Math.max(-USER_DELETE_WIDTH, Math.min(0, -USER_DELETE_WIDTH + dx));
             row.style.transform = `translateX(${tx}px)`;
-            setDeleteOpacity(tx < 0);
           } else if (dx < 0) {
             const tx = Math.max(-USER_DELETE_WIDTH, dx);
             row.style.transform = `translateX(${tx}px)`;
-            setDeleteOpacity(true);
           } else {
             row.style.transform = '';
-            setDeleteOpacity(false);
           }
         }, { passive: false });
 
@@ -2438,19 +2429,19 @@
           if (dirLocked !== 'h') return;
           const dx = e.changedTouches[0].clientX - startX;
           if (deleteRevealed) {
-            if (dx > 40) { deleteRevealed = false; setDeleteOpacity(false); setTx(0, true); }
-            else { setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
+            if (dx > 40) { deleteRevealed = false; setTx(0, true); }
+            else { setTx(-USER_DELETE_WIDTH, true); }
           } else {
-            if (dx < -40) { deleteRevealed = true; setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
-            else { setDeleteOpacity(false); setTx(0, true); }
+            if (dx < -40) { deleteRevealed = true; setTx(-USER_DELETE_WIDTH, true); }
+            else { setTx(0, true); }
           }
         };
         wrapper.addEventListener('touchend', onTouchEnd, { passive: true });
         wrapper.addEventListener('touchcancel', () => {
           if (!active) return;
           active = false;
-          if (deleteRevealed) { setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
-          else { setDeleteOpacity(false); setTx(0, true); }
+          if (deleteRevealed) { setTx(-USER_DELETE_WIDTH, true); }
+          else { setTx(0, true); }
         }, { passive: true });
 
         deleteAction.addEventListener('click', () => {
