@@ -1445,8 +1445,10 @@
         }
       };
       window._vvStart = () => {
-        baseVVH = window.visualViewport.height;
-        window.visualViewport.addEventListener('resize', onVVResize);
+        setTimeout(() => {
+          baseVVH = window.visualViewport.height;
+          window.visualViewport.addEventListener('resize', onVVResize);
+        }, 150);
       };
       window._vvStop = () => {
         setTimeout(() => {
