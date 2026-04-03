@@ -67,7 +67,7 @@ function normalizeAnswer(str) {
 // Common English first names used to detect "FirstName LastName" patterns.
 const COMMON_FIRST_NAMES = new Set([
   // Male
-  'aaron','abel','adam','adrian','alan','albert','alberto','alex','alexander','alexis','alfred','alvin',
+  'aaron','abel','abraham','adam','adrian','alan','albert','alberto','alex','alexander','alexis','alfred','alvin',
   'andrew','andy','angelo','anthony','antonio','archer','arnold','arthur','austin','ayn',
   'barry','ben','benjamin','bill','billy','blake','bob','bobby','brad','bradley','brandon','brendan',
   'brett','brian','bruce','bryan','bryce',
@@ -184,7 +184,12 @@ function matchesPart(userNorm, correctNorm, correctPartOrig) {
   return false;
 }
 
+function stripJeopardyPreamble(str) {
+  return str.replace(/^\s*(who(?:\s+(?:is|was|were))|what\s+(?:is|was|were)|where\s+(?:is|was|were)|when\s+(?:is|was|were))\s+/i, '').replace(/\?\s*$/, '').trim();
+}
+
 function isAnswerCorrect(userAnswer, correctAnswer) {
+  userAnswer = stripJeopardyPreamble(userAnswer);
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;

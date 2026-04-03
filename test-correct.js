@@ -276,6 +276,36 @@ const tests = [
   { correct: 'Simone Beauvoir',         user: 'Beauvoir',          expect: true,  note: 'non-English: Simone Beauvoir → Beauvoir' },
   { correct: 'Frida Kahlo',             user: 'Kahlo',             expect: true,  note: 'non-English: Frida Kahlo → Kahlo' },
   { correct: 'Olga Korbut',             user: 'Korbut',            expect: true,  note: 'non-English: Olga Korbut → Korbut' },
+
+  // ── Jeopardy-style preamble stripping ────────────────────────────────────
+  // "Who is" / "Who was"
+  { correct: 'Ben Stein',               user: 'Who is Stein?',              expect: true,  note: 'preamble: "Who is X?" — last name match' },
+  { correct: 'Ben Stein',               user: 'Who is Ben Stein?',          expect: true,  note: 'preamble: "Who is X?" — full name' },
+  { correct: 'Abraham Lincoln',         user: 'Who was Lincoln?',           expect: true,  note: 'preamble: "Who was X?" — last name' },
+  { correct: 'Abraham Lincoln',         user: 'Who was Abraham Lincoln?',   expect: true,  note: 'preamble: "Who was X?" — full name' },
+  { correct: 'Marie Curie',             user: 'Who is Marie Curie',         expect: true,  note: 'preamble: "Who is X" — no question mark' },
+  { correct: 'Napoleon Bonaparte',      user: 'who is Bonaparte',           expect: true,  note: 'preamble: lowercase "who is"' },
+  // "What is" / "What was"
+  { correct: 'New Zealand',             user: 'What is New Zealand?',       expect: true,  note: 'preamble: "What is X?" — place name' },
+  { correct: 'photosynthesis',          user: 'What is photosynthesis?',    expect: true,  note: 'preamble: "What is X?" — science term' },
+  { correct: 'photosynthesis',          user: 'What is photosynthesis',     expect: true,  note: 'preamble: "What is X" — no question mark' },
+  { correct: 'The Great Wall',          user: 'What is the Great Wall?',    expect: true,  note: 'preamble: "What is X?" — article dropped' },
+  { correct: 'the Titanic',             user: 'What was the Titanic?',      expect: true,  note: 'preamble: "What was X?" — historical' },
+  // "Where is" / "Where was"
+  { correct: 'New Zealand',             user: 'Where is New Zealand',       expect: true,  note: 'preamble: "Where is X" — no question mark' },
+  { correct: 'New Zealand',             user: 'Where is New Zealand?',      expect: true,  note: 'preamble: "Where is X?" — with question mark' },
+  { correct: 'Paris',                   user: 'Where is Paris?',            expect: true,  note: 'preamble: "Where is X?" — city' },
+  // "When is" / "When was"
+  { correct: '1776',                    user: 'When was 1776?',             expect: true,  note: 'preamble: "When was X?" — year' },
+  { correct: 'Independence Day',        user: 'When is Independence Day?',  expect: true,  note: 'preamble: "When is X?" — holiday' },
+  // No stripping when no preamble
+  { correct: 'New Zealand',             user: 'New Zealand',                expect: true,  note: 'preamble: no preamble — unchanged' },
+  { correct: 'photosynthesis',          user: 'Photosynthesis',             expect: true,  note: 'preamble: no preamble — plain answer' },
+  // Trailing "?" alone should not strip answer content
+  { correct: 'New Zealand',             user: 'New Zealand?',               expect: true,  note: 'preamble: trailing ? only — still accepted' },
+  // Should not accidentally strip "who" mid-sentence (preamble must be at start)
+  { correct: 'Doctor Who',              user: 'Doctor Who',                 expect: true,  note: 'preamble: "Who" mid-string — not stripped' },
+  { correct: 'Doctor Who',              user: 'Who is Doctor Who?',         expect: true,  note: 'preamble: "Who is Doctor Who?" — preamble stripped, content intact' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
