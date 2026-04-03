@@ -590,7 +590,7 @@
       78%  { opacity: 1; transform: scale(1.1); }
       100% { opacity: 1; transform: scale(1); }
     }
-    .player-score-coin.coin-pop { animation: coin-pop-in 1.2s ease-out 1.65s both; }
+    .player-score-coin.coin-pop { animation: coin-pop-in 1.2s ease-out 1.95s both; }
 
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #answer-responses .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
@@ -846,7 +846,7 @@
           h: 3 + Math.random() * 3,
           color: colors[Math.floor(Math.random() * colors.length)],
           age: 0,
-          life: 550 + Math.random() * 40,
+          life: 450 + Math.random() * 40,
         };
       });
       let lastTs;
@@ -1433,10 +1433,10 @@
       const onVVResize = () => {
         const prospective = Math.max(0, baseVVH - window.visualViewport.height);
         if (prospective > kbOffset) {
-          // Keyboard opening: debounce so we wait for viewport to settle before
-          // shifting — intermediate resize events report partial heights that would
-          // overshoot the shift and push elements off screen.
+          // Keyboard opening: try immediately (often already settled), then
+          // debounce at 300ms as a fallback for mid-animation resize events.
           clearTimeout(vvDebounce);
+          setTimeout(applyVVShift, 0);
           vvDebounce = setTimeout(applyVVShift, 300);
         } else {
           // Keyboard closing: apply immediately.
