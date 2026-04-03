@@ -32,7 +32,7 @@
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-    html { overflow: hidden; height: 100%; }
+    html { overflow: hidden; height: 100%; font-size: 16px; }
 
     /* Slide in from right over dashboard; dashboard parallaxes left */
     @view-transition { navigation: auto; }
@@ -78,6 +78,8 @@
     }
 
     body {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
       touch-action: none;
       background: #07102e;
       height: 100vh;
