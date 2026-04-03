@@ -588,7 +588,7 @@
       78%  { opacity: 1; transform: scale(1.1); }
       100% { opacity: 1; transform: scale(1); }
     }
-    .player-score-coin.coin-pop { animation: coin-pop-in 1.2s ease-out 1.2s both; }
+    .player-score-coin.coin-pop { animation: coin-pop-in 1.2s ease-out 1.35s both; }
 
     #answer-responses .player-status { font-size: 0.84rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #answer-responses .player-status.waiting        { color: rgba(0,0,0,0.38); font-weight: 500; }
@@ -829,7 +829,7 @@
       const H = canvas.height = window.innerHeight;
       const ctx = canvas.getContext('2d');
       const colors = ['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#A78BFA','#34D399','#F97316','#EC4899'];
-      const cx = W / 2, cy = H * 0.25;
+      const cx = W / 2, cy = H * 0.2;
       const pieces = Array.from({length: 130}, () => {
         const angle = Math.random() * Math.PI * 2;
         const speed = 2 + Math.random() * 9;
@@ -1200,7 +1200,7 @@
             let expiryFired = false;
             let expiryTimerId;
 
-            const triggerExpiry = (earlySubmit = false) => {
+            const triggerExpiry = (earlySubmit = false, answerOverride = null) => {
               if (expiryFired) return;
               expiryFired = true;
               clearTimeout(expiryTimerId);
@@ -1208,7 +1208,7 @@
 
               answerInput.disabled = true;
               answerInput.blur();
-              const submittedAnswer = answerInput.value.trim();
+              const submittedAnswer = answerOverride !== null ? answerOverride : answerInput.value.trim();
 
               // Show spinner
               inputSpinnerEl.classList.add('visible');
@@ -1351,6 +1351,18 @@
             answerInput.addEventListener('keydown', e => {
               if (e.key === 'Enter') triggerExpiry(true);
             });
+
+            // If user leaves and returns while timer is running, submit "Left the window"
+            const onVisibilityReturn = () => {
+              if (document.visibilityState !== 'visible') return;
+              try {
+                if (localStorage.getItem(`unanswered_${gameId}_${currentGameQuestionId}`)) {
+                  document.removeEventListener('visibilitychange', onVisibilityReturn);
+                  triggerExpiry(true, 'Left the window');
+                }
+              } catch {}
+            };
+            document.addEventListener('visibilitychange', onVisibilityReturn);
           }
         }, 3700);
         }, 600);
