@@ -1250,8 +1250,6 @@
       .user-row-wrapper:last-child .user-row { margin-bottom: 24px; }
     }
     .user-row-wrapper .user-row {
-      position: relative;
-      z-index: 1;
       touch-action: pan-y;
     }
     .user-row-delete-action {
@@ -2353,7 +2351,7 @@
                 <input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" />
               </div>`;
               if (!isAdmin) return rowHtml;
-              return `<div class="user-row-wrapper" data-user-id="${u.id}">${rowHtml}<div class="user-row-delete-action"><button class="delete-user-btn" aria-label="Delete user">${trashIcon}</button></div></div>`;
+              return `<div class="user-row-wrapper" data-user-id="${u.id}"><div class="user-row-delete-action"><button class="delete-user-btn" aria-label="Delete user">${trashIcon}</button></div>${rowHtml}</div>`;
             }).join('');
             scroller.querySelectorAll('.user-row').forEach(row => {
               if (selected.has(row.dataset.userId)) row.querySelector('input').checked = true;
