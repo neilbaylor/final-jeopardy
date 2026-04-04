@@ -1465,6 +1465,7 @@
     const userId = localStorage.getItem('userId');
     const GAMES_CACHE_KEY = `fjwf_games_${userId}`;
     let prevGameIds = null;
+    let lastLoadedAt = Date.now();
     function getCachedGames() {
       try {
         const parsed = JSON.parse(localStorage.getItem(GAMES_CACHE_KEY) || 'null');
@@ -1821,6 +1822,7 @@
 
       return Promise.all([fetch$, delay])
         .then(([games]) => {
+          lastLoadedAt = Date.now();
           setCachedGames(games);
           if (!silent) {
             spinner.classList.add('hidden');
@@ -2713,6 +2715,19 @@
       });
       content.addEventListener('touchcancel', () => { mode = null; snapBack(); });
     })();
+
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState !== 'visible') return;
+      if (Date.now() - lastLoadedAt < 15 * 60 * 1000) return;
+      lastLoadedAt = Date.now();
+      const gamesList = document.getElementById('games-list');
+      const spinner = document.getElementById('games-spinner');
+      gamesList.style.opacity = '';
+      gamesList.innerHTML = '';
+      spinner.classList.remove('hidden');
+      prevGameIds = null;
+      loadGames();
+    });
 
     window.addEventListener('pagehide', function(e) {
       if (e.persisted) {
