@@ -320,6 +320,9 @@ const tests = [
   { correct: 'Batman (or Bruce Wayne)',           user: 'Bruuce Wayne',      expect: true,  note: "(Or X) — alternative fuzzy misspelling" },
   { correct: 'Batman (or Bruce Wayne)',           user: 'Superman',          expect: false, note: "(Or X) — wrong answer" },
   { correct: 'Batman (or Bruce Wayne)',           user: 'Who is Wayne?',     expect: true,  note: "(Or X) — preamble stripped + last name" },
+
+  // ── JW inflation via shared prefix ───────────────────────────────────────
+  { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

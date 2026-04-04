@@ -193,7 +193,7 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;
-  if (natural.JaroWinklerDistance(a, b) >= 0.88) return true;
+  if (natural.JaroWinklerDistance(a, b) >= 0.885) return true;
 
   // Order-independent match for answers joined by "and" / "or" / "&"
   // e.g. "Neil Taylor and Joe Ross" accepts "Joe Ross & Neil Taylor"
