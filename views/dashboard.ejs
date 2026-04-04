@@ -2726,7 +2726,7 @@
 
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState !== 'visible') return;
-      if (Date.now() - lastLoadedAt < 60 * 60 * 1000) return;
+      if (Date.now() - lastLoadedAt < 90 * 60 * 1000) return;
       lastLoadedAt = Date.now();
       const gamesList = document.getElementById('games-list');
       const spinner = document.getElementById('games-spinner');
