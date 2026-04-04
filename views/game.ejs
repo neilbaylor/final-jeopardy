@@ -117,14 +117,6 @@
     #back-btn.disabled { opacity: 0; pointer-events: none; }
     #back-btn.navigating { pointer-events: none; }
     #back-btn svg { flex-shrink: 0; }
-    #back-btn-spinner {
-      width: 28px;
-      height: 28px;
-      border: 3px solid rgba(255,255,255,0.15);
-      border-top-color: rgba(255,255,255,0.55);
-      border-radius: 50%;
-      animation: inputSpin 0.75s linear infinite;
-    }
 
     /* Hide spinner + back btn until page transition completes */
     #spinner.pre-enter, #back-btn.pre-enter { opacity: 0 !important; }
@@ -752,7 +744,6 @@
     function handleBackBtn() {
       if (backBtn.classList.contains('navigating')) return;
       backBtn.classList.add('navigating');
-      backBtn.innerHTML = '<div id="back-btn-spinner"></div>';
       sessionStorage.setItem('vt-from-game', '1');
       window.location.href = '/dashboard';
     }
