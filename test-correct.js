@@ -319,6 +319,7 @@ const tests = [
   { correct: 'Batman (or Bruce Wayne)',           user: 'Wayne',             expect: true,  note: "(Or X) — alternative last name only" },
   { correct: 'Batman (or Bruce Wayne)',           user: 'Bruuce Wayne',      expect: true,  note: "(Or X) — alternative fuzzy misspelling" },
   { correct: 'Batman (or Bruce Wayne)',           user: 'Superman',          expect: false, note: "(Or X) — wrong answer" },
+  { correct: 'Batman (or Bruce Wayne)',           user: 'Who is Wayne?',     expect: true,  note: "(Or X) — preamble stripped + last name" },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
