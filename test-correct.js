@@ -306,6 +306,19 @@ const tests = [
   // Should not accidentally strip "who" mid-sentence (preamble must be at start)
   { correct: 'Doctor Who',              user: 'Doctor Who',                 expect: true,  note: 'preamble: "Who" mid-string — not stripped' },
   { correct: 'Doctor Who',              user: 'Who is Doctor Who?',         expect: true,  note: 'preamble: "Who is Doctor Who?" — preamble stripped, content intact' },
+
+  // ── (Or X) — primary or alternative ─────────────────────────────────────
+  { correct: "February 14 (Or Valentine's Day)", user: 'February 14',        expect: true,  note: "(Or X) — primary match" },
+  { correct: "February 14 (Or Valentine's Day)", user: "Valentine's Day",    expect: true,  note: "(Or X) — alternative exact" },
+  { correct: "February 14 (Or Valentine's Day)", user: 'Valentines Day',     expect: true,  note: "(Or X) — alternative fuzzy (no apostrophe)" },
+  { correct: "February 14 (Or Valentine's Day)", user: 'Valentines day',     expect: true,  note: "(Or X) — alternative fuzzy lowercase" },
+  { correct: "February 14 (Or Valentine's Day)", user: 'Valintines Day',     expect: true,  note: "(Or X) — alternative misspelling" },
+  { correct: "February 14 (Or Valentine's Day)", user: 'Christmas',          expect: false, note: "(Or X) — wrong answer" },
+  { correct: 'Batman (or Bruce Wayne)',           user: 'Batman',            expect: true,  note: "(Or X) — primary single name" },
+  { correct: 'Batman (or Bruce Wayne)',           user: 'Bruce Wayne',       expect: true,  note: "(Or X) — alternative full name" },
+  { correct: 'Batman (or Bruce Wayne)',           user: 'Wayne',             expect: true,  note: "(Or X) — alternative last name only" },
+  { correct: 'Batman (or Bruce Wayne)',           user: 'Bruuce Wayne',      expect: true,  note: "(Or X) — alternative fuzzy misspelling" },
+  { correct: 'Batman (or Bruce Wayne)',           user: 'Superman',          expect: false, note: "(Or X) — wrong answer" },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

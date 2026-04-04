@@ -263,6 +263,17 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   // Require multi-word answer and suffix must be ≥75% of the full answer length.
   if (a.includes(' ') && b.endsWith(a) && b.length > a.length && b[b.length - a.length - 1] === ' ' && a.length / b.length >= 0.72) return true;
 
+  // "(Or X)" at end — accept either the primary answer OR the alternative.
+  // e.g. "February 14 (Or Valentine's Day)" → accepts "February 14" or "Valentine's Day"
+  // e.g. "Batman (or Bruce Wayne)"           → accepts "Batman", "Bruce Wayne", or "Wayne"
+  const orAltMatch = correctAnswer.match(/^(.*?)\s*\(\s*or\s+([^)]+)\)\s*$/i);
+  if (orAltMatch) {
+    const primary = orAltMatch[1].trim();
+    const alt = orAltMatch[2].trim();
+    if (matchesPart(a, normalizeAnswer(primary), primary)) return true;
+    if (matchesPart(a, normalizeAnswer(alt), alt)) return true;
+  }
+
   // If the correct answer has parenthetical words, they are optional.
   // e.g. "(Randolph) Caldecott" accepts both "Caldecott" and "Randolph Caldecott".
   if (/\(/.test(correctAnswer)) {
