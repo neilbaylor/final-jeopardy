@@ -2725,7 +2725,7 @@
       gamesList.style.opacity = '';
       gamesList.innerHTML = '';
       spinner.classList.remove('hidden');
-      prevGameIds = null;
+      prevGameIds = new Set((currentGames || []).map(g => String(g.id)));
       loadGames();
     });
 
