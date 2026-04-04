@@ -78,7 +78,7 @@ const COMMON_FIRST_NAMES = new Set([
   'earl','eddie','edgar','edward','eli','elijah','elton','elvis','eric','ernest','ethan','eugene','evan',
   'felix','floyd','frank','franklin','fred','freddie','frederic','frederick',
   'gabriel','gary','gene','geoffrey','george','gerald','gilbert','glen','gordon','graham','grant','gregory',
-  'harold','harry','harvey','henry','herbert','homer','howard','hugo',
+  'hannibal','harold','harry','harvey','henry','herbert','homer','howard','hugo',
   'ian','ivan',
   'jack','jacob','jake','james','jason','javier','jay','jeff','jeffrey','jeremy','jerome',
   'jerry','jesse','jim','jimmy','joe','joel','john','johnny','jon','jonathan','jordan','jorge',
