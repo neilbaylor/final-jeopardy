@@ -7,14 +7,14 @@ function parseDbDate(str) {
   return new Date(str.includes('Z') || str.includes('+') ? str : str.replace(' ', 'T') + 'Z');
 }
 
-function relativeAnswerTime(ts, short, relativeTo) {
+function relativeAnswerTime(ts, short, relativeTo, answered) {
   if (!ts) return 'Waiting';
   const now = relativeTo ? parseDbDate(relativeTo).getTime() : Date.now();
   const diffMs = now - parseDbDate(ts).getTime();
   const diffHrs = diffMs / (1000 * 60 * 60);
   const noAgo = !!relativeTo;
   if (diffHrs < 1) return noAgo ? 'Quickly' : 'Recent';
-  if (diffHrs >= 24) return 'Expired';
+  if (diffHrs >= 24) return answered ? '1 day ago' : 'Expired';
   const hrs = Math.floor(diffHrs);
   if (short || noAgo) return hrs === 1 ? '1 hr' : hrs + ' hrs';
   return hrs === 1 ? '1hr ago' : hrs + 'hrs ago';
@@ -120,7 +120,7 @@ function buildPlayerCardHtml(p, opts) {
     ? 'Expired'
     : (opts && opts.askedAt && p._answeredAt)
       ? relativeAnswerTime(opts.askedAt, opts && opts.short, p._answeredAt)
-      : relativeAnswerTime(p._answeredAt, opts && opts.short, opts && opts.relativeTo);
+      : relativeAnswerTime(p._answeredAt, opts && opts.short, opts && opts.relativeTo, p._answered);
   return `<div class="game-player">
     ${avatarHtml}
     <div class="game-player-info">
