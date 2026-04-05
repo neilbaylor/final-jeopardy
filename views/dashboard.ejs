@@ -1250,10 +1250,10 @@
 
     /* Admin swipe-to-delete on user rows */
     .user-row-wrapper {
-      position: relative;
       touch-action: pan-y;
       border-bottom: 1px solid #f0f0f0;
     }
+    .user-row-wrapper:last-child { border-bottom: none; }
     .user-row-wrapper:last-child .user-row { border-bottom: none; }
     @media (display-mode: standalone) {
       .user-row-wrapper:last-child .user-row { margin-bottom: 24px; }
