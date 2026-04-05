@@ -1050,7 +1050,10 @@
           // 200ms later: "The Category is..." label with animated dots
           _setTimeout(() => {
             labelEl.classList.add('visible');
-            hostRevealEl.classList.add('visible');
+            // Force a reflow so the opacity:0 state is painted before adding visible,
+            // ensuring the CSS transition actually plays
+            hostRevealEl.offsetHeight; // eslint-disable-line no-unused-expressions
+            requestAnimationFrame(() => hostRevealEl.classList.add('visible'));
 
             // Animate "" → . → .. → ... at 345ms/step, 1.1–2.0 random cycles
             const cycles = 1.8 + Math.random() * 0.8;
@@ -1064,10 +1067,11 @@
                 clearInterval(dotsInterval);
                 // 200ms extra pause before cross-fade (extends the animation)
                 _setTimeout(() => {
-                  // Cross-fade: label out, category in, host out simultaneously
+                  // Cross-fade: label out, category in simultaneously
                   labelEl.classList.remove('visible');
-                  hostRevealEl.classList.remove('visible');
                   categoryEl.classList.add('visible');
+                  // Fade host out 400ms after the label fades out
+                  _setTimeout(() => hostRevealEl.classList.remove('visible'), 400);
                   // 1800ms later: Answer button + player cards (max 4, 30px below category)
                   _setTimeout(() => {
                     answerBtn.classList.add('visible');
