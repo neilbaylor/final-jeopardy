@@ -1427,7 +1427,6 @@
         const vvh = window.visualViewport.height;
         const newOffset = Math.max(0, baseVVH - vvh);
         if (newOffset === kbOffset) return;
-        if (newOffset > 0 && newOffset < 80) return;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
