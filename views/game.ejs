@@ -1161,7 +1161,10 @@
     loadGame();
 
     // Reset UI before page enters bfcache so the snapshot shows the spinner
-    window.addEventListener('pagehide', () => resetUI());
+    window.addEventListener('pagehide', () => {
+      hostRevealEl.style.opacity = '0';
+      resetUI();
+    });
 
     // Re-run the full flow when restored from bfcache (back/forward navigation)
     window.addEventListener('pageshow', e => {
