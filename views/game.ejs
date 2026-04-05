@@ -495,7 +495,6 @@
       width: 220px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.9s ease;
       z-index: 2;
     }
     #host-reveal.visible { opacity: 1; }
@@ -1053,7 +1052,10 @@
             // Force a reflow so the opacity:0 state is painted before adding visible,
             // ensuring the CSS transition actually plays
             hostRevealEl.offsetHeight; // eslint-disable-line no-unused-expressions
-            requestAnimationFrame(() => hostRevealEl.classList.add('visible'));
+            requestAnimationFrame(() => {
+              hostRevealEl.style.transition = 'opacity 1.1s ease';
+              hostRevealEl.classList.add('visible');
+            });
 
             // Animate "" → . → .. → ... at 345ms/step, 1.1–2.0 random cycles
             const cycles = 1.8 + Math.random() * 0.8;
@@ -1071,7 +1073,10 @@
                   labelEl.classList.remove('visible');
                   categoryEl.classList.add('visible');
                   // Fade host out 400ms after the label fades out
-                  _setTimeout(() => hostRevealEl.classList.remove('visible'), 400);
+                  _setTimeout(() => {
+                    hostRevealEl.style.transition = 'opacity 0.74s ease';
+                    hostRevealEl.classList.remove('visible');
+                  }, 250);
                   // 1800ms later: Answer button + player cards (max 4, 30px below category)
                   _setTimeout(() => {
                     answerBtn.classList.add('visible');
