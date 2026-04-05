@@ -497,7 +497,7 @@
       pointer-events: none;
       z-index: 2;
     }
-    #host-reveal.visible { opacity: 0.8; }
+    #host-reveal.visible { opacity: 0.65; }
     #host-reveal img { width: 100%; display: block; }
 
     /* Player cards below category */
@@ -1073,11 +1073,11 @@
                   // Cross-fade: label out, category in simultaneously
                   labelEl.classList.remove('visible');
                   categoryEl.classList.add('visible');
-                  // Fade host out 400ms after the label fades out
+                  // Fade host out with the label
                   _setTimeout(() => {
                     hostRevealEl.style.transition = 'opacity 0.45s ease';
                     hostRevealEl.classList.remove('visible');
-                  }, 250);
+                  }, 0);
                   // 1800ms later: Answer button + player cards (max 4, 30px below category)
                   _setTimeout(() => {
                     answerBtn.classList.add('visible');
