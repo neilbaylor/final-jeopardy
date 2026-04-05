@@ -1054,7 +1054,7 @@
             // ensuring the CSS transition actually plays
             hostRevealEl.offsetHeight; // eslint-disable-line no-unused-expressions
             requestAnimationFrame(() => {
-              hostRevealEl.style.transition = 'opacity 1.1s ease';
+              hostRevealEl.style.transition = 'opacity 1.5s ease';
               hostRevealEl.classList.add('visible');
             });
 
@@ -1075,7 +1075,7 @@
                   categoryEl.classList.add('visible');
                   // Fade host out 400ms after the label fades out
                   _setTimeout(() => {
-                    hostRevealEl.style.transition = 'opacity 0.74s ease';
+                    hostRevealEl.style.transition = 'opacity 0.45s ease';
                     hostRevealEl.classList.remove('visible');
                   }, 250);
                   // 1800ms later: Answer button + player cards (max 4, 30px below category)
