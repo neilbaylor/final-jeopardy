@@ -1056,8 +1056,8 @@
               hostRevealEl.classList.add('visible');
             });
 
-            // Animate "" → . → .. → ... at 345ms/step, 2.1–3.0 random cycles
-            const cycles = 2.8 + Math.random() * 0.8;
+            // Animate "" → . → .. → ... at 345ms/step, 2.4–3.0 random cycles
+            const cycles = 2.4 + Math.random() * 0.6;
             const totalSteps = Math.round(cycles * 4);
             let step = 0;
             dotsEl.textContent = '';
