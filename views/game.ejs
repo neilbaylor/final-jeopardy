@@ -752,6 +752,8 @@
     const inputBadgeEl       = document.getElementById('input-badge');
     const inputSpinnerEl     = document.getElementById('input-spinner');
     const answerResponsesEl  = document.getElementById('answer-responses');
+    const hostRevealEl       = document.getElementById('host-reveal');
+    const hostImages = ['host_pointing', 'host_money_mic', 'host_mic_presenting'];
     const errorModalBackdrop = document.getElementById('error-modal-backdrop');
     document.getElementById('error-modal-ok').addEventListener('click', () => errorModalBackdrop.classList.remove('open'));
     errorModalBackdrop.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
@@ -1037,11 +1039,7 @@
             }, 1800);
           }, 200);
         } else {
-          // Pick a random host image and preload it
-          const hostImages = ['host_pointing', 'host_money_mic', 'host_mic_presenting'];
-          const hostImg = hostImages[Math.floor(Math.random() * hostImages.length)];
-          const hostRevealEl = document.getElementById('host-reveal');
-          hostRevealEl.querySelector('img').src = `/images/${hostImg}.png`;
+          hostRevealEl.querySelector('img').src = `/images/${hostImages[Math.floor(Math.random() * hostImages.length)]}.png`;
 
           // Position host so its top sits just below where player cards will appear
           const gpTop = parseFloat(gamePlayersEl.style.top) || (window.innerHeight * 0.6);
@@ -1073,11 +1071,8 @@
                   // Cross-fade: label out, category in simultaneously
                   labelEl.classList.remove('visible');
                   categoryEl.classList.add('visible');
-                  // Fade host out with the label
-                  _setTimeout(() => {
-                    hostRevealEl.style.transition = 'opacity 0.45s ease';
-                    hostRevealEl.classList.remove('visible');
-                  }, 0);
+                  hostRevealEl.style.transition = 'opacity 0.45s ease';
+                  hostRevealEl.classList.remove('visible');
                   // 1800ms later: Answer button + player cards (max 4, 30px below category)
                   _setTimeout(() => {
                     answerBtn.classList.add('visible');
@@ -1112,7 +1107,6 @@
       questionEl.style.opacity = '';
       spinner.classList.remove('hidden');
       labelEl.classList.remove('visible');
-      const hostRevealEl = document.getElementById('host-reveal');
       hostRevealEl.classList.remove('visible');
       hostRevealEl.style.transition = 'none';
       categoryEl.classList.remove('visible', 'dismissing');
@@ -1176,7 +1170,7 @@
           labelEl.style.transition = '';
           questionEl.style.transition = '';
           gamePlayersEl.style.transition = '';
-          document.getElementById('host-reveal').style.transition = '';
+          hostRevealEl.style.transition = '';
         }));
         loadGame();
       }
