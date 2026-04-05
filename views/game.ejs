@@ -495,7 +495,7 @@
       width: 220px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.8s ease;
+      transition: opacity 0.9s ease;
       z-index: 2;
     }
     #host-reveal.visible { opacity: 1; }
@@ -1064,11 +1064,10 @@
                 clearInterval(dotsInterval);
                 // 200ms extra pause before cross-fade (extends the animation)
                 _setTimeout(() => {
-                  // Cross-fade: label out, category in simultaneously
+                  // Cross-fade: label out, category in, host out simultaneously
                   labelEl.classList.remove('visible');
+                  hostRevealEl.classList.remove('visible');
                   categoryEl.classList.add('visible');
-                  // Fade host out 400ms before player cards appear
-                  _setTimeout(() => hostRevealEl.classList.remove('visible'), 1400);
                   // 1800ms later: Answer button + player cards (max 4, 30px below category)
                   _setTimeout(() => {
                     answerBtn.classList.add('visible');
