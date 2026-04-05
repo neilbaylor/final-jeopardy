@@ -1044,7 +1044,8 @@
           hostRevealEl.querySelector('img').src = `/images/${hostImg}.png`;
 
           // Position host so its top sits just below where player cards will appear
-          hostRevealEl.style.top = gamePlayersEl.style.top || '60%';
+          const gpTop = parseFloat(gamePlayersEl.style.top) || (window.innerHeight * 0.6);
+          hostRevealEl.style.top = (gpTop + 150) + 'px';
 
           // 200ms later: "The Category is..." label with animated dots
           _setTimeout(() => {
