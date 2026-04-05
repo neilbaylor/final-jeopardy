@@ -1066,13 +1066,16 @@
               dotsEl.textContent = '.'.repeat(step % 4);
               if (step >= totalSteps - 1) {
                 clearInterval(dotsInterval);
+                // Host fades 300ms before the label/category cross-fade
+                _setTimeout(() => {
+                  hostRevealEl.style.transition = 'opacity 0.6s ease';
+                  hostRevealEl.classList.remove('visible');
+                }, 200);
                 // 500ms extra pause before cross-fade (extends the animation)
                 _setTimeout(() => {
                   // Cross-fade: label out, category in simultaneously
                   labelEl.classList.remove('visible');
                   categoryEl.classList.add('visible');
-                  hostRevealEl.style.transition = 'opacity 0.6s ease';
-                  hostRevealEl.classList.remove('visible');
                   // 1800ms later: Answer button + player cards (max 4, 30px below category)
                   _setTimeout(() => {
                     answerBtn.classList.add('visible');
