@@ -1254,9 +1254,10 @@
       touch-action: pan-y;
     }
     .user-row-wrapper:last-child { border-bottom: none; }
+    .user-row-wrapper:last-child .user-row { border-bottom: none; }
     @media (display-mode: standalone) {
-      .user-row-wrapper:last-child .user-row { margin-bottom: 24px; }
-      .user-row-wrapper:last-child { border-bottom: 1px solid #f0f0f0; }
+      .user-row:last-child { margin-bottom: 24px; }
+      .user-row-wrapper:last-child .user-row { margin-bottom: 24px; border-bottom: 1px solid #f0f0f0; }
     }
     .user-row-wrapper .user-row {
       position: relative;
