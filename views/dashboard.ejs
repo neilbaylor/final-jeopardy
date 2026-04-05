@@ -2082,7 +2082,6 @@
 
       // Swipe-right to reveal previous question row; swipe-left to reveal delete button
       const DELETE_WIDTH = 78;
-      const scrollEl = document.querySelector('.content');
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
         const prevRow     = wrapper.querySelector('.game-row-previous');
         const inner       = wrapper.querySelector('.game-row-inner');
@@ -2138,7 +2137,6 @@
           startY = e.touches[0].clientY;
           dirLocked = null;
           active = true;
-          scrollEl.style.overscrollBehaviorY = 'none';
           mainRow.style.transition = 'none';
           if (prevRow) prevRow.style.transition = 'none';
         }, { passive: true });
@@ -2193,7 +2191,6 @@
         const onTouchEnd = e => {
           if (!active) return;
           active = false;
-          scrollEl.style.overscrollBehaviorY = '';
           if (dirLocked !== 'h') return;
           const dx = e.changedTouches[0].clientX - startX;
           const fw = mainRow.offsetWidth;
@@ -2214,7 +2211,6 @@
         inner.addEventListener('touchcancel', () => {
           if (!active) return;
           active = false;
-          scrollEl.style.overscrollBehaviorY = '';
           if (isRevealed) setTx(mainRow.offsetWidth, true);
           else if (deleteRevealed) { setDeleteOpacity(true); setTx(-DELETE_WIDTH, true); }
           else { setDeleteOpacity(false); setTx(0, true); }
@@ -2423,7 +2419,6 @@
           startY = e.touches[0].clientY;
           dirLocked = null;
           active = true;
-          scrollEl.style.overscrollBehaviorY = 'none';
           row.style.transition = 'none';
         }, { passive: true });
 
@@ -2455,7 +2450,6 @@
         const onTouchEnd = e => {
           if (!active) return;
           active = false;
-          scrollEl.style.overscrollBehaviorY = '';
           if (dirLocked !== 'h') return;
           const dx = e.changedTouches[0].clientX - startX;
           if (deleteRevealed) {
@@ -2470,7 +2464,6 @@
         wrapper.addEventListener('touchcancel', () => {
           if (!active) return;
           active = false;
-          scrollEl.style.overscrollBehaviorY = '';
           if (deleteRevealed) { setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
           else { setDeleteOpacity(false); setTx(0, true); }
         }, { passive: true });
