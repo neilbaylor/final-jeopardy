@@ -486,6 +486,21 @@
     }
     #answer-text.visible { opacity: 1; }
 
+    /* Host character reveal during "And the Category is" animation */
+    #host-reveal {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+      z-index: 2;
+    }
+    #host-reveal.visible { opacity: 1; }
+    #host-reveal img { width: 100%; display: block; }
+
     /* Player cards below category */
     #game-players {
       position: absolute;
@@ -684,6 +699,7 @@
   <div id="good-luck">Good luck</div>
   <div id="load-error"></div>
 
+  <div id="host-reveal"><img alt="" /></div>
   <div id="game-players"></div>
   <div id="answer-input-wrap" style="display:none">
     <input id="answer-input" type="text" placeholder="Add your Answer" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" />
@@ -1022,9 +1038,19 @@
             }, 1800);
           }, 200);
         } else {
+          // Pick a random host image and preload it
+          const hostImages = ['host_pointing', 'host_money_mic', 'host_mic_presenting'];
+          const hostImg = hostImages[Math.floor(Math.random() * hostImages.length)];
+          const hostRevealEl = document.getElementById('host-reveal');
+          hostRevealEl.querySelector('img').src = `/images/${hostImg}.png`;
+
+          // Position host so its top sits just below where player cards will appear
+          hostRevealEl.style.top = gamePlayersEl.style.top || '60%';
+
           // 200ms later: "The Category is..." label with animated dots
           _setTimeout(() => {
             labelEl.classList.add('visible');
+            hostRevealEl.classList.add('visible');
 
             // Animate "" → . → .. → ... at 345ms/step, 1.1–2.0 random cycles
             const cycles = 1.8 + Math.random() * 0.8;
@@ -1036,20 +1062,25 @@
               dotsEl.textContent = '.'.repeat(step % 4);
               if (step >= totalSteps - 1) {
                 clearInterval(dotsInterval);
-                // Cross-fade: label out, category in simultaneously
-                labelEl.classList.remove('visible');
-                categoryEl.classList.add('visible');
-                // 1800ms later: Answer button + player cards (max 4, 30px below category)
+                // 200ms extra pause before cross-fade (extends the animation)
                 _setTimeout(() => {
-                  answerBtn.classList.add('visible');
-                  _setTimeout(() => answerBtn.classList.add('pulse'), 800);
-                  if (gamePlayers.length > 0) {
-                    gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, nextQuestionSummary(game.current_question ? game.current_question.asked_at : '', [...gamePlayers, { _isMe: true, _answered: meAnswered }]));
-                    if (gamePlayers.length === 1) gamePlayersEl.classList.add('count-1');
-                    else if (gamePlayers.length === 2) gamePlayersEl.classList.add('count-2');
-                    gamePlayersEl.classList.add('visible');
-                  }
-                }, 1800);
+                  // Cross-fade: label out, category in simultaneously
+                  labelEl.classList.remove('visible');
+                  categoryEl.classList.add('visible');
+                  // Fade host out 400ms before player cards appear
+                  _setTimeout(() => hostRevealEl.classList.remove('visible'), 1400);
+                  // 1800ms later: Answer button + player cards (max 4, 30px below category)
+                  _setTimeout(() => {
+                    answerBtn.classList.add('visible');
+                    _setTimeout(() => answerBtn.classList.add('pulse'), 800);
+                    if (gamePlayers.length > 0) {
+                      gamePlayersEl.innerHTML = buildGamePlayersHtml(gamePlayers, nextQuestionSummary(game.current_question ? game.current_question.asked_at : '', [...gamePlayers, { _isMe: true, _answered: meAnswered }]));
+                      if (gamePlayers.length === 1) gamePlayersEl.classList.add('count-1');
+                      else if (gamePlayers.length === 2) gamePlayersEl.classList.add('count-2');
+                      gamePlayersEl.classList.add('visible');
+                    }
+                  }, 1800);
+                }, 200);
               }
             }, 345);
           }, 200);
@@ -1072,6 +1103,9 @@
       questionEl.style.opacity = '';
       spinner.classList.remove('hidden');
       labelEl.classList.remove('visible');
+      const hostRevealEl = document.getElementById('host-reveal');
+      hostRevealEl.classList.remove('visible');
+      hostRevealEl.style.transition = 'none';
       categoryEl.classList.remove('visible', 'dismissing');
       categoryEl.textContent = '';
       questionEl.classList.remove('visible');
@@ -1133,6 +1167,7 @@
           labelEl.style.transition = '';
           questionEl.style.transition = '';
           gamePlayersEl.style.transition = '';
+          document.getElementById('host-reveal').style.transition = '';
         }));
         loadGame();
       }
