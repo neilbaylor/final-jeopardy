@@ -1071,7 +1071,7 @@
                   hostRevealEl.style.transition = 'opacity 1s ease';
                   hostRevealEl.classList.remove('visible');
                 }, 125);
-                // 500ms extra pause before cross-fade (extends the animation)
+                // 250ms extra pause before cross-fade (extends the animation)
                 _setTimeout(() => {
                   // Cross-fade: label out, category in simultaneously
                   labelEl.classList.remove('visible');
@@ -1087,7 +1087,7 @@
                       gamePlayersEl.classList.add('visible');
                     }
                   }, 1800);
-                }, 500);
+                }, 250);
               }
             }, 345);
           }, 200);
