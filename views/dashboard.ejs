@@ -2153,6 +2153,9 @@
               dirLocked = 'v';
               active = false;
               return;
+            } else if (Math.abs(dx) > Math.abs(dy)) {
+              e.preventDefault(); // horizontal bias — block overscroll before direction locks
+              return;
             } else {
               return;
             }
@@ -2429,6 +2432,7 @@
           if (!dirLocked) {
             if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) dirLocked = 'h';
             else if (Math.abs(dy) > 8) { dirLocked = 'v'; active = false; return; }
+            else if (Math.abs(dx) > Math.abs(dy)) { e.preventDefault(); return; }
             else return;
           }
           if (dirLocked !== 'h') return;
