@@ -1423,7 +1423,7 @@
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyVVShift = () => {
-        if (window.visualViewport.height < 150) { setTimeout(applyVVShift, 100); return; }
+        if (window.visualViewport.height < 150) { return; }
         const vvh = window.visualViewport.height;
         const newOffset = Math.max(0, baseVVH - vvh);
         if (newOffset === kbOffset) return;
@@ -1463,18 +1463,9 @@
         });
       };
       const onVVResize = () => {
-        const prospective = Math.max(0, baseVVH - window.visualViewport.height);
-        if (prospective > kbOffset) {
-          // Keyboard opening: try immediately (often already settled), then
-          // debounce at 300ms as a fallback for mid-animation resize events.
-          clearTimeout(vvDebounce);
-          setTimeout(applyVVShift, 0);
-          vvDebounce = setTimeout(applyVVShift, 400);
-        } else {
-          // Keyboard closing: apply immediately.
-          clearTimeout(vvDebounce);
-          applyVVShift();
-        }
+        applyVVShift();
+        clearTimeout(vvDebounce);
+        vvDebounce = setTimeout(() => { applyVVShift(); vvDebounce = setTimeout(applyVVShift, 500); }, 200);
       };
       window._vvStart = () => {
         if (window._vvStarted) return;
