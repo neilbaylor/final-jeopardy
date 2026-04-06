@@ -287,6 +287,7 @@
     }
 
     @keyframes spin {
+      from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
 
@@ -876,7 +877,7 @@
       animation: answerPulse 1.4s ease-out infinite;
     }
     .answer-btn:active { transform: scale(0.93); }
-    @keyframes btn-spin { to { transform: rotate(360deg); } }
+    @keyframes btn-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .answer-btn.loading {
       display: flex;
       align-items: center;
@@ -1111,6 +1112,7 @@
       animation: panelSpin 0.7s linear infinite;
     }
     @keyframes panelSpin {
+      from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
 
