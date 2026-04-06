@@ -2400,7 +2400,10 @@
         const deleteAction = wrapper.querySelector('.user-row-delete-action');
         let startX = 0, startY = 0, dirLocked = null, active = false, deleteRevealed = false;
         const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        const setDeleteOpacity = show => { deleteAction.style.opacity = show ? '1' : '0'; };
+        const setDeleteOpacity = show => {
+          deleteAction.style.transition = show ? 'none' : 'opacity 0s 300ms';
+          deleteAction.style.opacity = show ? '1' : '0';
+        };
         const setTx = (tx, animated) => {
           row.style.transition = animated ? ease : 'none';
           row.style.transform = tx ? `translateX(${tx}px)` : '';
