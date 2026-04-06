@@ -1465,7 +1465,13 @@
       const onVVResize = () => {
         applyVVShift();
         clearTimeout(vvDebounce);
-        vvDebounce = setTimeout(() => { applyVVShift(); vvDebounce = setTimeout(applyVVShift, 500); }, 200);
+        let vvChain = 0;
+        const scheduleNext = () => {
+          if (vvChain >= 10) return;
+          vvChain++;
+          vvDebounce = setTimeout(() => { applyVVShift(); scheduleNext(); }, 100);
+        };
+        scheduleNext();
       };
       window._vvStart = () => {
         if (window._vvStarted) return;
