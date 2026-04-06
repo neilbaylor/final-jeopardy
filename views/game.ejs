@@ -1476,7 +1476,7 @@
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
-        baseVVH = window.visualViewport.height;
+        baseVVH = document.body.clientHeight;
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
