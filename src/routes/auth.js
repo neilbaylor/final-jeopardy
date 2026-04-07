@@ -3,7 +3,7 @@ const passport = require('../config/passport');
 const router = express.Router();
 
 // Initiate Google OAuth flow
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
 
 // Google OAuth callback
 router.get(
