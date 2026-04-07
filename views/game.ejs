@@ -1463,7 +1463,9 @@
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
-        baseInputBottom = answerInput.getBoundingClientRect().bottom;
+        answerInputWrap.addEventListener('transitionend', () => {
+          baseInputBottom = answerInput.getBoundingClientRect().bottom;
+        }, { once: true });
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
