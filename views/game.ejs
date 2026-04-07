@@ -1463,12 +1463,9 @@
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
-        const captureBase = e => {
-          if (e.propertyName !== 'transform') return;
-          answerInputWrap.removeEventListener('transitionend', captureBase);
+        setTimeout(() => {
           baseInputBottom = answerInput.getBoundingClientRect().bottom;
-        };
-        answerInputWrap.addEventListener('transitionend', captureBase);
+        }, 500);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
