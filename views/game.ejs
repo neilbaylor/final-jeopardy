@@ -1463,9 +1463,7 @@
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
-        setTimeout(() => {
-          baseInputBottom = answerInput.getBoundingClientRect().bottom;
-        }, 500);
+        baseInputBottom = document.documentElement.clientHeight - parseFloat(getComputedStyle(answerInputWrap).bottom);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
