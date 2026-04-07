@@ -1777,7 +1777,6 @@
         btn.disabled = false;
         rows.forEach(row => {
           row.style.pointerEvents = '';
-          row.style.opacity = '';
           row.querySelector('input').disabled = false;
         });
       }
@@ -1789,7 +1788,6 @@
 
       rows.forEach(row => {
         row.style.pointerEvents = 'none';
-        row.style.opacity = '0.45';
         row.querySelector('input').disabled = true;
       });
 
