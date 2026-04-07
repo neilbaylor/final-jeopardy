@@ -1417,15 +1417,12 @@
     }
 
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
-      let baseVVH = window.visualViewport.height;
+      let baseInputBottom = 0;
       let kbOffset = 0;
-      let vvDebounce;
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyVVShift = () => {
-        if (window.visualViewport.height < 150) { return; }
-        const vvh = window.visualViewport.height;
-        const newOffset = Math.max(0, baseVVH - vvh);
+        const newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
@@ -1462,21 +1459,11 @@
           }
         });
       };
-      const onVVResize = () => {
-        applyVVShift();
-        clearTimeout(vvDebounce);
-        let vvChain = 0;
-        const scheduleNext = () => {
-          if (vvChain >= 10) return;
-          vvChain++;
-          vvDebounce = setTimeout(() => { applyVVShift(); scheduleNext(); }, 100);
-        };
-        scheduleNext();
-      };
+      const onVVResize = () => { applyVVShift(); };
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
-        baseVVH = document.body.clientHeight;
+        baseInputBottom = answerInput.getBoundingClientRect().bottom;
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
