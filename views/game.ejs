@@ -1463,9 +1463,12 @@
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
-        answerInputWrap.addEventListener('transitionend', () => {
+        const captureBase = e => {
+          if (e.propertyName !== 'transform') return;
+          answerInputWrap.removeEventListener('transitionend', captureBase);
           baseInputBottom = answerInput.getBoundingClientRect().bottom;
-        }, { once: true });
+        };
+        answerInputWrap.addEventListener('transitionend', captureBase);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
