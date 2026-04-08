@@ -305,6 +305,7 @@
       box-shadow: 0 1px 0 #f0f0f0;
       will-change: transform;
       -webkit-backface-visibility: hidden;
+      z-index: 1;
     }
 
 .fab {
@@ -1117,20 +1118,24 @@
     }
 
     /* Pull-to-refresh indicator */
-    #ptr-indicator,
+    #ptr-indicator {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 56px;
+      flex-shrink: 0;
+      background: #f9f9f9;
+    }
     #games-ptr-indicator {
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      height: 0;
-      overflow: hidden;
-      flex-shrink: 0;
-      will-change: height;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      height: 56px;
       background: #f9f9f9;
-    }
-    #ptr-indicator.ptr-snap,
-    #games-ptr-indicator.ptr-snap {
-      transition: height 0.18s ease;
     }
     #ptr-spinner,
     #games-ptr-spinner {
@@ -1153,6 +1158,9 @@
     #users-list-wrap {
       height: calc(100% - 60px);
       box-shadow: 0 -1px 0 #f0f0f0;
+      margin-top: -56px;
+      position: relative;
+      z-index: 1;
     }
     #users-list {
       padding: 0;
@@ -1388,8 +1396,8 @@
       </div>
     </div>
 
+    <div id="games-ptr-indicator"><div id="games-ptr-spinner"></div></div>
     <div class="content" id="content">
-      <div id="games-ptr-indicator"><div id="games-ptr-spinner"></div></div>
       <div id="games-container">
         <h2 class="games-title">Your Games</h2>
         <div id="games-spinner" class="hidden"><div class="panel-spin"></div></div>
@@ -2549,7 +2557,6 @@
         triggered = false;
         lastDy = 0;
         el.style.transition = '';
-        ptr.classList.remove('ptr-snap');
       }, { passive: true });
 
       el.addEventListener('touchmove', e => {
@@ -2560,7 +2567,6 @@
           if (dy > 3 && scroller.scrollTop <= 0) {
             mode = 'ptr';
             startY = e.touches[0].clientY;
-            ptr.style.height = '0';
             ptrSpinner.style.transform = 'rotate(0deg)';
           } else if (dy < -3 && scroller.scrollTop >= scroller.scrollHeight - scroller.clientHeight - 1) {
             mode = 'push';
@@ -2573,17 +2579,16 @@
         const d = e.touches[0].clientY - startY;
         if (mode === 'ptr') {
           e.preventDefault();
-          el.style.transform = '';
           if (d > 0) {
             const edy = Math.max(0, d - DEADZONE);
             lastDy = d;
-            ptr.style.height = (edy * 0.44) + 'px';
+            el.style.transform = `translateY(${edy * 0.44}px)`;
             const spinEdy = Math.max(0, edy - 18);
             ptrSpinner.style.transform = `rotate(${Math.min(spinEdy * 2.83, 360)}deg)`;
             triggered = d >= THRESHOLD;
           } else {
             triggered = false;
-            ptr.style.height = '0';
+            el.style.transform = '';
           }
         } else if (mode === 'push') {
           e.preventDefault();
@@ -2595,38 +2600,32 @@
         if (mode === null) return;
         const wasMode = mode;
         mode = null;
-        snapBack();
-        if (wasMode === 'ptr') {
-          ptr.classList.add('ptr-snap');
-          if (triggered) {
-            triggered = false;
-            ptr.style.height = '48px';
-            ptrSpinner.style.animationDelay = `${-(Math.min(Math.max(lastDy - 36, 0) * 2.83, 360) % 360) / 360 * 0.7}s`;
-            ptrSpinner.style.transform = '';
-            requestAnimationFrame(() => { ptrSpinner.classList.add('ptr-spinning'); });
-            loadFn().finally(() => {
-              setTimeout(() => {
-                ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
-                ptrSpinner.classList.remove('ptr-spinning');
-                ptrSpinner.style.animationDelay = '';
-                requestAnimationFrame(() => {
-                  setTimeout(() => {
-                    ptr.style.height = '0';
-                    setTimeout(() => { ptr.classList.remove('ptr-snap'); }, 180);
-                  }, 275);
-                });
-              }, 640);
-            });
-          } else {
-            ptr.style.height = '0';
-          }
+        if (wasMode !== 'ptr' || !triggered) {
+          snapBack();
+          return;
         }
+        triggered = false;
+        el.style.transition = 'transform 0.15s ease';
+        el.style.transform = 'translateY(48px)';
+        ptrSpinner.style.animationDelay = `${-(Math.min(Math.max(lastDy - 36, 0) * 2.83, 360) % 360) / 360 * 0.7}s`;
+        ptrSpinner.style.transform = '';
+        requestAnimationFrame(() => { ptrSpinner.classList.add('ptr-spinning'); });
+        loadFn().finally(() => {
+          setTimeout(() => {
+            ptrSpinner.style.transform = getComputedStyle(ptrSpinner).transform;
+            ptrSpinner.classList.remove('ptr-spinning');
+            ptrSpinner.style.animationDelay = '';
+            requestAnimationFrame(() => {
+              setTimeout(() => { snapBack(); }, 275);
+            });
+          }, 640);
+        });
       });
       el.addEventListener('touchcancel', () => { mode = null; snapBack(); });
     }
 
     setupPTR(
-      document.getElementById('users-list'),
+      document.getElementById('users-list-wrap'),
       document.getElementById('users-list-scroller'),
       document.getElementById('ptr-indicator'),
       document.getElementById('ptr-spinner'),
