@@ -2543,9 +2543,9 @@
 
       const snapBack = () => {
         if (el.style.transform) {
-          el.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+          el.style.transition = 'transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
           el.style.transform = '';
-          setTimeout(() => { el.style.transition = ''; }, 350);
+          setTimeout(() => { el.style.transition = ''; }, 250);
         }
       };
 
