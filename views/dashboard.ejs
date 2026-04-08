@@ -2546,6 +2546,7 @@
           el.style.transform = '';
           setTimeout(() => { el.style.transition = ''; }, 285);
         }
+        scroller.style.overflowY = '';
       };
 
       el.addEventListener('touchstart', e => {
@@ -2566,6 +2567,7 @@
             mode = 'ptr';
             startY = e.touches[0].clientY;
             ptrSpinner.style.transform = 'rotate(0deg)';
+            scroller.style.overflowY = 'hidden';
           } else if (dy < -3 && scroller.scrollTop >= scroller.scrollHeight - scroller.clientHeight - 1) {
             mode = 'push';
             startY = e.touches[0].clientY;
