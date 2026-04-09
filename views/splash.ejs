@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Final Jeopardy" />
+  <meta name="theme-color" content="#07102e" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/images/hone-screen-new.png" />
+  <title>Final Jeopardy with Friends</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #07102e;
+      overflow: hidden;
+    }
+    img {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <img src="/images/splash.jpg" alt="" id="splash-img" />
+  <script>
+    var start = Date.now();
+    document.getElementById('splash-img').onload = function() {
+      var elapsed = Date.now() - start;
+      var remaining = Math.max(0, 800 - elapsed);
+      setTimeout(function() { window.location.replace('/'); }, remaining);
+    };
+  </script>
+</body>
+</html>

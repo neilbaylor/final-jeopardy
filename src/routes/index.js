@@ -305,6 +305,11 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   return false;
 }
 
+// Splash screen
+router.get('/splash', (req, res) => {
+  res.render('splash');
+});
+
 // Login page
 router.get('/', (req, res) => {
   res.render('login', { error: req.query.error || null, user: req.user || null });

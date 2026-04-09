@@ -2,7 +2,7 @@
   "name": "Final Jeopardy with Friends",
   "short_name": "Final Jeopardy",
   "description": "Final Jeopardy with friends",
-  "start_url": "/",
+  "start_url": "/splash",
   "display": "standalone",
   "background_color": "#07102e",
   "theme_color": "#ffffff",

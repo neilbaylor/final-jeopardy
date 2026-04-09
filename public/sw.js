@@ -2,7 +2,7 @@
 //       cache-first (no revalidation) for /api/me
 //       game page keyed by path only (query string ignored)
 //       push notification support
-const CACHE = 'fjwf-static-v16';
+const CACHE = 'fjwf-static-v17';
 
 // Activate immediately without waiting for old tabs to close
 self.addEventListener('install', () => self.skipWaiting());
@@ -32,7 +32,7 @@ function shouldCache(url) {
   // Static assets
   if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf|eot)$/i.test(url.pathname)) return true;
   // Server-rendered pages (but not login)
-  if (url.pathname === '/dashboard' || url.pathname === '/game') return true;
+  if (url.pathname === '/splash' || url.pathname === '/dashboard' || url.pathname === '/game') return true;
   // API
   if (url.pathname === '/api/me') return true;
   return false;
