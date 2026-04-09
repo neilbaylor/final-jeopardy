@@ -32,7 +32,7 @@
     }
     #host {
       position: fixed;
-      top: 150px;
+      top: 115px;
       left: 50%;
       transform: translateX(-50%);
       width: 264px;
@@ -64,11 +64,11 @@
       var elapsed = Date.now() - start;
       var remaining = Math.max(0, 1550 - elapsed);
       setTimeout(function() {
-        host.style.transition = 'opacity 0.4s linear, transform 0.4s linear';
+        host.style.transition = 'opacity 0.3s linear, transform 0.3s linear';
         host.style.opacity = '0';
-        host.style.transform = 'translateX(-50%) scale(0.92)';
-        setTimeout(function() { window.location.replace('/'); }, 400);
-      }, remaining - 400);
+        host.style.transform = 'translateX(-50%) scale(0.77)';
+        setTimeout(function() { window.location.replace('/'); }, 300);
+      }, remaining - 300);
     }
     img.onload = onReady;
     img.src = '/images/' + hosts[Math.floor(Math.random() * hosts.length)] + '.png';
