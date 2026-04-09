@@ -43,6 +43,12 @@
     #host img {
       width: 100%;
       display: block;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%),
+                          linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+      -webkit-mask-composite: destination-in;
+      mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%),
+                  linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+      mask-composite: intersect;
     }
   </style>
 </head>
