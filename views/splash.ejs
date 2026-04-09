@@ -32,7 +32,7 @@
     }
     #host {
       position: fixed;
-      top: 190px;
+      top: 150px;
       left: 50%;
       transform: translateX(-50%);
       width: 264px;
@@ -57,19 +57,22 @@
   <script>
     var hosts = ['host_pointing', 'host_money_mic', 'host_mic_presenting', 'host_magician', 'host_flirty'];
     var img = document.getElementById('splash-img');
-    img.src = '/images/' + hosts[Math.floor(Math.random() * hosts.length)] + '.png';
     var start = Date.now();
-    img.onload = function() {
+    function onReady() {
       var host = document.getElementById('host');
       host.style.opacity = '0.8';
       var elapsed = Date.now() - start;
-      var remaining = Math.max(0, 1400 - elapsed);
+      var remaining = Math.max(0, 1550 - elapsed);
       setTimeout(function() {
-        host.style.transition = 'opacity 0.4s linear';
+        host.style.transition = 'opacity 0.4s linear, transform 0.4s linear';
         host.style.opacity = '0';
+        host.style.transform = 'translateX(-50%) scale(0.92)';
         setTimeout(function() { window.location.replace('/'); }, 400);
       }, remaining - 400);
-    };
+    }
+    img.onload = onReady;
+    img.src = '/images/' + hosts[Math.floor(Math.random() * hosts.length)] + '.png';
+    if (img.complete) onReady();
   </script>
 </body>
 </html>
