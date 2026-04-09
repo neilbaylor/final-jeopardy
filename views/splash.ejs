@@ -35,7 +35,7 @@
     var start = Date.now();
     document.getElementById('splash-img').onload = function() {
       var elapsed = Date.now() - start;
-      var remaining = Math.max(0, 800 - elapsed);
+      var remaining = Math.max(0, 600 - elapsed);
       setTimeout(function() { window.location.replace('/'); }, remaining);
     };
   </script>
