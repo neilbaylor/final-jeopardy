@@ -1,8 +1,8 @@
-// v16 - stale-while-revalidate for static assets + dashboard/game HTML
+// v18 - stale-while-revalidate for static assets + dashboard/game HTML
 //       cache-first (no revalidation) for /api/me
 //       game page keyed by path only (query string ignored)
 //       push notification support
-const CACHE = 'fjwf-static-v17';
+const CACHE = 'fjwf-static-v18';
 
 // Activate immediately without waiting for old tabs to close
 self.addEventListener('install', () => self.skipWaiting());
