@@ -30,29 +30,29 @@
       font-family: 'Segoe UI', 'Google Sans', system-ui, sans-serif;
       padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
     }
-    .logo-wrap {
-      margin-top: 10vh;
+    #host {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      opacity: 0.7;
+      pointer-events: none;
     }
-    .logo {
-      width: min(340px, 88vw);
-      border-radius: 24px;
+    #host img {
+      width: 100%;
       display: block;
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%),
-                          linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
-      -webkit-mask-composite: destination-in;
-      mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%),
-                  linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
-      mask-composite: intersect;
     }
   </style>
 </head>
 <body>
-  <div class="logo-wrap">
-    <img class="logo" src="/images/fjwf_logo.webp" alt="Final Jeopardy with Friends" id="splash-img" />
-  </div>
+  <div id="host"><img alt="" id="splash-img" /></div>
   <script>
+    var hosts = ['host_pointing', 'host_money_mic', 'host_mic_presenting', 'host_magician', 'host_flirty'];
+    var img = document.getElementById('splash-img');
+    img.src = '/images/' + hosts[Math.floor(Math.random() * hosts.length)] + '.png';
     var start = Date.now();
-    document.getElementById('splash-img').onload = function() {
+    img.onload = function() {
       var elapsed = Date.now() - start;
       var remaining = Math.max(0, 600 - elapsed);
       setTimeout(function() { window.location.replace('/'); }, remaining);
