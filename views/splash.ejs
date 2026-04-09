@@ -54,7 +54,7 @@
     var start = Date.now();
     img.onload = function() {
       var elapsed = Date.now() - start;
-      var remaining = Math.max(0, 600 - elapsed);
+      var remaining = Math.max(0, 1000 - elapsed);
       setTimeout(function() { window.location.replace('/'); }, remaining);
     };
   </script>
