@@ -30,9 +30,14 @@
   </style>
 </head>
 <body>
-  <img src="/images/splash.jpg" alt="" />
+  <img src="/images/splash.jpg" alt="" id="splash-img" />
   <script>
-    setTimeout(function() { window.location.replace('/'); }, 600);
+    var start = Date.now();
+    document.getElementById('splash-img').onload = function() {
+      var elapsed = Date.now() - start;
+      var remaining = Math.max(0, 600 - elapsed);
+      setTimeout(function() { window.location.replace('/'); }, remaining);
+    };
   </script>
 </body>
 </html>
