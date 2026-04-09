@@ -1562,7 +1562,7 @@
           cacheTimerFired = true;
           renderGames(pendingGames || cachedGames);
           const fab = document.getElementById('new-game');
-          setTimeout(() => { fab.style.opacity = '1'; }, 600);
+          setTimeout(() => { fab.style.opacity = '1'; }, 725);
         });
         // Background refresh — new games get the green fade-in via new-row class
         fetch(`/api/games?userId=${encodeURIComponent(userId)}&test=1`)
