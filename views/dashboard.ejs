@@ -675,6 +675,13 @@
       81.5%  { background-color: #e8f5e9; }
       100%   { background-color: #fff; }
     }
+    @keyframes new-row-fadein {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .game-row-wrapper.new-row {
+      animation: new-row-fadein 350ms ease-out both;
+    }
     .game-row-wrapper.new-row .game-row {
       animation: new-row-highlight 5400ms ease forwards;
       animation-delay: 200ms;
