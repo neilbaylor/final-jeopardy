@@ -73,6 +73,9 @@
       .btn-area {
         margin-bottom: max(env(safe-area-inset-bottom, 0px) + 0.5rem, 1.5rem);
       }
+      body.android .btn-area {
+        margin-bottom: max(env(safe-area-inset-bottom, 0px) + 0.5rem, 3rem);
+      }
     }
 
     @keyframes fadeIn {
@@ -446,6 +449,7 @@
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     const dismissed = sessionStorage.getItem('installDismissed');
 
+    if (/android/i.test(navigator.userAgent)) document.body.classList.add('android');
     const isMobile = /iphone|ipad|ipod|android|mobile/i.test(navigator.userAgent);
 
     if (!isMobile && !isStandalone && !uid) {
