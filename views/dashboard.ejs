@@ -71,6 +71,7 @@
     }
 
     .topbar {
+      z-index: 2;
       background: #07102e;
       display: flex;
       align-items: center;
@@ -293,6 +294,7 @@
     }
 
     .content {
+      z-index: 1;
       contain: strict;
       position: absolute;
       top: 60px;
@@ -309,6 +311,7 @@
     }
 
 .fab {
+      z-index: 1;
       position: absolute;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
       right: calc(env(safe-area-inset-right, 0px) + 8px);
