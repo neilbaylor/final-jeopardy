@@ -36,9 +36,9 @@
       left: 50%;
       transform: translateX(-50%);
       width: 264px;
-      opacity: 0.7;
+      opacity: 0;
       pointer-events: none;
-      transition: opacity 0.4s linear;
+      transition: opacity 0.15s ease;
     }
     #host img {
       width: 100%;
@@ -54,10 +54,13 @@
     img.src = '/images/' + hosts[Math.floor(Math.random() * hosts.length)] + '.png';
     var start = Date.now();
     img.onload = function() {
+      var host = document.getElementById('host');
+      host.style.opacity = '0.7';
       var elapsed = Date.now() - start;
       var remaining = Math.max(0, 1400 - elapsed);
       setTimeout(function() {
-        document.getElementById('host').style.opacity = '0';
+        host.style.transition = 'opacity 0.4s linear';
+        host.style.opacity = '0';
         setTimeout(function() { window.location.replace('/'); }, 400);
       }, remaining - 400);
     };
