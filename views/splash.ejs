@@ -65,10 +65,10 @@
       var elapsed = Date.now() - start;
       var remaining = Math.max(0, 1700 - elapsed);
       setTimeout(function() {
-        host.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-in-out';
+        host.style.transition = 'opacity 0.25s ease-out, transform 0.25s ease-in-out';
         host.style.opacity = '0';
         host.style.transform = 'translateX(-50%) scale(0.77)';
-        setTimeout(function() { window.location.replace('/'); }, 300);
+        setTimeout(function() { window.location.replace('/'); }, 250);
       }, remaining - 300);
     }
     img.onload = onReady;
