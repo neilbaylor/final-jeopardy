@@ -323,6 +323,16 @@ const tests = [
 
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
+
+  // ── Numeric answers — JW must not match similar-looking numbers ───────────
+  { correct: '2008',   user: '2008',   expect: true,  note: 'numeric: exact year match' },
+  { correct: '2008',   user: '2016',   expect: false, note: 'numeric: different year rejected (JW "two thousand" prefix)' },
+  { correct: '2008',   user: '2009',   expect: false, note: 'numeric: off-by-one year rejected' },
+  { correct: '1999',   user: '1998',   expect: false, note: 'numeric: adjacent years rejected' },
+  { correct: '1776',   user: '1766',   expect: false, note: 'numeric: similar year rejected' },
+  { correct: '42',     user: '42',     expect: true,  note: 'numeric: exact small number match' },
+  { correct: '42',     user: '43',     expect: false, note: 'numeric: adjacent small number rejected' },
+  { correct: '100',    user: '1000',   expect: false, note: 'numeric: different magnitude rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

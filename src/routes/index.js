@@ -193,7 +193,10 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;
-  if (natural.JaroWinklerDistance(a, b) >= 0.885) return true;
+  // Skip JW for pure-number correct answers (years, counts, etc.) — numbers like
+  // "2008" and "2016" share a long word prefix ("two thousand") that inflates JW.
+  const isNumericAnswer = /^\s*[\d,\s]+\s*$/.test(correctAnswer);
+  if (!isNumericAnswer && natural.JaroWinklerDistance(a, b) >= 0.885) return true;
 
   // Order-independent match for answers joined by "and" / "or" / "&"
   // e.g. "Neil Taylor and Joe Ross" accepts "Joe Ross & Neil Taylor"
