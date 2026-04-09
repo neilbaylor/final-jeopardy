@@ -1609,41 +1609,46 @@
         const total = stats.total_questions || 0;
         const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
         const gameCount = currentGames.length;
-        document.getElementById('stats-modal-header-text').textContent = `Your Stats Over ${gameCount} Game${gameCount !== 1 ? 's' : ''}`;
-        let leading = 0, tied = 0;
-        for (const g of currentGames) {
-          const mine = g.my_score || 0;
-          const maxOther = Math.max(0, ...(g.players || []).map(p => p.score || 0));
-          if (mine > 0 && mine > maxOther) leading++;
-          else if (mine > 0 && mine === maxOther) tied++;
-          else if (mine === 0 && maxOther === 0 && (g.players || []).length > 0) tied++;
-        }
-        let sub;
-        if (gameCount === 1) {
-          sub = leading === 1 ? "You're leading in your only game"
-              : tied === 1    ? "You're tied in your only game"
-              :                 "You're not leading in your only game";
+        if (gameCount === 0) {
+          document.getElementById('stats-modal-header-text').textContent = 'You have no Stats';
+          document.getElementById('stats-modal-subheading').textContent = 'No games yet';
         } else {
-          const all = gameCount;
-          if (leading === 0 && tied === 0) {
-            sub = "Leading or tied in none";
-          } else if (leading === all) {
-            sub = `Leading in all ${all} Games`;
-          } else if (tied === all) {
-            sub = `Tied in all ${all} Games`;
-          } else if (leading + tied === all) {
-            sub = leading === 0 ? `Tied in ${all} Games`
-                : tied === 0    ? `Leading in ${all} Games`
-                : `Leading in ${leading} Games, Tied in ${tied}`;
-          } else if (leading === 0) {
-            sub = `Tied in ${tied} Game${tied !== 1 ? 's' : ''}`;
-          } else if (tied === 0) {
-            sub = `Leading in ${leading} Game${leading !== 1 ? 's' : ''}`;
-          } else {
-            sub = `Leading in ${leading} Games, Tied in ${tied}`;
+          document.getElementById('stats-modal-header-text').textContent = `Your Stats Over ${gameCount} Game${gameCount !== 1 ? 's' : ''}`;
+          let leading = 0, tied = 0;
+          for (const g of currentGames) {
+            const mine = g.my_score || 0;
+            const maxOther = Math.max(0, ...(g.players || []).map(p => p.score || 0));
+            if (mine > 0 && mine > maxOther) leading++;
+            else if (mine > 0 && mine === maxOther) tied++;
+            else if (mine === 0 && maxOther === 0 && (g.players || []).length > 0) tied++;
           }
+          let sub;
+          if (gameCount === 1) {
+            sub = leading === 1 ? "You're leading in your only game"
+                : tied === 1    ? "You're tied in your only game"
+                :                 "You're not leading in your only game";
+          } else {
+            const all = gameCount;
+            if (leading === 0 && tied === 0) {
+              sub = "Leading or tied in none";
+            } else if (leading === all) {
+              sub = `Leading in all ${all} Games`;
+            } else if (tied === all) {
+              sub = `Tied in all ${all} Games`;
+            } else if (leading + tied === all) {
+              sub = leading === 0 ? `Tied in ${all} Games`
+                  : tied === 0    ? `Leading in ${all} Games`
+                  : `Leading in ${leading} Games, Tied in ${tied}`;
+            } else if (leading === 0) {
+              sub = `Tied in ${tied} Game${tied !== 1 ? 's' : ''}`;
+            } else if (tied === 0) {
+              sub = `Leading in ${leading} Game${leading !== 1 ? 's' : ''}`;
+            } else {
+              sub = `Leading in ${leading} Games, Tied in ${tied}`;
+            }
+          }
+          document.getElementById('stats-modal-subheading').textContent = sub;
         }
-        document.getElementById('stats-modal-subheading').textContent = sub;
         const avatarEl = document.getElementById('stats-modal-avatar');
         avatarEl.innerHTML = currentUser?.avatar_url
           ? `<img class="player-avatar" src="${currentUser.avatar_url}" alt="${currentUser.display_name || ''}" />`
@@ -1652,8 +1657,9 @@
         const coinEl = document.getElementById('stats-modal-coin');
         coinEl.textContent = Math.min(correct, 99);
         coinEl.style.display = correct === 0 ? 'none' : '';
-        document.getElementById('stats-modal-stat').textContent = `${correct} / ${total} (${pct}%)`;
+        document.getElementById('stats-modal-stat').textContent = gameCount === 0 ? 'Waiting' : `${correct} / ${total} (${pct}%)`;
         const streaksEl = document.getElementById('stats-modal-streaks');
+        streaksEl.style.display = gameCount === 0 ? 'none' : '';
         const lg = stats.longest_game;
         let longestGameStr = '—';
         if (lg && lg.question_count > 0) {
