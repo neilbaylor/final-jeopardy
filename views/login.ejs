@@ -452,7 +452,7 @@
     if (/android/i.test(navigator.userAgent)) {
       document.body.classList.add('android');
       if (window.matchMedia('(display-mode: standalone)').matches && window.visualViewport) {
-        const inset = Math.max(0, window.screen.height - window.visualViewport.height - window.visualViewport.offsetTop);
+        const inset = Math.max(0, window.innerHeight - window.visualViewport.height);
         document.documentElement.style.setProperty('--android-bottom-inset', inset + 'px');
       }
     }
