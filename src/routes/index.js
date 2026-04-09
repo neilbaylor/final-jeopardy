@@ -307,6 +307,7 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
 
 // Splash screen
 router.get('/splash', (req, res) => {
+  if (/android/i.test(req.headers['user-agent'] || '')) return res.redirect('/');
   res.render('splash');
 });
 
