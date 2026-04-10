@@ -326,8 +326,14 @@ const tests = [
   { correct: 'G.I. Joe',   user: 'GI Joe',   expect: true,  note: 'abbrev: G.I. — no dots in user input' },
   { correct: 'G.I. Joe',   user: 'G.I. Joe', expect: true,  note: 'abbrev: G.I. — exact match with dots' },
   { correct: 'I.R.S.',     user: 'IRS',      expect: true,  note: 'abbrev: I.R.S. — leading "I" must not become 1' },
-  // D.C. vs DC is a known ambiguity: "DC" without dots is a valid Roman numeral (=600),
-  // so the normalizer can't distinguish it from the abbreviation. Skipped.
+  { correct: 'D.C.',       user: 'DC',       expect: true,  note: 'abbrev: D.C. — "DC" is Roman numeral 600 but abbrev path accepts it' },
+  { correct: 'D.C.',       user: 'D.C.',     expect: true,  note: 'abbrev: D.C. — exact match' },
+  { correct: 'C.I.A.',     user: 'CIA',      expect: true,  note: 'abbrev: C.I.A. — all dots stripped' },
+  { correct: 'C.I.A.',     user: 'C.I.A.',   expect: true,  note: 'abbrev: C.I.A. — exact match' },
+  { correct: 'F.B.I.',     user: 'FBI',      expect: true,  note: 'abbrev: F.B.I. — all dots stripped' },
+  { correct: 'N.A.S.A.',   user: 'NASA',     expect: true,  note: 'abbrev: N.A.S.A. — all dots stripped' },
+  { correct: 'D.C. Comics', user: 'DC Comics', expect: true, note: 'abbrev: D.C. in phrase — dots stripped' },
+  { correct: 'D.C.',       user: 'Marvel',   expect: false, note: 'abbrev: D.C. — wrong answer rejected' },
 
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },

@@ -200,6 +200,23 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
   const isNumericAnswer = /^\s*[\d,\s]+\s*$/.test(correctAnswer);
   if (!isNumericAnswer && natural.JaroWinklerDistance(a, b) >= 0.885) return true;
 
+  // Abbreviation dot equivalence: "D.C." ↔ "DC", "G.I. Joe" ↔ "GI Joe", "C.I.A." ↔ "CIA".
+  // Uses a lightweight strip (no Roman numeral conversion) so e.g. "DC" isn't treated as
+  // Roman numeral 600 when it should match "D.C.".
+  if (/[A-Z]\.[A-Z]/.test(correctAnswer) || /[A-Z]\.[A-Z]/.test(userAnswer)) {
+    const abbrevStrip = s => s
+      .replace(/([A-Za-z])\.(?=[A-Za-z\s]|$)/g, '$1')
+      .replace(/([A-Za-z])\./g, '$1')
+      .toLowerCase()
+      .replace(/\b(the|a|an)\b/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const aDots = abbrevStrip(userAnswer);
+    const bDots = abbrevStrip(correctAnswer);
+    if (aDots === bDots) return true;
+    if (!isNumericAnswer && natural.JaroWinklerDistance(aDots, bDots) >= 0.885) return true;
+  }
+
   // Order-independent match for answers joined by "and" / "or" / "&"
   // e.g. "Neil Taylor and Joe Ross" accepts "Joe Ross & Neil Taylor"
   // Also accepts just last names: "Taylor and Ross" for "Neil Taylor and Joe Ross"
