@@ -1474,13 +1474,7 @@
           }
         });
       };
-      let vvResizeTimer = null;
-      let vvFirstFire = true;
-      const onVVResize = () => {
-        clearTimeout(vvResizeTimer);
-        if (vvFirstFire) { vvFirstFire = false; applyVVShift(); }
-        vvResizeTimer = setTimeout(() => { vvFirstFire = true; applyVVShift(); }, 200);
-      };
+      const onVVResize = () => { applyVVShift(); };
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
@@ -1491,7 +1485,6 @@
         setTimeout(() => {
           window._vvStarted = false;
           window.visualViewport.removeEventListener('resize', onVVResize);
-          clearTimeout(vvResizeTimer);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
