@@ -380,6 +380,11 @@ const tests = [
   // "Any N of" pattern
   { correct: 'North & South & East & West', user: 'North & East',   question: 'Any 2 of the 4 cardinal directions',                  expect: true,  note: 'q-nof: "Any 2 of" — valid pair' },
   { correct: 'North & South & East & West', user: 'South',          question: 'Any 2 of the 4 cardinal directions',                  expect: false, note: 'q-nof: "Any 2 of" — gave 1, need 2' },
+  // "and"-separated correct answers (not just &)
+  { correct: 'Alaska and Hawaii',     user: 'Alaska',          question: '1 of 2 states that are not in the contiguous U.S.',              expect: true,  note: 'q-nof: "and" separator — valid pick' },
+  { correct: 'Alaska and Hawaii',     user: 'Hawaii',          question: '1 of 2 states that are not in the contiguous U.S.',              expect: true,  note: 'q-nof: "and" separator — other valid pick' },
+  { correct: 'Alaska and Hawaii',     user: 'Texas',           question: '1 of 2 states that are not in the contiguous U.S.',              expect: false, note: 'q-nof: "and" separator — wrong answer rejected' },
+  { correct: 'Mercury and Venus and Mars', user: 'Venus & Mars', question: 'Name 2 of the 3 planets closest to the Sun',                  expect: true,  note: 'q-nof: "and" separator — valid pair, user uses &' },
   // Fuzzy match still works
   { correct: 'Alaska & Hawaii',       user: 'Alaskaa',         question: '1 of 2 states that are not in the contiguous U.S.',              expect: true,  note: 'q-nof: fuzzy match on valid pick' },
   // No question text — q-nof must NOT fire; single partial answer correctly rejected
