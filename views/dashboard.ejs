@@ -2544,7 +2544,7 @@
     });
 
     // Pull-to-refresh + bottom overscroll (shared setup)
-    function setupPTR(el, scroller, ptr, ptrSpinner, loadFn) {
+    function setupPTR(el, scroller, ptr, ptrSpinner, loadFn, spinnerEl) {
       const THRESHOLD = 125;
       const DEADZONE = 36;
       let startY = 0, mode = null, triggered = false, lastDy = 0;
@@ -2560,7 +2560,7 @@
 
       el.addEventListener('touchstart', e => {
         if (e.touches.length !== 1) return;
-        if (!document.getElementById('games-spinner').classList.contains('hidden')) return;
+        if (spinnerEl && !spinnerEl.classList.contains('hidden')) return;
         startY = e.touches[0].clientY;
         mode = null;
         triggered = false;
@@ -2639,7 +2639,8 @@
       document.getElementById('users-list-scroller'),
       document.getElementById('ptr-indicator'),
       document.getElementById('ptr-spinner'),
-      () => { usersCache = null; return loadUsers(true); }
+      () => { usersCache = null; return loadUsers(true); },
+      document.getElementById('panel-spinner')
     );
 
     setupPTR(
@@ -2647,7 +2648,8 @@
       document.getElementById('content'),
       document.getElementById('games-ptr-indicator'),
       document.getElementById('games-ptr-spinner'),
-      () => loadGames(true)
+      () => loadGames(true),
+      document.getElementById('games-spinner')
     );
 
     document.addEventListener('visibilitychange', function() {
