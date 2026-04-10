@@ -362,6 +362,35 @@ const tests = [
   // Fuzzy city name
   { correct: 'Albuquerque, New Mexico',   user: 'Albuquerqe',      expect: true,  note: 'geo: fuzzy city name + state stripped' },
 
+  // ── N-of from question text ───────────────────────────────────────────────
+  // "1 of 2 X" pattern
+  { correct: 'Alaska & Hawaii',       user: 'Alaska',          question: '1 of 2 states that are not in the contiguous U.S.',              expect: true,  note: 'q-nof: "1 of 2" — valid pick' },
+  { correct: 'Alaska & Hawaii',       user: 'Hawaii',          question: '1 of 2 states that are not in the contiguous U.S.',              expect: true,  note: 'q-nof: "1 of 2" — other valid pick' },
+  { correct: 'Alaska & Hawaii',       user: 'Texas',           question: '1 of 2 states that are not in the contiguous U.S.',              expect: false, note: 'q-nof: "1 of 2" — wrong state rejected' },
+  { correct: 'Alaska & Hawaii',       user: 'Alaska & Hawaii', question: '1 of 2 states that are not in the contiguous U.S.',              expect: true,  note: 'q-nof: "1 of 2" — giving both candidates is always accepted' },
+  // "Name N of..." pattern
+  { correct: 'Mercury & Venus & Mars & Jupiter', user: 'Mercury & Venus',     question: 'Name 2 of the 4 inner and outer planets',        expect: true,  note: 'q-nof: "Name 2 of 4" — valid pair' },
+  { correct: 'Mercury & Venus & Mars & Jupiter', user: 'Mars & Jupiter',      question: 'Name 2 of the 4 inner and outer planets',        expect: true,  note: 'q-nof: "Name 2 of 4" — different pair' },
+  { correct: 'Mercury & Venus & Mars & Jupiter', user: 'Mercury',             question: 'Name 2 of the 4 inner and outer planets',        expect: false, note: 'q-nof: "Name 2 of 4" — gave 1, need 2' },
+  { correct: 'Mercury & Venus & Mars & Jupiter', user: 'Pluto & Venus',       question: 'Name 2 of the 4 inner and outer planets',        expect: false, note: 'q-nof: "Name 2 of 4" — one wrong rejected' },
+  // "Either of" pattern → N=1
+  { correct: 'Red & Blue',            user: 'Red',             question: 'Either of the 2 primary colors used in this flag',             expect: true,  note: 'q-nof: "Either of" — first pick' },
+  { correct: 'Red & Blue',            user: 'Blue',            question: 'Either of the 2 primary colors used in this flag',             expect: true,  note: 'q-nof: "Either of" — second pick' },
+  { correct: 'Red & Blue',            user: 'Green',           question: 'Either of the 2 primary colors used in this flag',             expect: false, note: 'q-nof: "Either of" — wrong color rejected' },
+  // "Any N of" pattern
+  { correct: 'North & South & East & West', user: 'North & East',   question: 'Any 2 of the 4 cardinal directions',                  expect: true,  note: 'q-nof: "Any 2 of" — valid pair' },
+  { correct: 'North & South & East & West', user: 'South',          question: 'Any 2 of the 4 cardinal directions',                  expect: false, note: 'q-nof: "Any 2 of" — gave 1, need 2' },
+  // Fuzzy match still works
+  { correct: 'Alaska & Hawaii',       user: 'Alaskaa',         question: '1 of 2 states that are not in the contiguous U.S.',              expect: true,  note: 'q-nof: fuzzy match on valid pick' },
+  // No question text — q-nof must NOT fire; single partial answer correctly rejected
+  // (using "Red & Blue" since "red" JW-distance from "red blue" is ~0.854, below 0.885 threshold)
+  { correct: 'Red & Blue',            user: 'Red',             question: '',                                                               expect: false, note: 'q-nof: no question text — single partial answer rejected' },
+  // Single-candidate correct answer — q-nof must not activate
+  { correct: 'Alaska',               user: 'Alaska',          question: '1 of 2 states that are not in the contiguous U.S.',              expect: true,  note: 'q-nof: single correct answer still accepted normally' },
+  { correct: 'Alaska',               user: 'Hawaii',          question: '1 of 2 states that are not in the contiguous U.S.',              expect: false, note: 'q-nof: single correct answer — wrong answer rejected' },
+  // Question text with N-of in the middle (should NOT trigger — anchored to start)
+  { correct: 'Red & Blue',            user: 'Red',             question: 'This flag uses 1 of 2 colors',                                   expect: false, note: 'q-nof: N-of mid-question — not anchored, no trigger' },
+
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
 
@@ -381,7 +410,7 @@ const tests = [
 let pass = 0, fail = 0;
 
 const rows = tests.map(t => {
-  const got = isAnswerCorrect(t.user, t.correct);
+  const got = isAnswerCorrect(t.user, t.correct, t.question || '');
   const ok = got === t.expect;
   if (ok) pass++; else fail++;
   return {

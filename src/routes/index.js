@@ -241,7 +241,41 @@ const GEO_QUALIFIERS = new Set([
   'soviet union','ussr','yugoslavia','burma','persia','siam','rhodesia','ceylon',
 ]);
 
-function isAnswerCorrect(userAnswer, correctAnswer) {
+// Parse "name N of", "N of M", "either of", "any N of" anchored to the START of a question clue.
+// Returns N (required count) or 0 if not detected.
+function parseNOfFromQuestion(questionText) {
+  if (!questionText) return 0;
+  const q = questionText.trim();
+  let m;
+  // "Name 2 of..." / "Name 2 of the 4..." / "Give 2 of..."
+  m = q.match(/^(?:name|give|list)\s+(\d+)\s+of\b/i);
+  if (m) return parseInt(m[1], 10);
+  // "1 of 2 states" / "1 of the 2..."
+  m = q.match(/^(\d+)\s+of\s+(?:the\s+)?\d+\b/i);
+  if (m) return parseInt(m[1], 10);
+  // "Either of these..." → N=1
+  if (/^either\s+of\b/i.test(q)) return 1;
+  // "Any 2 of..." / "Any one of..."
+  m = q.match(/^any\s+(?:one|(\d+))\s+of\b/i);
+  if (m) return m[1] ? parseInt(m[1], 10) : 1;
+  return 0;
+}
+
+// Fuzzy match helper used by both (N Of) correct-answer format and question-derived N-of logic.
+function nOfFuzzyMatch(u, cNorm, cOrig) {
+  if (u === cNorm) return true;
+  const ratio = Math.min(u.length, cNorm.length) / Math.max(u.length, cNorm.length);
+  if (ratio >= 0.7 && natural.JaroWinklerDistance(u, cNorm) >= 0.88) return true;
+  const ln = extractLastName(cOrig);
+  if (ln !== null) {
+    const lnNorm = normalizeAnswer(ln);
+    if (u === lnNorm) return true;
+    if (natural.JaroWinklerDistance(u, lnNorm) >= 0.88) return true;
+  }
+  return false;
+}
+
+function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   userAnswer = stripJeopardyPreamble(userAnswer);
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
@@ -323,27 +357,41 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
       userParts = userAnswer.trim().split(/\s+/).map(s => normalizeAnswer(s));
     }
     if (userParts.length !== required) return false;
-    const nOfFuzzy = (u, cNorm, cOrig) => {
-      if (u === cNorm) return true;
-      const ratio = Math.min(u.length, cNorm.length) / Math.max(u.length, cNorm.length);
-      if (ratio >= 0.7 && natural.JaroWinklerDistance(u, cNorm) >= 0.88) return true;
-      // Also accept last name of full-name candidates
-      const ln = extractLastName(cOrig);
-      if (ln !== null) {
-        const lnNorm = normalizeAnswer(ln);
-        if (u === lnNorm) return true;
-        if (natural.JaroWinklerDistance(u, lnNorm) >= 0.88) return true;
-      }
-      return false;
-    };
     const usedCandidates = new Set();
     const matched = userParts.filter(u => {
-      const idx = candidatesOrig.findIndex((cOrig, i) => !usedCandidates.has(i) && nOfFuzzy(u, candidates[i], cOrig));
+      const idx = candidatesOrig.findIndex((cOrig, i) => !usedCandidates.has(i) && nOfFuzzyMatch(u, candidates[i], cOrig));
       if (idx === -1) return false;
       usedCandidates.add(idx);
       return true;
     });
     return matched.length === required;
+  }
+
+  // N-of from question text: e.g. "Name 2 of the 4 states...", "1 of 2 countries...", "Either of these...".
+  // Only triggers when the correct answer has multiple &/and-separated candidates and the question
+  // starts with a recognized N-of pattern. Does NOT return false on mismatch — falls through instead.
+  if (questionText) {
+    const nFromQ = parseNOfFromQuestion(questionText);
+    if (nFromQ > 0) {
+      const candidatesOrig = correctAnswer.split(/\s*(?:&|\band\b)\s*/i).map(s => s.trim()).filter(Boolean);
+      if (candidatesOrig.length > 1 && candidatesOrig.length >= nFromQ) {
+        const candidates = candidatesOrig.map(s => normalizeAnswer(s));
+        let userParts = userAnswer.split(/\s*(?:&|,|\band\b|\bor\b)\s*/i).map(s => normalizeAnswer(s.trim())).filter(Boolean);
+        if (userParts.length === 1 && nFromQ > 1) {
+          userParts = userAnswer.trim().split(/\s+/).map(s => normalizeAnswer(s));
+        }
+        if (userParts.length === nFromQ) {
+          const usedQ = new Set();
+          const matchedQ = userParts.filter(u => {
+            const idx = candidatesOrig.findIndex((cOrig, i) => !usedQ.has(i) && nOfFuzzyMatch(u, candidates[i], cOrig));
+            if (idx === -1) return false;
+            usedQ.add(idx);
+            return true;
+          });
+          if (matchedQ.length === nFromQ) return true;
+        }
+      }
+    }
   }
 
   // Allow omitting a leading qualifier (e.g. "Virgin Islands" for "U.S. Virgin Islands").
@@ -818,7 +866,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
 
     // 2. Look up the game_questions row (errors if question not linked to game)
     const [[gq]] = await conn.execute(
-      `SELECT gq.id AS game_question_id, q.answer AS correct_answer
+      `SELECT gq.id AS game_question_id, q.answer AS correct_answer, q.question AS question_text
        FROM game_questions gq
        JOIN questions q ON gq.question_id = q.id
        WHERE gq.game_id = ? AND gq.question_id = ?`,
@@ -827,7 +875,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
     if (!gq) return res.status(404).json({ error: 'Question is not part of this game' });
 
     // 3. Determine correctness
-    const correct = isAnswerCorrect(String(answer), gq.correct_answer);
+    const correct = isAnswerCorrect(String(answer), gq.correct_answer, gq.question_text);
 
     await conn.beginTransaction();
 
