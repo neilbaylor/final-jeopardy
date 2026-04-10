@@ -1475,7 +1475,12 @@
         });
       };
       let vvResizeTimer = null;
-      const onVVResize = () => { clearTimeout(vvResizeTimer); vvResizeTimer = setTimeout(applyVVShift, 200); };
+      let vvFirstFire = true;
+      const onVVResize = () => {
+        clearTimeout(vvResizeTimer);
+        if (vvFirstFire) { vvFirstFire = false; applyVVShift(); }
+        vvResizeTimer = setTimeout(() => { vvFirstFire = true; applyVVShift(); }, 200);
+      };
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
