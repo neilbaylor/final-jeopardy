@@ -335,6 +335,33 @@ const tests = [
   { correct: 'D.C. Comics', user: 'DC Comics', expect: true, note: 'abbrev: D.C. in phrase — dots stripped' },
   { correct: 'D.C.',       user: 'Marvel',   expect: false, note: 'abbrev: D.C. — wrong answer rejected' },
 
+  // ── Geographic qualifier stripping ───────────────────────────────────────
+  // US state
+  { correct: 'Orlando, Florida',          user: 'Orlando',         expect: true,  note: 'geo: city + US state — state stripped' },
+  { correct: 'Orlando, Florida',          user: 'orlando',         expect: true,  note: 'geo: lowercase city accepted' },
+  { correct: 'Orlando, Florida',          user: 'Orlando, Florida',expect: true,  note: 'geo: full answer still accepted' },
+  { correct: 'Orlando, Florida',          user: 'Miami',           expect: false, note: 'geo: wrong city rejected' },
+  { correct: 'Springfield, Illinois',     user: 'Springfield',     expect: true,  note: 'geo: Springfield + state stripped' },
+  { correct: 'Springfield, Illinois',     user: 'Sprngfield',      expect: true,  note: 'geo: fuzzy match on city name' },
+  { correct: 'New York, New York',        user: 'New York',        expect: true,  note: 'geo: city = state, still accepted' },
+  // Canadian province / territory
+  { correct: 'Toronto, Ontario',          user: 'Toronto',         expect: true,  note: 'geo: Canadian city + province stripped' },
+  { correct: 'Toronto, Canada',           user: 'Toronto',         expect: true,  note: 'geo: Canadian city + country stripped' },
+  { correct: 'Vancouver, British Columbia', user: 'Vancouver',     expect: true,  note: 'geo: multi-word province stripped' },
+  { correct: 'Quebec City, Quebec, Canada', user: 'Quebec City',   expect: true,  note: 'geo: double qualifier — last (Canada) stripped, prefix matched' },
+  // Country
+  { correct: 'Paris, France',             user: 'Paris',           expect: true,  note: 'geo: city + country stripped' },
+  { correct: 'London, England',           user: 'London',          expect: true,  note: 'geo: city + UK constituent stripped' },
+  { correct: 'Sydney, Australia',         user: 'Sydney',          expect: true,  note: 'geo: city + country stripped' },
+  { correct: 'Tokyo, Japan',              user: 'Tokyo',           expect: true,  note: 'geo: city + country stripped' },
+  { correct: 'Berlin, Germany',           user: 'Berlin',          expect: true,  note: 'geo: city + country stripped' },
+  // Non-geo qualifier — must NOT strip
+  { correct: 'Salt, Pepper',              user: 'Salt',            expect: false, note: 'geo: non-geo qualifier not stripped' },
+  { correct: 'Red, White and Blue',       user: 'Red',             expect: false, note: 'geo: non-geo multi-word not stripped' },
+  { correct: 'Ace, Deuce',                user: 'Ace',             expect: false, note: 'geo: non-geo suffix — short word, JW too low, not stripped' },
+  // Fuzzy city name
+  { correct: 'Albuquerque, New Mexico',   user: 'Albuquerqe',      expect: true,  note: 'geo: fuzzy city name + state stripped' },
+
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
 

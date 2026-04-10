@@ -190,6 +190,57 @@ function stripJeopardyPreamble(str) {
   return str.replace(/^\s*(who(?:\s+(?:is|was|were))|what\s+(?:is|was|were)|where\s+(?:is|was|were)|when\s+(?:is|was|were))\s+/i, '').replace(/\?\s*$/, '').trim();
 }
 
+// Geographic qualifiers — when the correct answer is "City, <qualifier>", the qualifier
+// is stripped and the user only needs to name the city. Only fires for known geo terms.
+const GEO_QUALIFIERS = new Set([
+  // US states
+  'alabama','alaska','arizona','arkansas','california','colorado','connecticut','delaware',
+  'florida','georgia','hawaii','idaho','illinois','indiana','iowa','kansas','kentucky',
+  'louisiana','maine','maryland','massachusetts','michigan','minnesota','mississippi',
+  'missouri','montana','nebraska','nevada','new hampshire','new jersey','new mexico',
+  'new york','north carolina','north dakota','ohio','oklahoma','oregon','pennsylvania',
+  'rhode island','south carolina','south dakota','tennessee','texas','utah','vermont',
+  'virginia','washington','west virginia','wisconsin','wyoming',
+  // DC + territories
+  'district of columbia','dc','puerto rico','guam','american samoa','us virgin islands',
+  // Canadian provinces & territories
+  'alberta','british columbia','manitoba','new brunswick','newfoundland',
+  'newfoundland and labrador','nova scotia','ontario','prince edward island','quebec',
+  'saskatchewan','northwest territories','nunavut','yukon',
+  // UK constituent countries
+  'england','scotland','wales','northern ireland','great britain',
+  // World countries (UN member states + common variants)
+  'afghanistan','albania','algeria','andorra','angola','antigua and barbuda','argentina',
+  'armenia','australia','austria','azerbaijan','bahamas','bahrain','bangladesh','barbados',
+  'belarus','belgium','belize','benin','bhutan','bolivia','bosnia','bosnia and herzegovina',
+  'botswana','brazil','brunei','bulgaria','burkina faso','burundi','cabo verde','cambodia',
+  'cameroon','canada','central african republic','chad','chile','china','colombia',
+  'comoros','congo','democratic republic of the congo','costa rica','croatia','cuba',
+  'cyprus','czech republic','czechia','denmark','djibouti','dominica','dominican republic',
+  'ecuador','egypt','el salvador','equatorial guinea','eritrea','estonia','eswatini',
+  'ethiopia','fiji','finland','france','gabon','gambia','germany','ghana','greece',
+  'grenada','guatemala','guinea','guinea-bissau','guyana','haiti','honduras','hungary',
+  'iceland','india','indonesia','iran','iraq','ireland','israel','italy','jamaica',
+  'japan','jordan','kazakhstan','kenya','kiribati','kosovo','kuwait','kyrgyzstan','laos',
+  'latvia','lebanon','lesotho','liberia','libya','liechtenstein','lithuania','luxembourg',
+  'madagascar','malawi','malaysia','maldives','mali','malta','marshall islands',
+  'mauritania','mauritius','mexico','micronesia','moldova','monaco','mongolia','montenegro',
+  'morocco','mozambique','myanmar','namibia','nauru','nepal','netherlands','new zealand',
+  'nicaragua','niger','nigeria','north korea','north macedonia','norway','oman','pakistan',
+  'palau','palestine','panama','papua new guinea','paraguay','peru','philippines','poland',
+  'portugal','qatar','romania','russia','rwanda','saint kitts and nevis','saint lucia',
+  'saint vincent and the grenadines','samoa','san marino','saudi arabia','senegal',
+  'serbia','seychelles','sierra leone','singapore','slovakia','slovenia','solomon islands',
+  'somalia','south africa','south korea','south sudan','spain','sri lanka','sudan',
+  'suriname','sweden','switzerland','syria','taiwan','tajikistan','tanzania','thailand',
+  'timor-leste','togo','tonga','trinidad and tobago','tunisia','turkey','turkmenistan',
+  'tuvalu','uganda','ukraine','united arab emirates','uae','united kingdom','uk',
+  'united states','usa','us','uruguay','uzbekistan','vanuatu','vatican','venezuela',
+  'vietnam','yemen','zambia','zimbabwe',
+  // Historical / common alternates
+  'soviet union','ussr','yugoslavia','burma','persia','siam','rhodesia','ceylon',
+]);
+
 function isAnswerCorrect(userAnswer, correctAnswer) {
   userAnswer = stripJeopardyPreamble(userAnswer);
   const a = normalizeAnswer(userAnswer);
@@ -215,6 +266,20 @@ function isAnswerCorrect(userAnswer, correctAnswer) {
     const bDots = abbrevStrip(correctAnswer);
     if (aDots === bDots) return true;
     if (!isNumericAnswer && natural.JaroWinklerDistance(aDots, bDots) >= 0.885) return true;
+  }
+
+  // Geographic qualifier: "Orlando, Florida" → accept "Orlando"; "Toronto, Canada" → accept "Toronto".
+  // Uses lastIndexOf so double qualifiers work too: "Quebec City, Quebec, Canada" → last = "Canada" → accept "Quebec City".
+  {
+    const lastComma = correctAnswer.lastIndexOf(',');
+    if (lastComma !== -1) {
+      const rawQualifier = correctAnswer.slice(lastComma + 1).trim();
+      const normQualifier = rawQualifier.toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim();
+      if (GEO_QUALIFIERS.has(normQualifier)) {
+        const prefix = correctAnswer.slice(0, lastComma).trim();
+        if (matchesPart(a, normalizeAnswer(prefix), prefix)) return true;
+      }
+    }
   }
 
   // Order-independent match for answers joined by "and" / "or" / "&"
