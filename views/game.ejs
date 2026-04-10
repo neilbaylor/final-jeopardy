@@ -1474,20 +1474,19 @@
           }
         });
       };
-      const onVVResize = () => { applyVVShift(); };
-      const onInputFocus = () => { setTimeout(applyVVShift, 100); };
+      let vvResizeTimer = null;
+      const onVVResize = () => { clearTimeout(vvResizeTimer); vvResizeTimer = setTimeout(applyVVShift, 200); };
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
         baseInputBottom = document.documentElement.clientHeight - parseFloat(getComputedStyle(answerInputWrap).bottom);
         window.visualViewport.addEventListener('resize', onVVResize);
-        answerInput.addEventListener('focus', onInputFocus);
       };
       window._vvStop = () => {
         setTimeout(() => {
           window._vvStarted = false;
           window.visualViewport.removeEventListener('resize', onVVResize);
-          answerInput.removeEventListener('focus', onInputFocus);
+          clearTimeout(vvResizeTimer);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
