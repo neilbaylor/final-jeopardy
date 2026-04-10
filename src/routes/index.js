@@ -43,7 +43,9 @@ function normalizeAnswer(str) {
   str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   str = str.replace(/['\u2018\u2019]/g, '');
   // Convert Roman numerals (all-uppercase tokens) before lowercasing
-  str = str.replace(/\b([IVXLCDMivxlcdm]+)\b/g, (m) => {
+  str = str.replace(/\b([IVXLCDMivxlcdm]+)\b/g, (m, _p1, offset, original) => {
+    // Skip tokens that are part of dot-separated abbreviations (e.g. G.I., I.R.S., D.C.)
+    if (original[offset - 1] === '.' || original[offset + m.length] === '.') return m;
     const u = m.toUpperCase();
     if (!_romanRe.test(u)) return m;
     const n = romanToNum(u);

@@ -321,6 +321,14 @@ const tests = [
   { correct: 'Batman (or Bruce Wayne)',           user: 'Superman',          expect: false, note: "(Or X) — wrong answer" },
   { correct: 'Batman (or Bruce Wayne)',           user: 'Who is Wayne?',     expect: true,  note: "(Or X) — preamble stripped + last name" },
 
+  // ── Abbreviations containing Roman-numeral letters ──────────────────────
+  { correct: 'G.I. Joe',   user: 'gi joe',   expect: true,  note: 'abbrev: G.I. — "I" must not be converted to Roman numeral 1' },
+  { correct: 'G.I. Joe',   user: 'GI Joe',   expect: true,  note: 'abbrev: G.I. — no dots in user input' },
+  { correct: 'G.I. Joe',   user: 'G.I. Joe', expect: true,  note: 'abbrev: G.I. — exact match with dots' },
+  { correct: 'I.R.S.',     user: 'IRS',      expect: true,  note: 'abbrev: I.R.S. — leading "I" must not become 1' },
+  // D.C. vs DC is a known ambiguity: "DC" without dots is a valid Roman numeral (=600),
+  // so the normalizer can't distinguish it from the abbreviation. Skipped.
+
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
 
