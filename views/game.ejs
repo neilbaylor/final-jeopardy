@@ -1434,10 +1434,12 @@
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseInputBottom = 0;
       let kbOffset = 0;
+      let kbClosing = false;
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyVVShift = () => {
         const newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
+        if (newOffset < kbOffset && !kbClosing) return;
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
@@ -1478,10 +1480,12 @@
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
+        kbClosing = false;
         baseInputBottom = document.documentElement.clientHeight - parseFloat(getComputedStyle(answerInputWrap).bottom);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
+        kbClosing = true;
         setTimeout(() => {
           window._vvStarted = false;
           window.visualViewport.removeEventListener('resize', onVVResize);
