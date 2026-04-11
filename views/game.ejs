@@ -1439,7 +1439,7 @@
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyVVShift = () => {
         const newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
-        if (newOffset < kbOffset && !kbClosing) return;
+        if (newOffset === 0 && kbOffset > 0 && !kbClosing) return;
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
