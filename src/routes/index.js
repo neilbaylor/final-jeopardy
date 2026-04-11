@@ -529,12 +529,12 @@ router.post('/api/games', async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // Check if the user is already at the game limit
+    // Check if the user is already at the game limit (admin user id 1 is exempt)
     const [[{ gameCount }]] = await conn.query(
       'SELECT COUNT(*) AS gameCount FROM game_users WHERE user_id = ?',
       [Number(userId)]
     );
-    if (gameCount >= 10) {
+    if (Number(userId) !== 1 && gameCount >= 10) {
       await conn.rollback();
       return res.status(409).json({ error: 'You have reached the maximum number of games' });
     }
