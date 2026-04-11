@@ -1435,6 +1435,8 @@
       let baseInputBottom = 0;
       let kbOffset = 0;
       let kbClosing = false;
+      answerInput.addEventListener('focus', () => { kbClosing = false; });
+      answerInput.addEventListener('blur',  () => { kbClosing = true; });
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyVVShift = () => {
@@ -1480,12 +1482,10 @@
       window._vvStart = () => {
         if (window._vvStarted) return;
         window._vvStarted = true;
-        kbClosing = false;
         baseInputBottom = document.documentElement.clientHeight - parseFloat(getComputedStyle(answerInputWrap).bottom);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
-        kbClosing = true;
         setTimeout(() => {
           window._vvStarted = false;
           window.visualViewport.removeEventListener('resize', onVVResize);
