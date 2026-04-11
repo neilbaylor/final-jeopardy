@@ -396,6 +396,9 @@ const tests = [
   // Question text with N-of in the middle (should NOT trigger — anchored to start)
   { correct: 'Red & Blue',            user: 'Red',             question: 'This flag uses 1 of 2 colors',                                   expect: false, note: 'q-nof: N-of mid-question — not anchored, no trigger' },
 
+  // ── Last-name shorthand — names not in original list ─────────────────────
+  { correct: 'Neville Chamberlain',   user: 'Chamberlain',     expect: true,  note: 'last name: Neville Chamberlain → Chamberlain' },
+
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
 
