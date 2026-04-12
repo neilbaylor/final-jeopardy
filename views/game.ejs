@@ -1434,15 +1434,14 @@
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseInputBottom = 0;
       let kbOffset = 0;
-      let kbClosing = false;
-      answerInput.addEventListener('focus', () => { kbClosing = false; });
-      answerInput.addEventListener('blur',  () => { kbClosing = true; });
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyVVShift = () => {
         const newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
-        if (newOffset < kbOffset && !kbClosing) return;
         if (newOffset === kbOffset) return;
+        // Only allow a decrease if it's a full close (back to 0). Partial decreases
+        // mid-open are spurious iOS events and should be ignored.
+        if (newOffset < kbOffset && newOffset !== 0) return;
         kbOffset = newOffset;
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
