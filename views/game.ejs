@@ -1480,14 +1480,13 @@
       };
       const onVVResize = () => { applyVVShift(); };
       window._vvStart = () => {
-        if (window._vvStarted) return;
-        window._vvStarted = true;
+        kbOffset = 0;
         baseInputBottom = document.documentElement.clientHeight - parseFloat(getComputedStyle(answerInputWrap).bottom);
+        window.visualViewport.removeEventListener('resize', onVVResize);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
         setTimeout(() => {
-          window._vvStarted = false;
           window.visualViewport.removeEventListener('resize', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
