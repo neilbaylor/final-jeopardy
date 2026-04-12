@@ -86,7 +86,7 @@ const tests = [
   { correct: 'John Thompson and Tyler Clark',   user: 'Clark and Thompson',   expect: true,  note: 'last-name — two people, reversed order' },
   { correct: 'John Thompson and Tyler Clark',   user: 'Thompson',             expect: false, note: 'last-name — two people, only one last name given' },
   { correct: 'John Thompson and Tyler Clark',   user: 'Smith and Clark',      expect: false, note: 'last-name — two people, one wrong last name' },
-  { correct: 'John Thompson and Tyler Clark',   user: 'John Thompson',        expect: true,  note: 'last-name — two people, one full name; JW prefix over-accept ⚠️ known' },
+  { correct: 'John Thompson and Tyler Clark',   user: 'John Thompson',        expect: false, note: 'last-name — two people, one full name; partial rejected' },
 
   // ── Last-name-only: two people joined by "&" ─────────────────────────────
   { correct: 'Neil Taylor & Joe Ross',          user: 'Taylor and Ross',      expect: true,  note: 'last-name — & in correct, full last names' },
@@ -138,7 +138,7 @@ const tests = [
   { correct: 'Simon & Garfunkel',  user: 'Simon',               expect: false, note: 'multi-part — only one half' },
   { correct: 'Tom & Jerry',        user: 'Tom and Jerry',        expect: true,  note: 'multi-part — "and" separator' },
   { correct: 'Tom & Jerry',        user: 'Jerry',                expect: false, note: 'multi-part — only one half' },
-  { correct: 'Tom & Jerry',        user: 'Tom & Jerry & Spike',  expect: true,  note: 'multi-part — extra name; JW over-accept ⚠️ known' },
+  { correct: 'Tom & Jerry',        user: 'Tom & Jerry & Spike',  expect: false, note: 'multi-part — extra name rejected (Spike is wrong)' },
 
   // ── Multi-part space-split fallback ───────────────────────────────────────
   // When user gives no connector, correct has 2 parts — space split used
@@ -223,9 +223,9 @@ const tests = [
   { correct: 'A or B or C',             user: 'D',                 expect: false, note: '"X or Y or Z" — non-option rejected' },
   // "and" / "&" connectors still require all parts
   // Note: short prefix like "Neil" JW-matches "neil joe" (≈0.9) — known JW over-accept ⚠️
-  { correct: 'Neil and Joe',            user: 'Neil',              expect: true,  note: '"X and Y" — JW prefix over-accept ⚠️ known' },
+  { correct: 'Neil and Joe',            user: 'Neil',              expect: false, note: '"X and Y" — partial answer rejected' },
   { correct: 'Neil and Joe',            user: 'Joe',               expect: false, note: '"X and Y" — second half alone rejected' },
-  { correct: 'Neil & Joe',              user: 'Neil',              expect: true,  note: '"X & Y" — JW prefix over-accept ⚠️ known' },
+  { correct: 'Neil & Joe',              user: 'Neil',              expect: false, note: '"X & Y" — partial answer rejected' },
   // Last-name matching on or-alternatives
   { correct: 'Neil Taylor or Joe Ross', user: 'Taylor',            expect: true,  note: '"X or Y" names — last name of first option' },
   { correct: 'Neil Taylor or Joe Ross', user: 'Ross',              expect: true,  note: '"X or Y" names — last name of second option' },
@@ -401,6 +401,9 @@ const tests = [
 
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
+  { correct: 'Nat King Cole & Natalie Cole',           user: 'Nat King Cole',                         expect: false, note: 'multi-part: partial match rejected (shared prefix inflates JW)' },
+  { correct: 'Nat King Cole & Natalie Cole',           user: 'Nat King Cole & Natalie Cole',           expect: true,  note: 'multi-part: full match accepted' },
+  { correct: 'Elton John & Billy Joel',                user: 'Elton John',                            expect: false, note: 'multi-part: one of two names rejected' },
 
   // ── Title prefix stripping ────────────────────────────────────────────────
   { correct: 'President Ronald Reagan',    user: 'Ronald Reagan',   expect: true,  note: 'title: President → accept full name' },

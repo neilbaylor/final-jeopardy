@@ -307,10 +307,19 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;
+
+  // Hoist multi-part detection so the JW guard below can use it.
+  const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|[&,])\s*/i).map(p => p.trim()).filter(Boolean);
+  const correctParts = splitConnectors(correctAnswer);
+  const isMultiPartAnswer = correctParts.length > 1;
+
   // Skip JW for pure-number correct answers (years, counts, etc.) — numbers like
   // "2008" and "2016" share a long word prefix ("two thousand") that inflates JW.
   const isNumericAnswer = /^\s*[\d,\s]+\s*$/.test(correctAnswer);
-  if (!isNumericAnswer && natural.JaroWinklerDistance(a, b) >= 0.885) return true;
+  // Skip JW for multi-part answers — normalizeAnswer converts & → space, making
+  // "Nat King Cole natalie cole" match "Nat King Cole" via shared prefix.
+  // The multi-part section below requires ALL parts to be present.
+  if (!isNumericAnswer && !isMultiPartAnswer && natural.JaroWinklerDistance(a, b) >= 0.885) return true;
 
   // Abbreviation dot equivalence: "D.C." ↔ "DC", "G.I. Joe" ↔ "GI Joe", "C.I.A." ↔ "CIA".
   // Uses a lightweight strip (no Roman numeral conversion) so e.g. "DC" isn't treated as
@@ -346,9 +355,7 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   // Order-independent match for answers joined by "and" / "or" / "&"
   // e.g. "Neil Taylor and Joe Ross" accepts "Joe Ross & Neil Taylor"
   // Also accepts just last names: "Taylor and Ross" for "Neil Taylor and Joe Ross"
-  const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|[&,])\s*/i).map(p => p.trim()).filter(Boolean);
-  const correctParts = splitConnectors(correctAnswer);
-  if (correctParts.length > 1) {
+  if (isMultiPartAnswer) {
     let userParts = splitConnectors(userAnswer);
     // If connector-split doesn't yield the right count, try whitespace-split
     // e.g. correct "W and JFK", user answers "JFK W" (no connector)
