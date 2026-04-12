@@ -275,6 +275,33 @@ function nOfFuzzyMatch(u, cNorm, cOrig) {
   return false;
 }
 
+// Titles that may optionally precede a name in a correct answer.
+// Multi-word variants listed first so they match before their single-word prefixes.
+const TITLE_PREFIXES = [
+  'prime minister', 'vice president', 'secretary of state', 'attorney general',
+  'chief justice', 'commanding general', 'supreme commander',
+  'president', 'senator', 'governor', 'commissioner', 'mayor', 'chancellor',
+  'king', 'queen', 'prince', 'princess', 'duke', 'duchess', 'emperor', 'empress',
+  'czar', 'tsar', 'sultan', 'pharaoh', 'pope',
+  'general', 'admiral', 'colonel', 'captain', 'major', 'sergeant', 'lieutenant',
+  'commander', 'marshal',
+  'doctor', 'dr', 'professor', 'prof', 'reverend', 'rev', 'father', 'brother', 'sister',
+  'saint', 'st',
+  'sir', 'lord', 'lady', 'dame',
+];
+
+// If `answer` starts with a known title prefix followed by a space, returns the remainder.
+// Otherwise returns null.
+function stripTitlePrefix(answer) {
+  const lower = answer.toLowerCase();
+  for (const t of TITLE_PREFIXES) {
+    if (lower.startsWith(t + ' ')) {
+      return answer.slice(t.length + 1).trim();
+    }
+  }
+  return null;
+}
+
 function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   userAnswer = stripJeopardyPreamble(userAnswer);
   const a = normalizeAnswer(userAnswer);
@@ -435,6 +462,28 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
     const lnNorm = normalizeAnswer(singleLn);
     if (a === lnNorm) return true;
     if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
+  }
+
+  // Title prefix: "President Ronald Reagan" → accept "Ronald Reagan" or "Reagan";
+  // "Prime Minister Boris Johnson" → accept "Boris Johnson" or "Johnson".
+  {
+    const withoutTitle = stripTitlePrefix(correctAnswer);
+    if (withoutTitle !== null) {
+      const bNoTitle = normalizeAnswer(withoutTitle);
+      // Exact full-name match
+      if (a === bNoTitle) return true;
+      // JW full-name match — require length ratio ≥ 0.6 to prevent prefix inflation
+      // (e.g. "Ronald" must not match "Ronald Reagan" just because of the shared prefix)
+      const ratio = Math.min(a.length, bNoTitle.length) / Math.max(a.length, bNoTitle.length);
+      if (ratio >= 0.6 && natural.JaroWinklerDistance(a, bNoTitle) >= 0.88) return true;
+      // Last-name only (e.g. "Reagan" for "Ronald Reagan")
+      const ln = extractLastName(withoutTitle);
+      if (ln !== null) {
+        const lnNorm = normalizeAnswer(ln);
+        if (a === lnNorm) return true;
+        if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
+      }
+    }
   }
 
   return false;

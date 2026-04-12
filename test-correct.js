@@ -402,6 +402,20 @@ const tests = [
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
 
+  // ── Title prefix stripping ────────────────────────────────────────────────
+  { correct: 'President Ronald Reagan',    user: 'Ronald Reagan',   expect: true,  note: 'title: President → accept full name' },
+  { correct: 'President Ronald Reagan',    user: 'Reagan',          expect: true,  note: 'title: President → accept last name' },
+  { correct: 'President Ronald Reagan',    user: 'Ronald',          expect: false, note: 'title: President → first name alone rejected' },
+  { correct: 'Senator John McCain',        user: 'John McCain',     expect: true,  note: 'title: Senator → accept full name' },
+  { correct: 'Senator John McCain',        user: 'McCain',          expect: true,  note: 'title: Senator → accept last name' },
+  { correct: 'Prime Minister Boris Johnson', user: 'Boris Johnson', expect: true,  note: 'title: Prime Minister → accept full name' },
+  { correct: 'Prime Minister Boris Johnson', user: 'Johnson',       expect: true,  note: 'title: Prime Minister → accept last name' },
+  { correct: 'General George Patton',      user: 'George Patton',   expect: true,  note: 'title: General → accept full name' },
+  { correct: 'General George Patton',      user: 'Patton',          expect: true,  note: 'title: General → accept last name' },
+  { correct: 'Commissioner Gordon',        user: 'Gordon',          expect: true,  note: 'title: Commissioner → accept surname-only answer' },
+  { correct: 'King Charles',              user: 'Charles',          expect: true,  note: 'title: King → accept name' },
+  { correct: 'Doctor Martin Luther King', user: 'Martin Luther King', expect: true, note: 'title: Doctor → accept name without title' },
+
   // ── Numeric answers — JW must not match similar-looking numbers ───────────
   { correct: '2008',   user: '2008',   expect: true,  note: 'numeric: exact year match' },
   { correct: '2008',   user: '2016',   expect: false, note: 'numeric: different year rejected (JW "two thousand" prefix)' },
