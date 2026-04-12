@@ -2661,7 +2661,7 @@
       gamesList.style.opacity = '0';
       gamesList.innerHTML = '';
       spinner.classList.remove('hidden');
-      prevGameIds = new Set((currentGames || []).map(g => String(g.id)));
+      prevGameIds = null;
       loadGames();
     });
 
