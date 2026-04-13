@@ -410,6 +410,10 @@ const tests = [
   { correct: 'Ludwig van Beethoven',   user: 'van Beethoven',   expect: true,  note: 'compound surname: van Beethoven accepted' },
   { correct: 'Ludwig van Beethoven',   user: 'Beethoven',       expect: true,  note: 'compound surname: bare surname accepted' },
   { correct: 'Vincent van Gogh',       user: 'Monet',           expect: false, note: 'compound surname: wrong artist rejected' },
+  { correct: 'Vincent van Gogh & Ludwig van Beethoven', user: 'Beethoven and van Gogh',  expect: true,  note: 'compound surname: multi-part, bare + particle, reversed' },
+  { correct: 'Vincent van Gogh & Ludwig van Beethoven', user: 'Gogh & Beethoven',        expect: true,  note: 'compound surname: multi-part, both bare surnames' },
+  { correct: 'Vincent van Gogh & Ludwig van Beethoven', user: 'Beethoven and vangough',  expect: true,  note: 'compound surname: multi-part, no-space variant' },
+  { correct: 'Vincent van Gogh & Ludwig van Beethoven', user: 'Monet and Beethoven',     expect: false, note: 'compound surname: multi-part, one wrong rejected' },
 
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
