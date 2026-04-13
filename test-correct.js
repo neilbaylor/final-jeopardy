@@ -398,6 +398,7 @@ const tests = [
 
   // ── Last-name shorthand — names not in original list ─────────────────────
   { correct: 'Neville Chamberlain',   user: 'Chamberlain',     expect: true,  note: 'last name: Neville Chamberlain → Chamberlain' },
+  { correct: 'Johannes Kepler',        user: 'Kepler',          expect: true,  note: 'last name: Johannes Kepler → Kepler' },
 
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },

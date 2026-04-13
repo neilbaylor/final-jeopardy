@@ -101,7 +101,7 @@ const COMMON_FIRST_NAMES = new Set([
   // Male — French
   'claude','emile','etienne','francois','gustave','jean','jules','pierre','rene',
   // Male — German/Austrian
-  'dieter','ernst','franz','gottfried','gunther','hans','heinrich','helmut','joachim',
+  'dieter','ernst','franz','gottfried','gunther','hans','heinrich','helmut','joachim','johannes',
   'leopold','ludwig','reinhold','rudolf','ulrich','walther','wilhelm','wolfgang',
   // Male — Italian
   'cesare','giacomo','giovanni','giuseppe','guglielmo','luigi','matteo','michelangelo','raffaello',
