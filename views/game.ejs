@@ -244,13 +244,14 @@
       background: rgba(0, 0, 0, 0.45);
       box-shadow: inset 0 -1px 0 rgba(155, 155, 155, 0.23);
       overflow: hidden;
+      opacity: 0;
       transform: translateY(-125%);
-      transition: transform 0.505s ease;
-      will-change: opacity;
+      transition: transform 0.505s ease, opacity 0s linear 0.505s;
+      will-change: transform;
       z-index: 9;
       pointer-events: none;
     }
-    #progress-bar.visible { transform: translateY(0); transition: transform 0.61s ease 0.2s; }
+    #progress-bar.visible { opacity: 1; transform: translateY(0); transition: transform 0.61s ease 0.2s, opacity 0s; }
     #progress-bar-fill {
       height: 100%;
       width: 100%;
