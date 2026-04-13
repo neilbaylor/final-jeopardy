@@ -400,6 +400,17 @@ const tests = [
   { correct: 'Neville Chamberlain',   user: 'Chamberlain',     expect: true,  note: 'last name: Neville Chamberlain → Chamberlain' },
   { correct: 'Johannes Kepler',        user: 'Kepler',          expect: true,  note: 'last name: Johannes Kepler → Kepler' },
 
+  // ── Compound surnames (particle names) ───────────────────────────────────
+  { correct: 'Leonardo da Vinci',      user: 'da Vinci',        expect: true,  note: 'compound surname: da Vinci accepted' },
+  { correct: 'Leonardo da Vinci',      user: 'DaVinci',         expect: true,  note: 'compound surname: DaVinci (no space) accepted' },
+  { correct: 'Leonardo da Vinci',      user: 'Vinci',           expect: true,  note: 'compound surname: bare surname accepted' },
+  { correct: 'Leonardo da Vinci',      user: 'Leonardo',        expect: true,  note: 'compound surname: first name alone — JW accepts (existing behaviour)' },
+  { correct: 'Vincent van Gogh',       user: 'van Gogh',        expect: true,  note: 'compound surname: van Gogh accepted' },
+  { correct: 'Vincent van Gogh',       user: 'Gogh',            expect: true,  note: 'compound surname: bare surname accepted' },
+  { correct: 'Ludwig van Beethoven',   user: 'van Beethoven',   expect: true,  note: 'compound surname: van Beethoven accepted' },
+  { correct: 'Ludwig van Beethoven',   user: 'Beethoven',       expect: true,  note: 'compound surname: bare surname accepted' },
+  { correct: 'Vincent van Gogh',       user: 'Monet',           expect: false, note: 'compound surname: wrong artist rejected' },
+
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
   { correct: 'Nat King Cole & Natalie Cole',           user: 'Nat King Cole',                         expect: false, note: 'multi-part: partial match rejected (shared prefix inflates JW)' },

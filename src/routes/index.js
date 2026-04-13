@@ -104,7 +104,7 @@ const COMMON_FIRST_NAMES = new Set([
   'dieter','ernst','franz','gottfried','gunther','hans','heinrich','helmut','joachim','johannes',
   'leopold','ludwig','reinhold','rudolf','ulrich','walther','wilhelm','wolfgang',
   // Male — Italian
-  'cesare','giacomo','giovanni','giuseppe','guglielmo','luigi','matteo','michelangelo','raffaello',
+  'cesare','giacomo','giovanni','giuseppe','guglielmo','leonardo','luigi','matteo','michelangelo','raffaello',
   // Male — Russian/Slavic
   'aleksei','alexei','boris','dmitri','fyodor','igor','mikhail','nikolai','pyotr','sergei',
   'stanislav','vasily','vladimir','yuri',
@@ -172,8 +172,31 @@ function extractLastName(namePart) {
   return null;
 }
 
+// Small connecting words that appear between a first name and a compound surname.
+// e.g. "Leonardo da Vinci", "Vincent van Gogh", "Ludwig van Beethoven"
+const NAME_PARTICLES = new Set([
+  'da','de','del','della','di','du','des',       // Italian / French / Spanish
+  'van','von',                                    // Dutch / German
+  'el','al','bin','bint','ibn',                   // Arabic
+  'le','la','lo','los','las',                     // French / Spanish
+  'af','av',                                      // Scandinavian
+  'ap','ab',                                      // Welsh
+]);
+
+// If `name` is "FirstName [particle] Rest…" (3+ words, first is a known first name,
+// second is a known particle), returns everything after the first name (the compound
+// surname). e.g. "Leonardo da Vinci" → "da Vinci". Otherwise returns null.
+function extractCompoundSurname(name) {
+  const words = name.trim().split(/\s+/);
+  if (words.length < 3) return null;
+  if (!COMMON_FIRST_NAMES.has(words[0].toLowerCase())) return null;
+  if (!NAME_PARTICLES.has(words[1].toLowerCase())) return null;
+  return words.slice(1).join(' ');
+}
+
 // Compare a normalized user part against a correct part (also normalized).
-// Also accepts just the last name when correctPartOrig is a "FirstName LastName".
+// Also accepts just the last name when correctPartOrig is a "FirstName LastName",
+// and the compound surname (or bare surname) for "FirstName [particle] Surname" names.
 function matchesPart(userNorm, correctNorm, correctPartOrig) {
   if (userNorm === correctNorm) return true;
   if (natural.JaroWinklerDistance(userNorm, correctNorm) >= 0.88) return true;
@@ -182,6 +205,17 @@ function matchesPart(userNorm, correctNorm, correctPartOrig) {
     const lnNorm = normalizeAnswer(ln);
     if (userNorm === lnNorm) return true;
     if (natural.JaroWinklerDistance(userNorm, lnNorm) >= 0.88) return true;
+  }
+  // Compound surname: "Leonardo da Vinci" → accept "da Vinci" (or "DaVinci") or "Vinci"
+  const cs = extractCompoundSurname(correctPartOrig);
+  if (cs !== null) {
+    const csNorm = normalizeAnswer(cs);
+    if (userNorm === csNorm) return true;
+    if (natural.JaroWinklerDistance(userNorm, csNorm) >= 0.88) return true;
+    // Also accept just the final surname without the particle
+    const finalNorm = normalizeAnswer(cs.split(/\s+/).pop());
+    if (userNorm === finalNorm) return true;
+    if (natural.JaroWinklerDistance(userNorm, finalNorm) >= 0.88) return true;
   }
   return false;
 }
@@ -471,6 +505,17 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
     if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
   }
 
+  // Compound surname: "Leonardo da Vinci" → accept "da Vinci", "DaVinci", or "Vinci".
+  const singleCs = extractCompoundSurname(correctAnswer);
+  if (singleCs !== null) {
+    const csNorm = normalizeAnswer(singleCs);
+    if (a === csNorm) return true;
+    if (natural.JaroWinklerDistance(a, csNorm) >= 0.88) return true;
+    const finalNorm = normalizeAnswer(singleCs.split(/\s+/).pop());
+    if (a === finalNorm) return true;
+    if (natural.JaroWinklerDistance(a, finalNorm) >= 0.88) return true;
+  }
+
   // Title prefix: "President Ronald Reagan" → accept "Ronald Reagan" or "Reagan";
   // "Prime Minister Boris Johnson" → accept "Boris Johnson" or "Johnson".
   {
@@ -489,6 +534,16 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
         const lnNorm = normalizeAnswer(ln);
         if (a === lnNorm) return true;
         if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
+      }
+      // Compound surname (e.g. "da Vinci" or "Vinci" for "President Leonardo da Vinci")
+      const cs = extractCompoundSurname(withoutTitle);
+      if (cs !== null) {
+        const csNorm = normalizeAnswer(cs);
+        if (a === csNorm) return true;
+        if (natural.JaroWinklerDistance(a, csNorm) >= 0.88) return true;
+        const finalNorm = normalizeAnswer(cs.split(/\s+/).pop());
+        if (a === finalNorm) return true;
+        if (natural.JaroWinklerDistance(a, finalNorm) >= 0.88) return true;
       }
     }
   }
