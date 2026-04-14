@@ -913,7 +913,9 @@ router.get('/api/stats', async (req, res) => {
     const [[row]] = await db.query(
       `SELECT
          COUNT(ga.id)                              AS total_questions,
-         SUM(ga.is_correct = 1)                   AS correct_answers
+         SUM(ga.is_correct = 1)                   AS correct_answers,
+         SUM(gq.asked_at >= NOW() - INTERVAL 7 DAY) AS total_questions_week,
+         SUM(ga.is_correct = 1 AND gq.asked_at >= NOW() - INTERVAL 7 DAY) AS correct_answers_week
        FROM game_users gu
        JOIN game_questions gq ON gq.game_id = gu.game_id
        JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
@@ -953,8 +955,10 @@ router.get('/api/stats', async (req, res) => {
     } : null;
 
     res.json({
-      total_questions:            Number(row.total_questions  || 0),
-      correct_answers:            Number(row.correct_answers  || 0),
+      total_questions:            Number(row.total_questions      || 0),
+      correct_answers:            Number(row.correct_answers      || 0),
+      total_questions_week:       Number(row.total_questions_week || 0),
+      correct_answers_week:       Number(row.correct_answers_week || 0),
       longest_streak_overall:     longestStreakOverall,
       longest_streak_single_game: longestStreakSingleGame,
       longest_game:               longestGame,
