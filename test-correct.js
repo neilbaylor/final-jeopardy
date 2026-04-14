@@ -415,6 +415,12 @@ const tests = [
   { correct: 'Vincent van Gogh & Ludwig van Beethoven', user: 'Beethoven and vangough',  expect: true,  note: 'compound surname: multi-part, no-space variant' },
   { correct: 'Vincent van Gogh & Ludwig van Beethoven', user: 'Monet and Beethoven',     expect: false, note: 'compound surname: multi-part, one wrong rejected' },
 
+  // ── Multi-part: mixed separators / missing separators ────────────────────
+  { correct: 'blue, white & orange',  user: 'blue orange and white',   expect: true,  note: 'multi-part: space-separated with and, no comma between first two' },
+  { correct: 'blue, white & orange',  user: 'blue and orange and white', expect: true, note: 'multi-part: all ands' },
+  { correct: 'blue, white & orange',  user: 'orange white blue',        expect: true,  note: 'multi-part: space-only, no connectors' },
+  { correct: 'blue, white & orange',  user: 'blue orange and green',    expect: false, note: 'multi-part: wrong colour rejected' },
+
   // ── JW inflation via shared prefix ───────────────────────────────────────
   { correct: 'Secretary Of State & Attorney General', user: 'secretary of state and vice president', expect: false, note: 'multi-part: shared prefix must not inflate JW' },
   { correct: 'Nat King Cole & Natalie Cole',           user: 'Nat King Cole',                         expect: false, note: 'multi-part: partial match rejected (shared prefix inflates JW)' },
