@@ -397,6 +397,13 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
       const spaceParts = userAnswer.trim().split(/\s+/);
       if (spaceParts.length === correctParts.length) userParts = spaceParts;
     }
+    // If still wrong count, try stripping bare connector words from the space-split.
+    // e.g. user answers "blue orange and white" for "blue, white & orange":
+    // space-split gives ["blue","orange","and","white"] (4); strip "and" → 3 parts.
+    if (userParts.length !== correctParts.length) {
+      const stripped = userAnswer.trim().split(/\s+/).filter(w => !/^(and|or)$/i.test(w));
+      if (stripped.length === correctParts.length) userParts = stripped;
+    }
     if (userParts.length === correctParts.length) {
       const normUser = userParts.map(normalizeAnswer);
       const normCorrect = correctParts.map(normalizeAnswer);
