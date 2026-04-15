@@ -168,7 +168,7 @@ const tests = [
   { correct: 'Mao Zedong (Mao)',    user: 'Moa',                 expect: false, note: 'trailing paren alias — 3-char transposition below JW threshold' },
   { correct: 'Muhammad Ali (Cassius Clay)', user: 'Cassius Clay', expect: true, note: 'trailing paren alias — multi-word alias accepted' },
   { correct: 'Muhammad Ali (Cassius Clay)', user: 'Muhammad Ali', expect: true, note: 'trailing paren alias — primary name still accepted' },
-  { correct: 'Muhammad Ali (Cassius Clay)', user: 'Clay',         expect: false, note: 'trailing paren alias — last name of alias not extracted (cassius not in first names list)' },
+  { correct: 'Muhammad Ali (Cassius Clay)', user: 'Clay',         expect: true,  note: 'trailing paren alias — last name of alias accepted (cassius in first names list)' },
 
   // ── Roman numerals ────────────────────────────────────────────────────────
   { correct: 'Henry VIII',         user: 'Henry 8',           expect: true,  note: 'roman numeral — VIII = 8' },
