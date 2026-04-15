@@ -1435,15 +1435,10 @@
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseInputBottom = 0;
       let kbOffset = 0;
+      let lastGoodOffset = 0;
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
-      const applyVVShift = () => {
-        const newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
-        if (newOffset === kbOffset) return;
-        // Only allow a decrease if it's a full close (back to 0). Partial decreases
-        // mid-open are spurious iOS events and should be ignored.
-        if (newOffset < kbOffset && newOffset !== 0) return;
-        kbOffset = newOffset;
+      const applyShift = () => {
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
           document.addEventListener('touchmove', blockScroll, { passive: false });
@@ -1478,14 +1473,35 @@
           }
         });
       };
+      const applyVVShift = () => {
+        const newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
+        if (newOffset === kbOffset) return;
+        // Only allow a decrease if it's a full close (back to 0). Partial decreases
+        // mid-open are spurious iOS events and should be ignored.
+        if (newOffset < kbOffset && newOffset !== 0) return;
+        kbOffset = newOffset;
+        if (kbOffset > 0) lastGoodOffset = kbOffset;
+        applyShift();
+      };
       const onVVResize = () => { applyVVShift(); };
+      const onFocus = () => {
+        setTimeout(() => {
+          if (kbOffset === 0 && lastGoodOffset > 0 && document.activeElement === answerInput) {
+            kbOffset = lastGoodOffset;
+            applyShift();
+          }
+        }, 400);
+      };
       window._vvStart = () => {
         kbOffset = 0;
+        lastGoodOffset = 0;
         baseInputBottom = document.documentElement.clientHeight - parseFloat(getComputedStyle(answerInputWrap).bottom);
         window.visualViewport.removeEventListener('resize', onVVResize);
         window.visualViewport.addEventListener('resize', onVVResize);
+        answerInput.addEventListener('focus', onFocus);
       };
       window._vvStop = () => {
+        answerInput.removeEventListener('focus', onFocus);
         setTimeout(() => {
           window.visualViewport.removeEventListener('resize', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
