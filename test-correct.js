@@ -166,7 +166,9 @@ const tests = [
   { correct: 'Mao Zedong (Mao)',    user: 'Mao',                 expect: true,  note: 'trailing paren alias — short name accepted' },
   { correct: 'Mao Zedong (Mao)',    user: 'Mao Zedong',          expect: true,  note: 'trailing paren alias — full name accepted' },
   { correct: 'Mao Zedong (Mao)',    user: 'Moa',                 expect: false, note: 'trailing paren alias — 3-char transposition below JW threshold' },
+  { correct: 'Mao Zedong (Mao)',    user: 'Maoo',                expect: true,  note: 'trailing paren alias — JW fuzzy on alias (extra char)' },
   { correct: 'Muhammad Ali (Cassius Clay)', user: 'Cassius Clay', expect: true, note: 'trailing paren alias — multi-word alias accepted' },
+  { correct: 'Muhammad Ali (Cassius Clay)', user: 'Cassius Caly', expect: true, note: 'trailing paren alias — JW fuzzy on multi-word alias (transposition)' },
   { correct: 'Muhammad Ali (Cassius Clay)', user: 'Muhammad Ali', expect: true, note: 'trailing paren alias — primary name still accepted' },
   { correct: 'Muhammad Ali (Cassius Clay)', user: 'Clay',         expect: true,  note: 'trailing paren alias — last name of alias accepted (cassius in first names list)' },
 
