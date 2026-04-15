@@ -486,10 +486,16 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
 
   // If the correct answer has parenthetical words, they are optional.
   // e.g. "(Randolph) Caldecott" accepts both "Caldecott" and "Randolph Caldecott".
+  // A trailing paren is also accepted as an alias: "Mao Zedong (Mao)" → accept "Mao".
   if (/\(/.test(correctAnswer)) {
     const withoutOptional = normalizeAnswer(correctAnswer.replace(/\([^)]*\)/g, ''));
     if (a === withoutOptional) return true;
     if (natural.JaroWinklerDistance(a, withoutOptional) >= 0.88) return true;
+    const trailingParen = correctAnswer.match(/^.+\s+\(([^)]+)\)\s*$/);
+    if (trailingParen) {
+      const alias = trailingParen[1].trim();
+      if (!/^or\s/i.test(alias) && matchesPart(a, normalizeAnswer(alias), alias)) return true;
+    }
   }
 
   // "X or Y [or Z]" — pure "or" connector means any one alternative is acceptable.
