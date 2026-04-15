@@ -1492,6 +1492,14 @@
           }
         }, 400);
       };
+      const onBlur = () => {
+        setTimeout(() => {
+          if (kbOffset > 0 && document.activeElement !== answerInput) {
+            kbOffset = 0;
+            applyShift();
+          }
+        }, 400);
+      };
       window._vvStart = () => {
         kbOffset = 0;
         lastGoodOffset = 0;
@@ -1499,9 +1507,11 @@
         window.visualViewport.removeEventListener('resize', onVVResize);
         window.visualViewport.addEventListener('resize', onVVResize);
         answerInput.addEventListener('focus', onFocus);
+        answerInput.addEventListener('blur', onBlur);
       };
       window._vvStop = () => {
         answerInput.removeEventListener('focus', onFocus);
+        answerInput.removeEventListener('blur', onBlur);
         setTimeout(() => {
           window.visualViewport.removeEventListener('resize', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
