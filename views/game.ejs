@@ -1486,9 +1486,19 @@
       const onVVResize = () => { applyVVShift(); };
       const onFocus = () => {
         setTimeout(() => {
-          if (kbOffset === 0 && lastGoodOffset > 0 && document.activeElement === answerInput) {
-            kbOffset = lastGoodOffset;
-            applyShift();
+          if (kbOffset === 0 && document.activeElement === answerInput) {
+            if (lastGoodOffset > 0) {
+              kbOffset = lastGoodOffset;
+              applyShift();
+            } else {
+              // First focus, no prior value — use viewport height delta as last resort
+              const vvOffset = Math.max(0, window.innerHeight - window.visualViewport.height);
+              if (vvOffset > 0) {
+                kbOffset = vvOffset;
+                lastGoodOffset = vvOffset;
+                applyShift();
+              }
+            }
           }
         }, 400);
       };
