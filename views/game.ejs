@@ -1433,7 +1433,7 @@
     }
 
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
-      let baseInputBottom = 0;
+      let baseVVHeight = 0;
       let kbOffset = 0;
 
       const blockScroll = e => e.preventDefault();
@@ -1474,19 +1474,15 @@
         });
       };
       const applyVVShift = () => {
-        const newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
+        const newOffset = Math.max(0, baseVVHeight - window.visualViewport.height);
         if (newOffset === kbOffset) return;
-        // Only allow a decrease if it's a full close (back to 0). Partial decreases
-        // mid-open are spurious iOS events and should be ignored.
-        if (newOffset < kbOffset && newOffset !== 0) return;
         kbOffset = newOffset;
         applyShift();
       };
       const onVVResize = () => { applyVVShift(); };
       window._vvStart = () => {
         kbOffset = 0;
-
-        baseInputBottom = document.documentElement.clientHeight - parseFloat(getComputedStyle(answerInputWrap).bottom);
+        baseVVHeight = window.visualViewport.height;
         window.visualViewport.removeEventListener('resize', onVVResize);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
