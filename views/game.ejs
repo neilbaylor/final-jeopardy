@@ -1435,7 +1435,7 @@
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseInputBottom = 0;
       let kbOffset = 0;
-      let lastGoodOffset = 0;
+
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyShift = () => {
@@ -1480,13 +1480,12 @@
         // mid-open are spurious iOS events and should be ignored.
         if (newOffset < kbOffset && newOffset !== 0) return;
         kbOffset = newOffset;
-        if (kbOffset > 0) lastGoodOffset = kbOffset;
         applyShift();
       };
       const onVVResize = () => { applyVVShift(); };
       window._vvStart = () => {
         kbOffset = 0;
-        lastGoodOffset = 0;
+
         baseInputBottom = document.documentElement.clientHeight - parseFloat(getComputedStyle(answerInputWrap).bottom);
         window.visualViewport.removeEventListener('resize', onVVResize);
         window.visualViewport.addEventListener('resize', onVVResize);
