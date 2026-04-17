@@ -1695,9 +1695,17 @@
       if (merged.length <= 1) {
         subtitle = '';
       } else if (tiedAtTop.length > 1) {
-        subtitle = tiedAtTop.length === 2
-          ? `${firstName(tiedAtTop[0])} and ${firstName(tiedAtTop[1])} are tied`
-          : `${tiedAtTop.length} Players are tied`;
+        if (tiedAtTop.length === 2) {
+          const meIdx = tiedAtTop.findIndex(p => p._isMe);
+          if (meIdx !== -1) {
+            const other = tiedAtTop[1 - meIdx];
+            subtitle = `You and ${firstName(other)} are tied`;
+          } else {
+            subtitle = `${firstName(tiedAtTop[0])} and ${firstName(tiedAtTop[1])} are tied`;
+          }
+        } else {
+          subtitle = `${tiedAtTop.length} Players are tied`;
+        }
       } else {
         const diff = merged[0].score - merged[1].score;
         subtitle = merged[0]._isMe
