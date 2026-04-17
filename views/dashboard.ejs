@@ -1677,9 +1677,9 @@
         const correct = Number(s.correct_answers || 0);
         const correctWeek = Number(s.correct_answers_week || 0);
         const longestStreak = Number(s.longest_streak || 0);
-        const denom = (cqId && !answeredCurrent.has(String(p.id)))
-          ? Math.max(0, totalQuestions - 1)
-          : totalQuestions;
+        const missedCurrent = cqId && !answeredCurrent.has(String(p.id));
+        const denom = missedCurrent ? Math.max(0, totalQuestions - 1) : totalQuestions;
+        const weekDenom = missedCurrent ? Math.max(0, totalQuestionsWeek - 1) : totalQuestionsWeek;
         const pct = denom > 0 ? Math.round((correct / denom) * 100) : 0;
         return {
           id: p.id,
@@ -1691,6 +1691,7 @@
           correctWeek,
           longestStreak,
           denom,
+          weekDenom,
           pct,
         };
       }).sort((a, b) => b.score - a.score);
@@ -1751,8 +1752,8 @@
           streakRows.push(`<div class="stats-streak-row">Correct Streak: <strong>${p.longestStreak}</strong></div>`);
         }
         if (showWeek) {
-          const weekPct = totalQuestionsWeek > 0 ? Math.round((p.correctWeek / totalQuestionsWeek) * 100) : 0;
-          const weekStr = totalQuestionsWeek > 0 ? `${p.correctWeek} / ${totalQuestionsWeek} (${weekPct}%)` : '—';
+          const weekPct = p.weekDenom > 0 ? Math.round((p.correctWeek / p.weekDenom) * 100) : 0;
+          const weekStr = p.weekDenom > 0 ? `${p.correctWeek} / ${p.weekDenom} (${weekPct}%)` : '—';
           streakRows.push(`<div class="stats-streak-row">Past Week: <strong>${weekStr}</strong></div>`);
         }
         const streaksHtml = streakRows.length > 0
