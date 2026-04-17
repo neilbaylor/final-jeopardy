@@ -278,6 +278,17 @@
       align-items: center;
       gap: 9px;
     }
+    .stats-player-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stats-player-streaks {
+      padding-left: 57px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
     #stats-modal-players .game-player-info { flex: 1; min-width: 0; }
     #stats-modal .player-avatar-wrap { width: 48px; height: 48px; }
     #stats-modal .player-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.08); display: block; }
@@ -1656,6 +1667,7 @@
       }
 
       const totalQuestions = Number(stats.total_questions || 0);
+      const totalQuestionsWeek = Number(stats.total_questions_week || 0);
       const cqId = (game && game.current_question) ? game.current_question.game_question_id : null;
       const answeredCurrent = new Set(
         cqId ? ((game.answers || []).filter(a => a.game_question_id === cqId).map(a => String(a.user_id))) : []
@@ -1663,6 +1675,8 @@
       const merged = allPlayers.map(p => {
         const s = statsByUser.get(String(p.id)) || {};
         const correct = Number(s.correct_answers || 0);
+        const correctWeek = Number(s.correct_answers_week || 0);
+        const longestStreak = Number(s.longest_streak || 0);
         const denom = (cqId && !answeredCurrent.has(String(p.id)))
           ? Math.max(0, totalQuestions - 1)
           : totalQuestions;
@@ -1674,6 +1688,8 @@
           score: p.score || 0,
           _isMe: !!p._isMe,
           correct,
+          correctWeek,
+          longestStreak,
           denom,
           pct,
         };
@@ -1719,6 +1735,7 @@
       );
 
       const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+      const showWeek = days !== null && days > 10;
       const playersHtml = merged.map(p => {
         const nameLabel = p._isMe ? 'You' : esc(p.display_name || '');
         const avatarInner = p.avatar_url
@@ -1729,12 +1746,27 @@
           ? `<div class="coin player-score-coin${shimmerClass}${p.score > 99 ? ' coin-3digit' : ''}">${Math.min(p.score, 999)}</div>`
           : '';
         const statLine = p.denom > 0 ? `${p.correct} / ${p.denom} (${p.pct}%)` : 'No questions yet';
-        return `<div class="stats-player-row">
-          <div class="player-avatar-wrap">${avatarInner}${coinBadge}</div>
-          <div class="game-player-info">
-            <span class="player-name">${nameLabel}</span>
-            <span class="player-status">${statLine}</span>
+        const streakRows = [];
+        if (p.longestStreak > 0) {
+          streakRows.push(`<div class="stats-streak-row">Correct Streak: <strong>${p.longestStreak}</strong></div>`);
+        }
+        if (showWeek) {
+          const weekPct = totalQuestionsWeek > 0 ? Math.round((p.correctWeek / totalQuestionsWeek) * 100) : 0;
+          const weekStr = totalQuestionsWeek > 0 ? `${p.correctWeek} / ${totalQuestionsWeek} (${weekPct}%)` : '—';
+          streakRows.push(`<div class="stats-streak-row">Past Week: <strong>${weekStr}</strong></div>`);
+        }
+        const streaksHtml = streakRows.length > 0
+          ? `<div class="stats-player-streaks">${streakRows.join('')}</div>`
+          : '';
+        return `<div class="stats-player-block">
+          <div class="stats-player-row">
+            <div class="player-avatar-wrap">${avatarInner}${coinBadge}</div>
+            <div class="game-player-info">
+              <span class="player-name">${nameLabel}</span>
+              <span class="player-status">${statLine}</span>
+            </div>
           </div>
+          ${streaksHtml}
         </div>`;
       }).join('');
       document.getElementById('stats-modal-players').innerHTML = playersHtml;
