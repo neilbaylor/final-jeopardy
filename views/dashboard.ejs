@@ -265,7 +265,7 @@
     }
     #stats-modal-content .game-player-info { flex: 1; min-width: 0; }
     #stats-modal-players {
-      padding: 4px 16px 16px;
+      padding: 10px 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -677,7 +677,7 @@
       z-index: -1;
       opacity: 0;
       height: 100%;
-      width: 78px;
+      width: 85px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1641,7 +1641,18 @@
       const gamePlayers = (game && Array.isArray(game.players)) ? game.players : [];
       const statsByUser = new Map((stats.players || []).map(p => [String(p.user_id), p]));
 
-      const merged = gamePlayers.map(p => {
+      const allPlayers = [...gamePlayers];
+      if (currentUser && currentUser.id != null && !allPlayers.some(p => String(p.id) === String(currentUser.id))) {
+        allPlayers.push({
+          id: currentUser.id,
+          display_name: currentUser.display_name || '',
+          avatar_url: currentUser.avatar_url || '',
+          score: (game && game.my_score != null) ? game.my_score : 0,
+          _isMe: true,
+        });
+      }
+
+      const merged = allPlayers.map(p => {
         const s = statsByUser.get(String(p.id)) || {};
         const correct = Number(s.correct_answers || 0);
         const answered = Number(s.total_answered || 0);
@@ -1651,6 +1662,7 @@
           display_name: p.display_name || '',
           avatar_url: p.avatar_url || '',
           score: p.score || 0,
+          _isMe: !!p._isMe,
           correct,
           answered,
           pct,
@@ -1658,32 +1670,33 @@
       }).sort((a, b) => b.score - a.score);
 
       const days = stats.first_question_date
-        ? Math.max(1, Math.ceil((Date.now() - new Date(stats.first_question_date).getTime()) / 86400000))
-        : 0;
-      document.getElementById('stats-modal-header-text').textContent =
-        days > 0 ? `Stats for your game over the last ${days} day${days !== 1 ? 's' : ''}` : 'Stats for your game';
+        ? Math.max(0, Math.floor((Date.now() - new Date(stats.first_question_date).getTime()) / 86400000))
+        : null;
+      let header;
+      if (days === null)    header = 'Stats for game';
+      else if (days === 0)  header = 'Stats for game created today';
+      else                  header = `Stats for game created ${days} day${days !== 1 ? 's' : ''} ago`;
+      document.getElementById('stats-modal-header-text').textContent = header;
 
       const firstName = p => ((p.display_name || '').trim().split(' ')[0] || '');
       let subtitle = '';
       if (merged.length <= 1) {
         subtitle = '';
-      } else if (merged[0].score === 0) {
-        subtitle = 'No coins yet';
       } else if (merged[0].score === merged[1].score) {
-        const tied = merged.filter(p => p.score === merged[0].score);
-        subtitle = tied.length === 2
-          ? `${firstName(tied[0])} is tied with ${firstName(tied[1])}`
-          : `${tied.length}-way tie for the lead`;
+        subtitle = 'Game is tied';
       } else {
         const diff = merged[0].score - merged[1].score;
-        subtitle = `${firstName(merged[0])} is leading by ${diff} coin${diff !== 1 ? 's' : ''}`;
+        const coinStr = `${diff} coin${diff !== 1 ? 's' : ''}`;
+        subtitle = merged[0]._isMe
+          ? `You are leading by ${coinStr}`
+          : `${firstName(merged[0])} is leading by ${coinStr}`;
       }
       document.getElementById('stats-modal-subheading').textContent = subtitle;
 
       const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
       const playersHtml = merged.map(p => {
         const fn = firstName(p);
-        const nameLabel = esc(fn.length <= 10 ? fn : fn.slice(0, 10));
+        const nameLabel = p._isMe ? 'You' : esc(fn.length <= 10 ? fn : fn.slice(0, 10));
         const avatarInner = p.avatar_url
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${nameLabel}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
