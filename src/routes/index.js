@@ -974,6 +974,67 @@ router.get('/api/stats', async (req, res) => {
   }
 });
 
+// API: get stats for a specific game
+router.get('/api/games/:gameId/stats', async (req, res) => {
+  const gameId = Number(req.params.gameId);
+  if (!gameId) return res.status(400).json({ error: 'Missing or invalid gameId' });
+  try {
+    const [[gameRow]] = await db.query(
+      `SELECT COUNT(*)       AS total_questions,
+              MIN(asked_at)  AS first_question_date
+       FROM game_questions
+       WHERE game_id = ?`,
+      [gameId]
+    );
+
+    const [playerRows] = await db.query(
+      `SELECT u.id           AS user_id,
+              u.display_name AS display_name,
+              SUM(ga.id IS NOT NULL AND gq.asked_at >= NOW() - INTERVAL 7 DAY)        AS total_questions_week,
+              SUM(ga.is_correct = 1 AND gq.asked_at >= NOW() - INTERVAL 7 DAY)        AS correct_answers_week
+       FROM game_users gu
+       JOIN users u                ON u.id = gu.user_id
+       LEFT JOIN game_questions gq ON gq.game_id = gu.game_id
+       LEFT JOIN game_answers   ga ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
+       WHERE gu.game_id = ?
+       GROUP BY u.id, u.display_name`,
+      [gameId]
+    );
+
+    const [answerRows] = await db.query(
+      `SELECT ga.user_id, ga.is_correct, gq.game_id
+       FROM game_questions gq
+       JOIN game_answers   ga ON ga.game_question_id = gq.id
+       WHERE gq.game_id = ?
+       ORDER BY gq.asked_at, gq.id`,
+      [gameId]
+    );
+
+    const answersByUser = new Map();
+    for (const a of answerRows) {
+      if (!answersByUser.has(a.user_id)) answersByUser.set(a.user_id, []);
+      answersByUser.get(a.user_id).push(a);
+    }
+
+    const players = playerRows.map(p => ({
+      user_id:              p.user_id,
+      display_name:         p.display_name,
+      longest_streak:       computeStreaks(answersByUser.get(p.user_id) || []).longest_streak_single_game,
+      correct_answers_week: Number(p.correct_answers_week || 0),
+      total_questions_week: Number(p.total_questions_week || 0),
+    }));
+
+    res.json({
+      players,
+      total_questions:     Number(gameRow.total_questions || 0),
+      first_question_date: gameRow.first_question_date,
+    });
+  } catch (err) {
+    console.error('Get game stats error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // API: submit an answer for a game question
 router.post('/api/games/:gameId/answers', async (req, res) => {
   const gameId = Number(req.params.gameId);
