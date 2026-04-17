@@ -1653,10 +1653,17 @@
       }
 
       const totalQuestions = Number(stats.total_questions || 0);
+      const cqId = (game && game.current_question) ? game.current_question.game_question_id : null;
+      const answeredCurrent = new Set(
+        cqId ? ((game.answers || []).filter(a => a.game_question_id === cqId).map(a => String(a.user_id))) : []
+      );
       const merged = allPlayers.map(p => {
         const s = statsByUser.get(String(p.id)) || {};
         const correct = Number(s.correct_answers || 0);
-        const pct = totalQuestions > 0 ? Math.round((correct / totalQuestions) * 100) : 0;
+        const denom = (cqId && !answeredCurrent.has(String(p.id)))
+          ? Math.max(0, totalQuestions - 1)
+          : totalQuestions;
+        const pct = denom > 0 ? Math.round((correct / denom) * 100) : 0;
         return {
           id: p.id,
           display_name: p.display_name || '',
@@ -1664,6 +1671,7 @@
           score: p.score || 0,
           _isMe: !!p._isMe,
           correct,
+          denom,
           pct,
         };
       }).sort((a, b) => b.score - a.score);
@@ -1702,7 +1710,7 @@
         const coinBadge = p.score > 0
           ? `<div class="coin player-score-coin${p.score > 99 ? ' coin-3digit' : ''}">${Math.min(p.score, 999)}</div>`
           : '';
-        const statLine = totalQuestions > 0 ? `${p.correct} / ${totalQuestions} (${p.pct}%)` : 'No questions yet';
+        const statLine = p.denom > 0 ? `${p.correct} / ${p.denom} (${p.pct}%)` : 'No questions yet';
         return `<div class="stats-player-row">
           <div class="player-avatar-wrap">${avatarInner}${coinBadge}</div>
           <div class="game-player-info">
