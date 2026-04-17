@@ -1712,7 +1712,7 @@
 
       const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
       const playersHtml = merged.map(p => {
-        const nameLabel = esc(p.display_name || '');
+        const nameLabel = p._isMe ? 'You' : esc(p.display_name || '');
         const avatarInner = p.avatar_url
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${nameLabel}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
