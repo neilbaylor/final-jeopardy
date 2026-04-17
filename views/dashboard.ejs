@@ -264,6 +264,18 @@
       font-weight: 700;
     }
     #stats-modal-content .game-player-info { flex: 1; min-width: 0; }
+    #stats-modal-players {
+      padding: 4px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .stats-player-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    #stats-modal-players .game-player-info { flex: 1; min-width: 0; }
     #stats-modal .player-avatar-wrap { width: 48px; height: 48px; }
     #stats-modal .player-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,0,0,0.08); display: block; }
     #stats-modal .player-avatar-placeholder { width: 48px; height: 48px; border-radius: 50%; background: #e8eaf0; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
@@ -1492,6 +1504,7 @@
         </div>
       </div>
       <div id="stats-modal-streaks"></div>
+      <div id="stats-modal-players" style="display:none"></div>
     </div>
   </div>
 
@@ -1623,6 +1636,77 @@
     document.addEventListener('click', () => {
       document.getElementById('user-popover').classList.remove('open');
     });
+    function openGameStatsModal(gameId, stats) {
+      const game = currentGames.find(g => String(g.id) === String(gameId));
+      const gamePlayers = (game && Array.isArray(game.players)) ? game.players : [];
+      const statsByUser = new Map((stats.players || []).map(p => [String(p.user_id), p]));
+
+      const merged = gamePlayers.map(p => {
+        const s = statsByUser.get(String(p.id)) || {};
+        const correct = Number(s.correct_answers || 0);
+        const answered = Number(s.total_answered || 0);
+        const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+        return {
+          id: p.id,
+          display_name: p.display_name || '',
+          avatar_url: p.avatar_url || '',
+          score: p.score || 0,
+          correct,
+          answered,
+          pct,
+        };
+      }).sort((a, b) => b.score - a.score);
+
+      const days = stats.first_question_date
+        ? Math.max(1, Math.ceil((Date.now() - new Date(stats.first_question_date).getTime()) / 86400000))
+        : 0;
+      document.getElementById('stats-modal-header-text').textContent =
+        days > 0 ? `Stats for your game over the last ${days} day${days !== 1 ? 's' : ''}` : 'Stats for your game';
+
+      const firstName = p => ((p.display_name || '').trim().split(' ')[0] || '');
+      let subtitle = '';
+      if (merged.length <= 1) {
+        subtitle = '';
+      } else if (merged[0].score === 0) {
+        subtitle = 'No coins yet';
+      } else if (merged[0].score === merged[1].score) {
+        const tied = merged.filter(p => p.score === merged[0].score);
+        subtitle = tied.length === 2
+          ? `${firstName(tied[0])} is tied with ${firstName(tied[1])}`
+          : `${tied.length}-way tie for the lead`;
+      } else {
+        const diff = merged[0].score - merged[1].score;
+        subtitle = `${firstName(merged[0])} is leading by ${diff} coin${diff !== 1 ? 's' : ''}`;
+      }
+      document.getElementById('stats-modal-subheading').textContent = subtitle;
+
+      const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+      const playersHtml = merged.map(p => {
+        const fn = firstName(p);
+        const nameLabel = esc(fn.length <= 10 ? fn : fn.slice(0, 10));
+        const avatarInner = p.avatar_url
+          ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${nameLabel}" />`
+          : `<div class="player-avatar-placeholder">👤</div>`;
+        const coinBadge = p.score > 0
+          ? `<div class="coin player-score-coin${p.score > 99 ? ' coin-3digit' : ''}">${Math.min(p.score, 999)}</div>`
+          : '';
+        const statLine = p.answered > 0 ? `${p.correct} / ${p.answered} (${p.pct}%)` : 'No answers yet';
+        return `<div class="stats-player-row">
+          <div class="player-avatar-wrap">${avatarInner}${coinBadge}</div>
+          <div class="game-player-info">
+            <span class="player-name">${nameLabel}</span>
+            <span class="player-status">${statLine}</span>
+          </div>
+        </div>`;
+      }).join('');
+      document.getElementById('stats-modal-players').innerHTML = playersHtml;
+
+      document.getElementById('stats-modal-content').style.display = 'none';
+      document.getElementById('stats-modal-streaks').style.display = 'none';
+      document.getElementById('stats-modal-players').style.display = '';
+      document.getElementById('stats-modal-backdrop').classList.add('open');
+    }
+
     let statsFetching = false;
     document.getElementById('stats-btn').addEventListener('click', async e => {
       e.stopPropagation();
@@ -1631,6 +1715,8 @@
       const iconEl = document.getElementById('stats-btn-icon');
       iconEl.innerHTML = '<div class="stats-spin"></div>';
       try {
+        document.getElementById('stats-modal-content').style.display = '';
+        document.getElementById('stats-modal-players').style.display = 'none';
         const statsRes = await fetch(`/api/stats?userId=${userId}`);
         const stats = await statsRes.json();
         const correct = stats.correct_answers || 0;
@@ -2296,7 +2382,7 @@
               const res = await fetch(`/api/games/${encodeURIComponent(gameId)}/stats`);
               if (!res.ok) throw new Error('stats fetch failed');
               const stats = await res.json();
-              wrapper._gameStats = stats;
+              openGameStatsModal(gameId, stats);
             } catch (err) {
               console.error('Game stats error:', err);
             } finally {
