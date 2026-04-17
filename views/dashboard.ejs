@@ -649,7 +649,7 @@
       z-index: -1;
       opacity: 0;
       height: 100%;
-      width: 90px;
+      width: 78px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -658,16 +658,38 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
-    .delete-game-btn {
+    .game-row-stats-action {
+      position: absolute;
+      right: 78px;
+      top: 0;
+      z-index: -1;
+      opacity: 0;
+      height: 100%;
+      width: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #07102e;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .delete-game-btn,
+    .stats-game-btn {
       background: none;
       border: none;
       color: #fff;
       pointer-events: none;
       padding: 0;
-      margin: -2px -10px 0 0;
+      margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    .stats-game-btn .btn-spinner {
+      width: 18px;
+      height: 18px;
+      border-color: rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
     }
 
     @keyframes new-row-highlight {
@@ -2015,6 +2037,15 @@
         return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
           <div class="game-row-inner">
           ${prevRowHtml}
+          <div class="game-row-stats-action">
+            <button class="stats-game-btn" aria-label="Game stats">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" y1="20" x2="6" y2="12"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="18" y1="20" x2="18" y2="8"></line>
+              </svg>
+            </button>
+          </div>
           <div class="game-row-delete-action">
             <button class="delete-game-btn" aria-label="Delete game">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -2104,23 +2135,24 @@
         row.addEventListener('click', () => openPrevModal(row.dataset.gameId));
       });
 
-      // Swipe-right to reveal previous question row; swipe-left to reveal delete button
-      const DELETE_WIDTH = 78;
+      // Swipe-right to reveal previous question row; swipe-left to reveal stats + delete buttons
+      const ACTIONS_WIDTH = 156;
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
-        const prevRow     = wrapper.querySelector('.game-row-previous');
-        const inner       = wrapper.querySelector('.game-row-inner');
-        const mainRow     = wrapper.querySelector('.game-row:not(.game-row-previous)');
+        const prevRow      = wrapper.querySelector('.game-row-previous');
+        const inner        = wrapper.querySelector('.game-row-inner');
+        const mainRow      = wrapper.querySelector('.game-row:not(.game-row-previous)');
         const deleteAction = wrapper.querySelector('.game-row-delete-action');
+        const statsAction  = wrapper.querySelector('.game-row-stats-action');
 
         let startX = 0, startY = 0, dirLocked = null, active = false, isRevealed = false, deleteRevealed = false;
 
         const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        const setDeleteOpacity = show => {
-          if (!deleteAction) return;
-          deleteAction.style.transition = show
-            ? 'none'
-            : 'opacity 0s 300ms';
-          deleteAction.style.opacity = show ? '1' : '0';
+        const setActionsOpacity = show => {
+          [statsAction, deleteAction].forEach(el => {
+            if (!el) return;
+            el.style.transition = show ? 'none' : 'opacity 0s 300ms';
+            el.style.opacity = show ? '1' : '0';
+          });
         };
         const setTx = (tx, animated) => {
           mainRow.style.transition = animated ? ease : 'none';
@@ -2139,7 +2171,7 @@
         mainRow.addEventListener('click', () => {
           if (deleteRevealed) {
             deleteRevealed = false;
-            setDeleteOpacity(false);
+            setActionsOpacity(false);
             setTx(0, true);
             return;
           }
@@ -2192,23 +2224,23 @@
             mainRow.style.transform = tx ? `translateX(${tx}px)` : '';
             if (prevRow) prevRow.style.transform = tx ? `translateX(${tx}px)` : '';
           } else if (deleteRevealed) {
-            const tx = Math.max(-DELETE_WIDTH, Math.min(0, -DELETE_WIDTH + dx));
+            const tx = Math.max(-ACTIONS_WIDTH, Math.min(0, -ACTIONS_WIDTH + dx));
             mainRow.style.transform = `translateX(${tx}px)`;
-            setDeleteOpacity(tx < 0);
+            setActionsOpacity(tx < 0);
           } else {
             if (dx > 0 && prevRow) {
               const tx = Math.min(fw, dx);
               mainRow.style.transform = `translateX(${tx}px)`;
               prevRow.style.transform = `translateX(${tx}px)`;
-              setDeleteOpacity(false);
+              setActionsOpacity(false);
             } else if (dx < 0) {
-              const tx = Math.max(-DELETE_WIDTH, dx);
+              const tx = Math.max(-ACTIONS_WIDTH, dx);
               mainRow.style.transform = `translateX(${tx}px)`;
-              setDeleteOpacity(true);
+              setActionsOpacity(true);
             } else {
               mainRow.style.transform = '';
               if (prevRow) prevRow.style.transform = '';
-              setDeleteOpacity(false);
+              setActionsOpacity(false);
             }
           }
         }, { passive: false });
@@ -2224,12 +2256,12 @@
             if (dx < -40) { isRevealed = false; wrapper.dataset.revealed = 'false'; setTx(0, true); }
             else           { setTx(fw, true); }
           } else if (deleteRevealed) {
-            if (dx > 40) { deleteRevealed = false; setDeleteOpacity(false); setTx(0, true); }
-            else          { setDeleteOpacity(true); setTx(-DELETE_WIDTH, true); }
+            if (dx > 40) { deleteRevealed = false; setActionsOpacity(false); setTx(0, true); }
+            else          { setActionsOpacity(true); setTx(-ACTIONS_WIDTH, true); }
           } else {
             if (dx > 40 && prevRow) { isRevealed = true; wrapper.dataset.revealed = 'true'; setTx(fw, true); }
-            else if (dx < -40)      { deleteRevealed = true; setDeleteOpacity(true); setTx(-DELETE_WIDTH, true); }
-            else                    { setDeleteOpacity(false); setTx(0, true); }
+            else if (dx < -40)      { deleteRevealed = true; setActionsOpacity(true); setTx(-ACTIONS_WIDTH, true); }
+            else                    { setActionsOpacity(false); setTx(0, true); }
           }
         };
 
@@ -2239,8 +2271,8 @@
           active = false;
           cardSwiping = false;
           if (isRevealed) setTx(mainRow.offsetWidth, true);
-          else if (deleteRevealed) { setDeleteOpacity(true); setTx(-DELETE_WIDTH, true); }
-          else { setDeleteOpacity(false); setTx(0, true); }
+          else if (deleteRevealed) { setActionsOpacity(true); setTx(-ACTIONS_WIDTH, true); }
+          else { setActionsOpacity(false); setTx(0, true); }
         }, { passive: true });
 
         if (deleteAction) {
@@ -2248,6 +2280,29 @@
             const backdrop = document.getElementById('delete-modal-backdrop');
             backdrop.dataset.gameId = wrapper.dataset.gameId;
             backdrop.classList.add('open');
+          });
+        }
+
+        if (statsAction) {
+          const statsBtn = statsAction.querySelector('.stats-game-btn');
+          const statsIconHtml = statsBtn.innerHTML;
+          let statsLoading = false;
+          statsAction.addEventListener('click', async () => {
+            if (statsLoading) return;
+            statsLoading = true;
+            statsBtn.innerHTML = '<span class="btn-spinner"></span>';
+            try {
+              const gameId = wrapper.dataset.gameId;
+              const res = await fetch(`/api/games/${encodeURIComponent(gameId)}/stats`);
+              if (!res.ok) throw new Error('stats fetch failed');
+              const stats = await res.json();
+              wrapper._gameStats = stats;
+            } catch (err) {
+              console.error('Game stats error:', err);
+            } finally {
+              statsBtn.innerHTML = statsIconHtml;
+              statsLoading = false;
+            }
           });
         }
       });
