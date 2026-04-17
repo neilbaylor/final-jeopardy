@@ -163,11 +163,18 @@ const COMMON_FIRST_NAMES = new Set([
 ]);
 
 // If `namePart` is "FirstName LastName" (exactly 2 words, first is a known first name),
-// returns the last name; otherwise returns null.
+// returns the last name. Also handles "FirstName M. LastName" / "FirstName M LastName"
+// (3 words where the middle word is a single-letter middle initial).
+// Otherwise returns null.
 function extractLastName(namePart) {
   const words = namePart.trim().split(/\s+/);
   if (words.length === 2 && COMMON_FIRST_NAMES.has(words[0].toLowerCase())) {
     return words[1];
+  }
+  if (words.length === 3
+      && COMMON_FIRST_NAMES.has(words[0].toLowerCase())
+      && /^[A-Za-z]\.?$/.test(words[1])) {
+    return words[2];
   }
   return null;
 }
