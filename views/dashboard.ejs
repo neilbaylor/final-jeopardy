@@ -239,6 +239,9 @@
       font-size: 0.88rem;
       font-weight: 500;
       color: rgba(0,0,0,0.42);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     #stats-modal-content {
       padding: 10px 16px 12px;
@@ -681,7 +684,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #07102e;
+      background: #888;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
@@ -1680,35 +1683,42 @@
         ? Math.max(0, Math.floor((Date.now() - new Date(stats.first_question_date).getTime()) / 86400000))
         : null;
       let header;
-      if (days === null)    header = 'Stats for game';
-      else if (days === 0)  header = 'Stats for game created today';
-      else                  header = `Stats for game created ${days} day${days !== 1 ? 's' : ''} ago`;
+      if (days === null)    header = 'Stats for Game';
+      else if (days === 0)  header = 'Stats for Game over Today';
+      else                  header = `Stats for Game over ${days} Day${days !== 1 ? 's' : ''}`;
       document.getElementById('stats-modal-header-text').textContent = header;
 
       const firstName = p => ((p.display_name || '').trim().split(' ')[0] || '');
+      const topScore = merged.length > 0 ? merged[0].score : 0;
+      const tiedAtTop = merged.filter(p => p.score === topScore);
       let subtitle = '';
       if (merged.length <= 1) {
         subtitle = '';
-      } else if (merged[0].score === merged[1].score) {
-        subtitle = 'Game is tied';
+      } else if (tiedAtTop.length > 1) {
+        subtitle = tiedAtTop.length === 2
+          ? `${firstName(tiedAtTop[0])} and ${firstName(tiedAtTop[1])} are tied`
+          : `${tiedAtTop.length} Players are tied`;
       } else {
         const diff = merged[0].score - merged[1].score;
-        const coinStr = `${diff} coin${diff !== 1 ? 's' : ''}`;
         subtitle = merged[0]._isMe
-          ? `You are leading by ${coinStr}`
-          : `${firstName(merged[0])} is leading by ${coinStr}`;
+          ? `You are leading by ${diff}`
+          : `${firstName(merged[0])} is leading by ${diff}`;
       }
       document.getElementById('stats-modal-subheading').textContent = subtitle;
 
+      const shimmerByPlayer = new Set(
+        topScore > 0 ? tiedAtTop.map(p => String(p.id)) : []
+      );
+
       const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
       const playersHtml = merged.map(p => {
-        const fn = firstName(p);
-        const nameLabel = p._isMe ? 'You' : esc(fn.length <= 10 ? fn : fn.slice(0, 10));
+        const nameLabel = esc(p.display_name || '');
         const avatarInner = p.avatar_url
           ? `<img class="player-avatar" src="${esc(p.avatar_url)}" alt="${nameLabel}" />`
           : `<div class="player-avatar-placeholder">👤</div>`;
+        const shimmerClass = shimmerByPlayer.has(String(p.id)) ? ' coin-shimmer' : '';
         const coinBadge = p.score > 0
-          ? `<div class="coin player-score-coin${p.score > 99 ? ' coin-3digit' : ''}">${Math.min(p.score, 999)}</div>`
+          ? `<div class="coin player-score-coin${shimmerClass}${p.score > 99 ? ' coin-3digit' : ''}">${Math.min(p.score, 999)}</div>`
           : '';
         const statLine = p.denom > 0 ? `${p.correct} / ${p.denom} (${p.pct}%)` : 'No questions yet';
         return `<div class="stats-player-row">
