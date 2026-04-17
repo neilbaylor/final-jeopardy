@@ -119,6 +119,17 @@ const tests = [
   // ── Last-name-only: three-word names should NOT trigger ───────────────────
   { correct: 'Mary Jo Smith',            user: 'Smith',               expect: false, note: 'last-name — 3-word name, no last-name simplification' },
 
+  // ── Last-name-only: middle initial (single letter, optional dot) ─────────
+  { correct: 'James K. Polk',            user: 'Polk',                expect: true,  note: 'middle initial — "K." + first name → accept last name' },
+  { correct: 'James K Polk',             user: 'Polk',                expect: true,  note: 'middle initial — "K" (no dot) + first name → accept last name' },
+  { correct: 'James K. Polk',            user: 'James K. Polk',       expect: true,  note: 'middle initial — full name still accepted' },
+  { correct: 'James K. Polk',            user: 'Jefferson',           expect: false, note: 'middle initial — wrong last name rejected' },
+  { correct: 'John F. Kennedy',          user: 'Kennedy',             expect: true,  note: 'middle initial — JFK last name accepted' },
+  { correct: 'George W. Bush',           user: 'Bush',                expect: true,  note: 'middle initial — "W." accepted as middle initial' },
+  { correct: 'James K Polk and Joe Garfield', user: 'Garfield and Polk', expect: true, note: 'middle initial — multi-part, last names in reversed order' },
+  { correct: 'James K. Polk and Joe Garfield', user: 'Polk and Garfield', expect: true, note: 'middle initial — multi-part with dot in initial' },
+  { correct: 'James K Polk and Joe Garfield', user: 'Polk',            expect: false, note: 'middle initial — multi-part, only one last name given' },
+
   // ── Exact match ───────────────────────────────────────────────────────────
   { correct: 'Paris',              user: 'Paris',           expect: true,  note: 'exact match' },
   { correct: 'Paris',              user: 'paris',           expect: true,  note: 'exact match — lowercase' },
