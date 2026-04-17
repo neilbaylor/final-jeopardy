@@ -989,7 +989,6 @@ router.get('/api/games/:gameId/stats', async (req, res) => {
 
     const [playerRows] = await db.query(
       `SELECT gu.user_id AS user_id,
-              SUM(ga.id IS NOT NULL)                                                  AS total_answered,
               SUM(ga.is_correct = 1)                                                  AS correct_answers,
               SUM(ga.id IS NOT NULL AND gq.asked_at >= NOW() - INTERVAL 7 DAY)        AS total_questions_week,
               SUM(ga.is_correct = 1 AND gq.asked_at >= NOW() - INTERVAL 7 DAY)        AS correct_answers_week
@@ -1020,7 +1019,6 @@ router.get('/api/games/:gameId/stats', async (req, res) => {
       user_id:              p.user_id,
       longest_streak:       computeStreaks(answersByUser.get(p.user_id) || []).longest_streak_single_game,
       correct_answers:      Number(p.correct_answers || 0),
-      total_answered:       Number(p.total_answered || 0),
       correct_answers_week: Number(p.correct_answers_week || 0),
       total_questions_week: Number(p.total_questions_week || 0),
     }));

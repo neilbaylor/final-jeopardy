@@ -1652,11 +1652,11 @@
         });
       }
 
+      const totalQuestions = Number(stats.total_questions || 0);
       const merged = allPlayers.map(p => {
         const s = statsByUser.get(String(p.id)) || {};
         const correct = Number(s.correct_answers || 0);
-        const answered = Number(s.total_answered || 0);
-        const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+        const pct = totalQuestions > 0 ? Math.round((correct / totalQuestions) * 100) : 0;
         return {
           id: p.id,
           display_name: p.display_name || '',
@@ -1664,7 +1664,6 @@
           score: p.score || 0,
           _isMe: !!p._isMe,
           correct,
-          answered,
           pct,
         };
       }).sort((a, b) => b.score - a.score);
@@ -1703,7 +1702,7 @@
         const coinBadge = p.score > 0
           ? `<div class="coin player-score-coin${p.score > 99 ? ' coin-3digit' : ''}">${Math.min(p.score, 999)}</div>`
           : '';
-        const statLine = p.answered > 0 ? `${p.correct} / ${p.answered} (${p.pct}%)` : 'No answers yet';
+        const statLine = totalQuestions > 0 ? `${p.correct} / ${totalQuestions} (${p.pct}%)` : 'No questions yet';
         return `<div class="stats-player-row">
           <div class="player-avatar-wrap">${avatarInner}${coinBadge}</div>
           <div class="game-player-info">
