@@ -943,11 +943,10 @@ router.get('/api/stats', async (req, res) => {
 
     const [gameRows] = await db.query(
       `SELECT gq.game_id,
-              COUNT(ga.id)        AS question_count,
+              COUNT(*)            AS question_count,
               MIN(gq.asked_at)    AS first_question_date
        FROM game_users gu
        JOIN game_questions gq ON gq.game_id = gu.game_id
-       JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
        WHERE gu.user_id = ?
        GROUP BY gq.game_id
        ORDER BY question_count DESC

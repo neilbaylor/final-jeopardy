@@ -1791,7 +1791,7 @@
         let longestGameStr = '—';
         if (lg && lg.question_count > 0) {
           const days = lg.first_question_date
-            ? Math.round((Date.now() - new Date(lg.first_question_date).getTime()) / 86400000)
+            ? Math.max(0, Math.floor((Date.now() - new Date(lg.first_question_date).getTime()) / 86400000))
             : null;
           longestGameStr = days !== null
             ? `${lg.question_count} Questions / ${days} Days`
