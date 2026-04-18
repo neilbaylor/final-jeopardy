@@ -122,8 +122,54 @@ const tests = [
   // If only some parts are names, only those parts get last-name treatment
   { correct: 'John Thompson and Paris',  user: 'Thompson and Paris',  expect: true,  note: 'last-name — mixed: person + non-person' },
 
-  // ── Last-name-only: three-word names should NOT trigger ───────────────────
-  { correct: 'Mary Jo Smith',            user: 'Smith',               expect: false, note: 'last-name — 3-word name, no last-name simplification' },
+  // ── Last-name-only: three-word person names ──────────────────────────────
+  // Mary Jo Smith is now a 3-word person name → middle "Jo" not a stop word → "Smith" accepted
+  { correct: 'Mary Jo Smith',            user: 'Smith',               expect: true,  note: '3-word name — Mary Jo Smith → Smith accepted' },
+  { correct: 'William Randolph Hearst',  user: 'Hearst',              expect: true,  note: '3-word name — William Randolph Hearst → Hearst' },
+  { correct: 'William Randolph Hearst',  user: 'William Randolph Hearst', expect: true, note: '3-word name — full name still accepted' },
+  { correct: 'William Randolph Hearst',  user: 'William Hearst',      expect: true,  note: '3-word name — drop middle name' },
+  { correct: 'William Randolph Hearst',  user: 'Pulitzer',            expect: false, note: '3-word name — wrong surname rejected' },
+  { correct: 'Edgar Allan Poe',          user: 'Poe',                 expect: true,  note: '3-word name — Edgar Allan Poe → Poe' },
+  { correct: 'John Wilkes Booth',        user: 'Booth',               expect: true,  note: '3-word name — John Wilkes Booth → Booth' },
+  { correct: 'Ralph Waldo Emerson',      user: 'Emerson',             expect: true,  note: '3-word name — Ralph Waldo Emerson → Emerson' },
+  { correct: 'Henry Wadsworth Longfellow', user: 'Longfellow',        expect: true,  note: '3-word name — Henry Wadsworth Longfellow → Longfellow' },
+  { correct: 'Mary Tyler Moore',         user: 'Moore',               expect: true,  note: '3-word name — Mary Tyler Moore → Moore' },
+
+  // 3-word non-person answers with stop words: middle stop word blocks shortcut
+  { correct: 'Jack the Ripper',          user: 'Ripper',              expect: false, note: '3-word — "the" stop word blocks last-name shortcut' },
+  { correct: 'Joan of Arc',              user: 'Arc',                 expect: false, note: '3-word — "of" stop word blocks last-name shortcut' },
+  { correct: 'Winnie the Pooh',          user: 'Pooh',                expect: false, note: '3-word — "the" stop word blocks last-name shortcut' },
+  { correct: 'Adam and Eve',             user: 'Eve',                 expect: false, note: '3-word — "and" stop word blocks last-name shortcut' },
+
+  // 3-word names where first word is NOT a known first name → no shortcut
+  { correct: 'Pumpkin Spice Latte',      user: 'Latte',               expect: false, note: '3-word — first word not a known first name' },
+  { correct: 'New York City',            user: 'City',                expect: false, note: '3-word — first word not a known first name' },
+
+  // ── Multi-part: 3-word person names ──────────────────────────────────────
+  { correct: 'James Garfield & William Randolph Hearst', user: 'Hearst and Garfield', expect: true,  note: '3-word combo — 2-word + 3-word last names, reversed' },
+  { correct: 'James Garfield & William Randolph Hearst', user: 'Garfield and Hearst', expect: true,  note: '3-word combo — 2-word + 3-word last names, in order' },
+  { correct: 'James Garfield & William Randolph Hearst', user: 'Garfield & Hearst',   expect: true,  note: '3-word combo — & separator' },
+  { correct: 'James Garfield & William Randolph Hearst', user: 'Hearst',              expect: false, note: '3-word combo — only one half' },
+  { correct: 'James Garfield & William Randolph Hearst', user: 'Garfield',            expect: false, note: '3-word combo — only first half' },
+  { correct: 'James Garfield & William Randolph Hearst', user: 'Hearst and Pulitzer', expect: false, note: '3-word combo — one wrong rejected' },
+  { correct: 'Edgar Allan Poe & John Wilkes Booth',      user: 'Poe and Booth',       expect: true,  note: '3-word combo — both 3-word names' },
+  { correct: 'Edgar Allan Poe & John Wilkes Booth',      user: 'Booth and Poe',       expect: true,  note: '3-word combo — both 3-word, reversed' },
+  { correct: 'Edgar Allan Poe & John Wilkes Booth',      user: 'Poe & Booth',         expect: true,  note: '3-word combo — & separator' },
+  { correct: 'Ralph Waldo Emerson and Henry Wadsworth Longfellow', user: 'Emerson and Longfellow', expect: true, note: '3-word combo — both 3-word, "and" in correct' },
+  { correct: 'Ralph Waldo Emerson and Henry Wadsworth Longfellow', user: 'Longfellow and Emerson', expect: true, note: '3-word combo — both 3-word, reversed' },
+  { correct: 'William Randolph Hearst & James K. Polk',  user: 'Hearst and Polk',     expect: true,  note: '3-word + middle-initial combo' },
+  { correct: 'William Randolph Hearst & James K. Polk',  user: 'Polk and Hearst',     expect: true,  note: '3-word + middle-initial combo, reversed' },
+
+  // ── Inverse: user adds a middle name that the DB answer does not have ────
+  { correct: 'William Hearst',           user: 'William Randolph Hearst', expect: true,  note: 'inverse — user adds middle name to 2-word DB answer' },
+  { correct: 'Hearst',                   user: 'William Randolph Hearst', expect: true,  note: 'inverse — user expands single-word DB answer' },
+  { correct: 'Poe',                      user: 'Edgar Allan Poe',     expect: true,  note: 'inverse — single-word DB, user adds first + middle' },
+  { correct: 'Booth',                    user: 'John Wilkes Booth',   expect: true,  note: 'inverse — single-word DB, user adds first + middle' },
+  { correct: 'Smith',                    user: 'Mary Jo Smith',       expect: true,  note: 'inverse — single-word DB, user provides 3-word name' },
+  { correct: 'Hearst',                   user: 'Pulitzer',            expect: false, note: 'inverse — wrong user surname rejected' },
+  { correct: 'William Hearst',           user: 'Randolph Pulitzer',   expect: false, note: 'inverse — user wrong surname even with middle' },
+  { correct: 'Poe',                      user: 'Stephen King',        expect: false, note: 'inverse — entirely wrong person rejected' },
+
 
   // ── Last-name-only: middle initial (single letter, optional dot) ─────────
   { correct: 'James K. Polk',            user: 'Polk',                expect: true,  note: 'middle initial — "K." + first name → accept last name' },

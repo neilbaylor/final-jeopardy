@@ -162,10 +162,18 @@ const COMMON_FIRST_NAMES = new Set([
   'giselle','isolde',
 ]);
 
+// Words that, if they appear as the middle token of a 3-word answer, indicate
+// it's not a "FirstName Middle LastName" person name (e.g. "Jack the Ripper",
+// "Joan of Arc"). When present, we suppress the 3-word last-name shortcut.
+const NAME_STOP_WORDS = new Set(['the','a','an','of','and','or','to','for','in','on']);
+
 // If `namePart` is "FirstName LastName" (exactly 2 words, first is a known first name),
 // returns the last name. Also handles "FirstName M. LastName" / "FirstName M LastName"
-// (3 words where the middle word is a single-letter middle initial).
-// Otherwise returns null.
+// (3 words with a single-letter middle initial), and "FirstName Middle LastName"
+// (3 words where the middle word is not a stop-word — e.g. "William Randolph Hearst",
+// "Edgar Allan Poe"). Returns null otherwise.
+// Note: this is a heuristic — multi-word non-person answers like "Peter Pumpkin Eater"
+// can match incorrectly, since we don't have a noun dictionary to filter by.
 function extractLastName(namePart) {
   const words = namePart.trim().split(/\s+/);
   if (words.length === 2 && COMMON_FIRST_NAMES.has(words[0].toLowerCase())) {
@@ -174,6 +182,12 @@ function extractLastName(namePart) {
   if (words.length === 3
       && COMMON_FIRST_NAMES.has(words[0].toLowerCase())
       && /^[A-Za-z]\.?$/.test(words[1])) {
+    return words[2];
+  }
+  if (words.length === 3
+      && COMMON_FIRST_NAMES.has(words[0].toLowerCase())
+      && /^[A-Za-z]+$/.test(words[1])
+      && !NAME_STOP_WORDS.has(words[1].toLowerCase())) {
     return words[2];
   }
   return null;
@@ -539,6 +553,22 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
     const lnNorm = normalizeAnswer(singleLn);
     if (a === lnNorm) return true;
     if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
+  }
+
+  // Inverse: user supplied "FirstName [Middle] LastName" but correct answer is
+  // a shorter form (single word, or a different length name). Compare the
+  // user's extracted last name against the full correct and against the
+  // correct's extracted last name.
+  const userLn = extractLastName(userAnswer);
+  if (userLn !== null) {
+    const userLnNorm = normalizeAnswer(userLn);
+    if (userLnNorm === b) return true;
+    if (natural.JaroWinklerDistance(userLnNorm, b) >= 0.88) return true;
+    if (singleLn !== null) {
+      const lnNorm = normalizeAnswer(singleLn);
+      if (userLnNorm === lnNorm) return true;
+      if (natural.JaroWinklerDistance(userLnNorm, lnNorm) >= 0.88) return true;
+    }
   }
 
   // Compound surname: "Leonardo da Vinci" → accept "da Vinci", "DaVinci", or "Vinci".
