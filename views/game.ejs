@@ -1435,7 +1435,6 @@
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseVVHeight = 0;
       let kbOffset = 0;
-      let phase = null; // 'open' | 'close' | null
 
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
@@ -1476,11 +1475,6 @@
       };
       const applyVVShift = () => {
         const newOffset = Math.max(0, baseVVHeight - window.visualViewport.height);
-        // Gate by phase: during open the offset should only grow (viewport
-        // shrinking); during close it should only shrink (viewport growing).
-        // This filters out stray resize events that swing the wrong way mid-animation.
-        if (phase === 'open'  && newOffset < kbOffset) return;
-        if (phase === 'close' && newOffset > kbOffset) return;
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         applyShift();
@@ -1488,19 +1482,16 @@
       const onVVResize = () => { applyVVShift(); };
       window._vvStart = () => {
         kbOffset = 0;
-        phase = 'open';
         baseVVHeight = window.visualViewport.height;
         window.visualViewport.removeEventListener('resize', onVVResize);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
-        phase = 'close';
         setTimeout(() => {
           window.visualViewport.removeEventListener('resize', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
-          phase = null;
         }, 1000);
       };
     }
