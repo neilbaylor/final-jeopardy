@@ -90,6 +90,16 @@
       padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
       position: relative;
     }
+    /* Cover Android/Samsung chrome hairline between status bar and webview. */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: #07102e;
+      z-index: 9999;
+      pointer-events: none;
+    }
 
     #page-wrap { touch-action: pan-x pan-y; height: 100%; }
 
