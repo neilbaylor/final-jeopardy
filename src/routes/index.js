@@ -329,6 +329,7 @@ const TITLE_PREFIXES = [
   'doctor', 'dr', 'professor', 'prof', 'reverend', 'rev', 'father', 'brother', 'sister',
   'saint', 'st',
   'sir', 'lord', 'lady', 'dame',
+  'mount',
 ];
 
 // If `answer` starts with a known title prefix followed by a space, returns the remainder.
@@ -345,6 +346,10 @@ function stripTitlePrefix(answer) {
 
 function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   userAnswer = stripJeopardyPreamble(userAnswer);
+  // Expand "Mt." / "Mt" (before whitespace) to "Mount" on both sides so the two
+  // forms are interchangeable (e.g. "Mt. Everest" ⇔ "Mount Everest").
+  userAnswer    = userAnswer.replace(/\bMt\.?(?=\s)/gi, 'Mount');
+  correctAnswer = correctAnswer.replace(/\bMt\.?(?=\s)/gi, 'Mount');
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;

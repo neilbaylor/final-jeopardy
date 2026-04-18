@@ -77,7 +77,13 @@ const tests = [
 
   // ── Last-name-only: non-person answers should NOT trigger ──────────────────
   { correct: 'New York',               user: 'York',                expect: false, note: 'last-name — not a person name, should not accept last word' },
-  { correct: 'Mount Everest',          user: 'Everest',             expect: false, note: 'last-name — "Mount" not a first name, no last-name logic' },
+  { correct: 'Mount Everest',          user: 'Everest',             expect: true,  note: 'geo prefix — "Mount" treated as optional prefix' },
+  { correct: 'Mt. Everest',            user: 'Everest',             expect: true,  note: 'geo prefix — "Mt." treated as optional prefix' },
+  { correct: 'Mt. Everest',            user: 'Mount Everest',       expect: true,  note: 'geo prefix — Mt. ⇔ Mount' },
+  { correct: 'Mt. Everest',            user: 'Mt. Everest',         expect: true,  note: 'geo prefix — exact match still accepted' },
+  { correct: 'Mt. Everest',            user: 'K2',                  expect: false, note: 'geo prefix — wrong mountain rejected' },
+  { correct: 'Mt. Rushmore',           user: 'Rushmore',            expect: true,  note: 'geo prefix — Mt. Rushmore → Rushmore' },
+  { correct: 'Mt. Rushmore',           user: 'Mount Rushmore',      expect: true,  note: 'geo prefix — Mt. Rushmore ⇔ Mount Rushmore' },
   { correct: 'Jupiter',               user: 'Jupiter',              expect: true,  note: 'last-name — single word, exact match' },
 
   // ── Last-name-only: two people joined by "and" ────────────────────────────
@@ -218,7 +224,7 @@ const tests = [
   { correct: 'The United States of America',  user: 'States of America',       expect: false, note: 'suffix — too short (<72% of full length)' },
   { correct: 'The United States of America',  user: 'United States of America', expect: true, note: 'suffix — omit "The", long enough' },
   { correct: 'Lake Superior',                 user: 'Superior',                expect: false, note: 'suffix — single word, a.includes(" ") fails' },
-  { correct: 'Mount Saint Helens',            user: 'Saint Helens',            expect: false, note: 'suffix — ratio 0.667 < 0.72, rejected' },
+  { correct: 'Mount Saint Helens',            user: 'Saint Helens',            expect: true,  note: 'geo prefix — "Mount" stripped, "Saint Helens" accepted' },
   { correct: 'Mount Saint Helens',            user: 'Helens',                  expect: false, note: 'suffix — single word rejected' },
   { correct: 'New York City',                 user: 'York City',               expect: false, note: 'suffix — ratio 0.692 < 0.72, rejected' },
   { correct: 'New York City',                 user: 'City',                    expect: false, note: 'suffix — single word rejected' },
