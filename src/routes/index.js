@@ -330,6 +330,9 @@ const TITLE_PREFIXES = [
   'saint', 'st',
   'sir', 'lord', 'lady', 'dame',
   'mount',
+  'mr', 'mrs', 'ms',
+  'sgt', 'lt', 'col', 'capt', 'cmdr', 'maj',
+  'gov', 'sen', 'pres',
 ];
 
 // If `answer` starts with a known title prefix followed by a space, returns the remainder.
@@ -350,6 +353,14 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   // forms are interchangeable (e.g. "Mt. Everest" ⇔ "Mount Everest").
   userAnswer    = userAnswer.replace(/\bMt\.?(?=\s)/gi, 'Mount');
   correctAnswer = correctAnswer.replace(/\bMt\.?(?=\s)/gi, 'Mount');
+  // Strip trailing dots on short abbreviations (e.g. "Dr." → "Dr") so that
+  // dotted honorifics and titles flow through the TITLE_PREFIXES stripping
+  // path. Scoped to 1–5 letter tokens before whitespace to avoid touching
+  // sentence punctuation or multi-dot forms like "U.S.A." that normalizeAnswer
+  // handles separately.
+  const stripAbbrevDot = s => s.replace(/\b([A-Za-z]{1,5})\.(?=\s)/g, '$1');
+  userAnswer    = stripAbbrevDot(userAnswer);
+  correctAnswer = stripAbbrevDot(correctAnswer);
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;

@@ -466,6 +466,23 @@ const tests = [
   { correct: 'King Charles',              user: 'Charles',          expect: true,  note: 'title: King → accept name' },
   { correct: 'Doctor Martin Luther King', user: 'Martin Luther King', expect: true, note: 'title: Doctor → accept name without title' },
 
+  // ── Abbreviated titles with trailing dots ────────────────────────────────
+  { correct: 'Dr. Martin Luther King',  user: 'Martin Luther King', expect: true,  note: 'abbrev: Dr. → accept name without title' },
+  { correct: 'Dr. Martin Luther King',  user: 'Dr. Martin Luther King', expect: true, note: 'abbrev: Dr. → exact with dot accepted' },
+  { correct: 'Dr. Martin Luther King',  user: 'Dr Martin Luther King',  expect: true, note: 'abbrev: Dr. → accept without dot' },
+  { correct: 'Prof. Albert Einstein',   user: 'Albert Einstein',    expect: true,  note: 'abbrev: Prof. → strip title' },
+  { correct: 'Prof. Albert Einstein',   user: 'Einstein',           expect: true,  note: 'abbrev: Prof. → strip title, last name' },
+  { correct: 'Rev. Martin Luther King', user: 'Martin Luther King', expect: true,  note: 'abbrev: Rev. → strip title' },
+  { correct: 'Sgt. Pepper',             user: 'Pepper',             expect: true,  note: 'abbrev: Sgt. → strip title' },
+  { correct: 'Lt. Dan',                 user: 'Dan',                expect: true,  note: 'abbrev: Lt. → strip title' },
+  { correct: 'Col. Mustard',            user: 'Mustard',            expect: true,  note: 'abbrev: Col. → strip title' },
+  { correct: 'Capt. Kirk',              user: 'Kirk',               expect: true,  note: 'abbrev: Capt. → strip title' },
+  { correct: 'Mr. Rogers',              user: 'Rogers',             expect: true,  note: 'abbrev: Mr. → strip honorific' },
+  { correct: 'Mrs. Doubtfire',          user: 'Doubtfire',          expect: true,  note: 'abbrev: Mrs. → strip honorific' },
+  { correct: 'Ms. Marvel',              user: 'Marvel',             expect: true,  note: 'abbrev: Ms. → strip honorific' },
+  { correct: 'St. Augustine',           user: 'Augustine',          expect: true,  note: 'abbrev: St. → strip title (already supported; regression)' },
+
+
   // ── Numeric answers — JW must not match similar-looking numbers ───────────
   { correct: '2008',   user: '2008',   expect: true,  note: 'numeric: exact year match' },
   { correct: '2008',   user: '2016',   expect: false, note: 'numeric: different year rejected (JW "two thousand" prefix)' },
