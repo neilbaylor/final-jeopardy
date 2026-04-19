@@ -1757,7 +1757,7 @@
         const coinBadge = p.score > 0
           ? `<div class="coin player-score-coin${shimmerClass}${p.score > 99 ? ' coin-3digit' : ''}">${Math.min(p.score, 999)}</div>`
           : '';
-        const statLine = p.denom > 0 ? `${p.correct} / ${p.denom} (${p.pct}%)` : 'No questions yet';
+        const statLine = p.denom > 0 ? `${p.correct} / ${p.denom} (${p.pct}%)` : 'No Answers yet';
         const streakRows = [];
         if (p.longestStreak > 0) {
           streakRows.push(`<div class="stats-streak-row">Correct Streak: <strong>${p.longestStreak}</strong></div>`);
