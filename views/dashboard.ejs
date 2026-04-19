@@ -759,7 +759,7 @@
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
-    .game-row:nth-child(4):before, .game-row:nth-child(4):after, .game-row:nth-child(1):before, .game-row:nth-child(1):after  {
+    .game-row:last-child:before, .game-row:last-child:after, .game-row:nth-child(1):before, .game-row:nth-child(1):after  {
       content: '';
       width: 5px;
       height: 5px;
@@ -774,7 +774,7 @@
       transform: translateX(-50%);
       margin-left: 5px;
     }
-    .game-row:nth-child(4):after {
+    .game-row:last-child:after {
       margin-left: -5px;
       background: #fff;
     }
@@ -2129,6 +2129,7 @@
 
     let gameViewData = new Map();
     let gamePrevViewData = new Map();
+    let gameTpqViewData = new Map();
     function renderGames(games) {
       currentGames = Array.isArray(games) ? games : [];
       const list = document.getElementById('games-list');
@@ -2182,37 +2183,40 @@
           ? `<div class="game-player"><div class="player-overflow-circle">+${overflow}</div></div>`
           : '';
 
-        const pq = game.previous_question;
-        const pqAnswerByUser = pq
-          ? new Map((game.previous_answers || []).filter(a => a.game_question_id === pq.game_question_id).map(a => [a.user_id, a]))
-          : null;
-        const prevRowHtml = pq ? (() => {
-          const pqCategory = toTitleCase(pq.category);
-          const pqPlayers = combined.map(p => {
-            const ans = pqAnswerByUser.get(p.id);
+        const buildPrevRowHtml = (q, answersList, store, extraClass) => {
+          if (!q) return '';
+          const qCategory = toTitleCase(q.category);
+          const qAnswerByUser = new Map((answersList || []).filter(a => a.game_question_id === q.game_question_id).map(a => [a.user_id, a]));
+          const qPlayers = combined.map(p => {
+            const ans = qAnswerByUser.get(p.id);
             return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answer: ans ? ans.answer : null };
           });
-          const pqVisible = pqPlayers.length > MAX_VISIBLE ? pqPlayers.slice(0, MAX_VISIBLE) : pqPlayers;
-          const pqOverflow = pqPlayers.length > MAX_VISIBLE ? pqPlayers.length - MAX_VISIBLE : 0;
-          const pqPlayerHtml = pqVisible.map(p => buildPlayerCardHtml(p, { short: pqPlayers.length > 3, unansweredIncorrect: true, askedAt: pq.asked_at, relativeTo: pq.asked_at, simpleCoin: true })).join('');
-          const pqOverflowHtml = pqOverflow > 0 ? `<div class="game-player"><div class="player-overflow-circle">+${pqOverflow}</div></div>` : '';
-          const myPqAnswer = pqAnswerByUser.get(currentUser ? currentUser.id : null);
-          gamePrevViewData.set(String(game.id), { players: pqPlayers, myAnswer: myPqAnswer ? myPqAnswer.answer : '', askedAt: pq.asked_at, relativeTo: pq.asked_at, category: pqCategory, question: pq.question, correctAnswer: pq.answer });
-          return `<div class="game-row game-row-previous" data-game-id="${escHtml(game.id)}">
+          const qVisible = qPlayers.length > MAX_VISIBLE ? qPlayers.slice(0, MAX_VISIBLE) : qPlayers;
+          const qOverflow = qPlayers.length > MAX_VISIBLE ? qPlayers.length - MAX_VISIBLE : 0;
+          const qPlayerHtml = qVisible.map(p => buildPlayerCardHtml(p, { short: qPlayers.length > 3, unansweredIncorrect: true, askedAt: q.asked_at, relativeTo: q.asked_at, simpleCoin: true })).join('');
+          const qOverflowHtml = qOverflow > 0 ? `<div class="game-player"><div class="player-overflow-circle">+${qOverflow}</div></div>` : '';
+          const myAns = qAnswerByUser.get(currentUser ? currentUser.id : null);
+          store.set(String(game.id), { players: qPlayers, myAnswer: myAns ? myAns.answer : '', askedAt: q.asked_at, relativeTo: q.asked_at, category: qCategory, question: q.question, correctAnswer: q.answer });
+          return `<div class="game-row game-row-previous ${extraClass}" data-game-id="${escHtml(game.id)}">
             <div class="game-row-header">
-              <span class="game-category">${escHtml(pqCategory)}</span>
+              <span class="game-category">${escHtml(qCategory)}</span>
             </div>
             <div class="game-row-body">
-              <div class="game-players" style="gap:${pqPlayers.length > 3 ? '2px' : '4px'}">${pqPlayerHtml}${pqOverflowHtml}</div>
+              <div class="game-players" style="gap:${qPlayers.length > 3 ? '2px' : '4px'}">${qPlayerHtml}${qOverflowHtml}</div>
               <button class="view-btn">Answers</button>
             </div>
-            <div class="game-row-summary">${formatQuestionDate(pq.asked_at)}</div>
+            <div class="game-row-summary">${formatQuestionDate(q.asked_at)}</div>
           </div>`;
-        })() : '';
+        };
+        const prevRowHtml = buildPrevRowHtml(game.previous_question, game.previous_answers, gamePrevViewData, '');
+        const tpqRowHtml  = game.previous_question
+          ? buildPrevRowHtml(game.two_previous_question, game.two_previous_answers, gameTpqViewData, 'game-row-two-previous')
+          : '';
 
         const isExisting = prevGameIds !== null && prevGameIds.has(String(game.id));
         return `<div class="game-row-wrapper" data-game-id="${escHtml(game.id)}" style="${isExisting ? 'animation:none' : `animation-delay:${(idx * staggerMs / 1000).toFixed(3)}s`}">
           <div class="game-row-inner">
+          ${tpqRowHtml}
           ${prevRowHtml}
           <div class="game-row-stats-action">
             <button class="stats-game-btn" aria-label="Game stats">
@@ -2277,8 +2281,8 @@
 
 
 
-      function openPrevModal(gameId) {
-        const { players, myAnswer, askedAt, relativeTo, category, question, correctAnswer } = gamePrevViewData.get(gameId) || {};
+      function openPrevModal(gameId, store) {
+        const { players, myAnswer, askedAt, relativeTo, category, question, correctAnswer } = (store || gamePrevViewData).get(gameId) || {};
         document.getElementById('view-modal-category').textContent = toTitleCase(category || '');
         document.getElementById('view-modal-question').textContent = question || '';
         document.getElementById('view-modal-answer').textContent = toTitleCase(correctAnswer || '');
@@ -2293,8 +2297,12 @@
           e.stopPropagation();
           const wrapper = btn.closest('.game-row-wrapper');
           const gameId = wrapper.dataset.gameId;
+          if (wrapper.dataset.revealed === 'two' && gameTpqViewData.has(gameId)) {
+            openPrevModal(gameId, gameTpqViewData);
+            return;
+          }
           if (wrapper.dataset.revealed === 'true' && gamePrevViewData.has(gameId)) {
-            openPrevModal(gameId);
+            openPrevModal(gameId, gamePrevViewData);
             return;
           }
           const { players, myAnswer, askedAt, category, question, correctAnswer } = gameViewData.get(gameId) || {};
@@ -2308,20 +2316,26 @@
         });
       });
 
-      document.querySelectorAll('.game-row-previous').forEach(row => {
-        row.addEventListener('click', () => openPrevModal(row.dataset.gameId));
+      document.querySelectorAll('.game-row-two-previous').forEach(row => {
+        row.addEventListener('click', () => openPrevModal(row.dataset.gameId, gameTpqViewData));
+      });
+
+      document.querySelectorAll('.game-row-previous:not(.game-row-two-previous)').forEach(row => {
+        row.addEventListener('click', () => openPrevModal(row.dataset.gameId, gamePrevViewData));
       });
 
       // Swipe-right to reveal previous question row; swipe-left to reveal stats + delete buttons
       const ACTIONS_WIDTH = 156;
       document.querySelectorAll('.game-row-wrapper').forEach(wrapper => {
-        const prevRow      = wrapper.querySelector('.game-row-previous');
+        const prevRow      = wrapper.querySelector('.game-row-previous:not(.game-row-two-previous)');
+        const tpqRow       = wrapper.querySelector('.game-row-two-previous');
         const inner        = wrapper.querySelector('.game-row-inner');
         const mainRow      = wrapper.querySelector('.game-row:not(.game-row-previous)');
         const deleteAction = wrapper.querySelector('.game-row-delete-action');
         const statsAction  = wrapper.querySelector('.game-row-stats-action');
 
-        let startX = 0, startY = 0, dirLocked = null, active = false, isRevealed = false, deleteRevealed = false;
+        let startX = 0, startY = 0, dirLocked = null, active = false, revealState = 0, deleteRevealed = false;
+        const revealedRows = [mainRow, prevRow, tpqRow].filter(Boolean);
 
         const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         const setActionsOpacity = show => {
@@ -2331,16 +2345,17 @@
             el.style.opacity = show ? '1' : '0';
           });
         };
+        const setRevealedDataset = state => {
+          wrapper.dataset.revealed = state === 2 ? 'two' : state === 1 ? 'true' : 'false';
+        };
         const setTx = (tx, animated) => {
-          mainRow.style.transition = animated ? ease : 'none';
-          if (prevRow) prevRow.style.transition = animated ? ease : 'none';
+          revealedRows.forEach(el => { el.style.transition = animated ? ease : 'none'; });
           mainRow.style.transform = tx ? `translateX(${tx}px)` : '';
-          // prevRow only follows for positive (right-swipe) translations
-          if (prevRow) prevRow.style.transform = (tx > 0) ? `translateX(${tx}px)` : '';
+          // prev/tpq rows only follow for positive (right-swipe) translations
+          [prevRow, tpqRow].forEach(el => { if (el) el.style.transform = (tx > 0) ? `translateX(${tx}px)` : ''; });
           if (animated) {
             mainRow.addEventListener('transitionend', () => {
-              mainRow.style.transition = '';
-              if (prevRow) prevRow.style.transition = '';
+              revealedRows.forEach(el => { el.style.transition = ''; });
             }, { once: true });
           }
         };
@@ -2359,7 +2374,7 @@
             btn.classList.add('loading');
             window.location.href = `/game?id=${wrapper.dataset.gameId}`;
           } else {
-            const viewBtn = wrapper.querySelector('.view-btn');
+            const viewBtn = wrapper.querySelector('.game-row:not(.game-row-previous) .view-btn');
             if (viewBtn && !viewBtn.classList.contains('loading')) viewBtn.click();
           }
         });
@@ -2370,8 +2385,7 @@
           startY = e.touches[0].clientY;
           dirLocked = null;
           active = true;
-          mainRow.style.transition = 'none';
-          if (prevRow) prevRow.style.transition = 'none';
+          revealedRows.forEach(el => { el.style.transition = 'none'; });
         }, { passive: true });
 
         inner.addEventListener('touchmove', e => {
@@ -2396,10 +2410,19 @@
           e.preventDefault();
 
           const fw = mainRow.offsetWidth;
-          if (isRevealed) {
-            const tx = Math.max(0, Math.min(fw, fw + dx));
+          const setTranslate = tx => {
             mainRow.style.transform = tx ? `translateX(${tx}px)` : '';
-            if (prevRow) prevRow.style.transform = tx ? `translateX(${tx}px)` : '';
+            [prevRow, tpqRow].forEach(el => { if (el) el.style.transform = (tx > 0) ? `translateX(${tx}px)` : ''; });
+          };
+          if (revealState === 2) {
+            // From two-prev reveal: swipe left goes back to prev-reveal; clamp [fw, 2*fw]
+            const tx = Math.max(fw, Math.min(2 * fw, 2 * fw + dx));
+            setTranslate(tx);
+          } else if (revealState === 1) {
+            // From prev-reveal: swipe left back to 0, swipe right to tpq-reveal (if tpq exists)
+            const max = tpqRow ? 2 * fw : fw;
+            const tx = Math.max(0, Math.min(max, fw + dx));
+            setTranslate(tx);
           } else if (deleteRevealed) {
             const tx = Math.max(-ACTIONS_WIDTH, Math.min(0, -ACTIONS_WIDTH + dx));
             mainRow.style.transform = `translateX(${tx}px)`;
@@ -2407,16 +2430,14 @@
           } else {
             if (dx > 0 && prevRow) {
               const tx = Math.min(fw, dx);
-              mainRow.style.transform = `translateX(${tx}px)`;
-              prevRow.style.transform = `translateX(${tx}px)`;
+              setTranslate(tx);
               setActionsOpacity(false);
             } else if (dx < 0) {
               const tx = Math.max(-ACTIONS_WIDTH, dx);
               mainRow.style.transform = `translateX(${tx}px)`;
               setActionsOpacity(true);
             } else {
-              mainRow.style.transform = '';
-              if (prevRow) prevRow.style.transform = '';
+              setTranslate(0);
               setActionsOpacity(false);
             }
           }
@@ -2429,14 +2450,18 @@
           if (dirLocked !== 'h') return;
           const dx = e.changedTouches[0].clientX - startX;
           const fw = mainRow.offsetWidth;
-          if (isRevealed) {
-            if (dx < -40) { isRevealed = false; wrapper.dataset.revealed = 'false'; setTx(0, true); }
-            else           { setTx(fw, true); }
+          if (revealState === 2) {
+            if (dx < -40) { revealState = 1; setRevealedDataset(1); setTx(fw, true); }
+            else          { setTx(2 * fw, true); }
+          } else if (revealState === 1) {
+            if (dx < -40)                    { revealState = 0; setRevealedDataset(0); setTx(0, true); }
+            else if (dx > 40 && tpqRow)      { revealState = 2; setRevealedDataset(2); setTx(2 * fw, true); }
+            else                             { setTx(fw, true); }
           } else if (deleteRevealed) {
             if (dx > 40) { deleteRevealed = false; setActionsOpacity(false); setTx(0, true); }
-            else          { setActionsOpacity(true); setTx(-ACTIONS_WIDTH, true); }
+            else         { setActionsOpacity(true); setTx(-ACTIONS_WIDTH, true); }
           } else {
-            if (dx > 40 && prevRow) { isRevealed = true; wrapper.dataset.revealed = 'true'; setTx(fw, true); }
+            if (dx > 40 && prevRow) { revealState = 1; setRevealedDataset(1); setTx(fw, true); }
             else if (dx < -40)      { deleteRevealed = true; setActionsOpacity(true); setTx(-ACTIONS_WIDTH, true); }
             else                    { setActionsOpacity(false); setTx(0, true); }
           }
@@ -2447,7 +2472,9 @@
           if (!active) return;
           active = false;
           cardSwiping = false;
-          if (isRevealed) setTx(mainRow.offsetWidth, true);
+          const fw = mainRow.offsetWidth;
+          if (revealState === 2) setTx(2 * fw, true);
+          else if (revealState === 1) setTx(fw, true);
           else if (deleteRevealed) { setActionsOpacity(true); setTx(-ACTIONS_WIDTH, true); }
           else { setActionsOpacity(false); setTx(0, true); }
         }, { passive: true });
