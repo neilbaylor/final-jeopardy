@@ -1820,13 +1820,13 @@
           }
           let sub;
           if (gameCount === 1) {
-            sub = leading === 1 ? "You're leading in your only game"
+            sub = leading === 1 ? "Leading in 1 Game"
                 : tied === 1    ? "Tied in 1 Game"
-                :                 "You're not leading in your only game";
+                :                 "Trailing in 1 Game";
           } else {
             const all = gameCount;
             if (leading === 0 && tied === 0) {
-              sub = "Leading or tied in none";
+              sub = `Trailing in ${all} Games`;
             } else if (leading === all) {
               sub = `Leading in all ${all} Games`;
             } else if (tied === all) {
