@@ -1699,11 +1699,15 @@
         };
       }).sort((a, b) => b.score - a.score);
 
-      const days = stats.first_question_date
-        ? Math.max(0, Math.floor((Date.now() - new Date(stats.first_question_date).getTime()) / 86400000))
+      // DB DATETIMEs come back as "YYYY-MM-DD HH:mm:ss" (UTC). JS parses that as
+      // local time, so we explicitly convert to ISO UTC before constructing Date.
+      const parseDbDate = s => s ? new Date(s.replace(' ', 'T') + 'Z') : null;
+      const firstDt = parseDbDate(stats.first_question_date);
+      const days = firstDt
+        ? Math.max(0, Math.floor((Date.now() - firstDt.getTime()) / 86400000))
         : null;
-      const isToday = stats.first_question_date
-        ? new Date(stats.first_question_date).toDateString() === new Date().toDateString()
+      const isToday = firstDt
+        ? firstDt.toDateString() === new Date().toDateString()
         : false;
       let header;
       if (days === null)       header = 'Stats for Game';
@@ -1856,8 +1860,12 @@
         const lg = stats.longest_game;
         let longestGameStr = '—';
         if (lg && lg.question_count > 0) {
-          const days = lg.first_question_date
-            ? Math.max(0, Math.floor((Date.now() - new Date(lg.first_question_date).getTime()) / 86400000))
+          // DB DATETIMEs are UTC but come back without a timezone suffix; force UTC parsing.
+          const lgFirst = lg.first_question_date
+            ? new Date(lg.first_question_date.replace(' ', 'T') + 'Z')
+            : null;
+          const days = lgFirst
+            ? Math.max(0, Math.floor((Date.now() - lgFirst.getTime()) / 86400000))
             : null;
           longestGameStr = days !== null
             ? `${lg.question_count} Questions / ${days} Days`
