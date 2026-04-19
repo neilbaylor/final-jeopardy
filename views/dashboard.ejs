@@ -759,11 +759,15 @@
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
-    .game-row:last-child:before, .game-row:last-child:after, .game-row:nth-child(1):before, .game-row:nth-child(1):after  {
+    .game-row .dot { display: none; }
+    .game-row-inner:has(.game-row-previous) > .game-row:before,
+    .game-row-inner:has(.game-row-previous) > .game-row:after,
+    .game-row-inner:has(.game-row-two-previous) > .game-row .dot {
       content: '';
+      display: block;
       width: 5px;
       height: 5px;
-      background: #ccc;
+      background: #fff;
       position: absolute;
       top: 4px;
       left: 50%;
@@ -771,20 +775,22 @@
       border-radius: 50%;
       border: 1px solid #bbb;
       opacity: 0.52;
+      box-sizing: border-box;
       transform: translateX(-50%);
-      margin-left: 5px;
     }
-    .game-row:last-child:after {
-      margin-left: -5px;
-      background: #fff;
-    }
-    .game-row:nth-child(1):before {
-      background: #fff;
-    }
-    .game-row:nth-child(1):after {
-      background: #ccc;
-      margin-left: -5px;
-    }
+    .game-row-inner:has(.game-row-previous):not(:has(.game-row-two-previous)) > .game-row:before { margin-left: -5px; }
+    .game-row-inner:has(.game-row-previous):not(:has(.game-row-two-previous)) > .game-row:after  { margin-left: 5px; }
+    .game-row-inner:has(.game-row-two-previous) > .game-row:before { margin-left: -10px; }
+    .game-row-inner:has(.game-row-two-previous) > .game-row:after  { margin-left: 10px; }
+
+    /* 2-card fill: left filled on prev, right filled on main */
+    .game-row-inner:has(.game-row-previous):not(:has(.game-row-two-previous)) > .game-row-previous:before { background: #ccc; }
+    .game-row-inner:has(.game-row-previous):not(:has(.game-row-two-previous)) > .game-row:last-child:after { background: #ccc; }
+
+    /* 3-card fill: left filled on tpq, middle filled on prev, right filled on main */
+    .game-row-inner:has(.game-row-two-previous) > .game-row-two-previous:before { background: #ccc; }
+    .game-row-inner:has(.game-row-two-previous) > .game-row-previous:not(.game-row-two-previous) .dot { background: #ccc; }
+    .game-row-inner:has(.game-row-two-previous) > .game-row:last-child:after { background: #ccc; }
     .game-row-header {
       padding: 8px 9px 0;
     }
@@ -2198,6 +2204,7 @@
           const myAns = qAnswerByUser.get(currentUser ? currentUser.id : null);
           store.set(String(game.id), { players: qPlayers, myAnswer: myAns ? myAns.answer : '', askedAt: q.asked_at, relativeTo: q.asked_at, category: qCategory, question: q.question, correctAnswer: q.answer });
           return `<div class="game-row game-row-previous ${extraClass}" data-game-id="${escHtml(game.id)}">
+            <div class="dot"></div>
             <div class="game-row-header">
               <span class="game-category">${escHtml(qCategory)}</span>
             </div>
@@ -2236,6 +2243,7 @@
             </button>
           </div>
           <div class="game-row">
+            <div class="dot"></div>
             <div class="game-row-header">
               <span class="game-category">${escHtml(category)}</span>
             </div>
