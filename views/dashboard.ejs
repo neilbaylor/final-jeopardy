@@ -1865,22 +1865,24 @@
             ? new Date(lg.first_question_date.replace(' ', 'T') + 'Z')
             : null;
           const days = lgFirst
-            ? Math.max(0, Math.floor((Date.now() - lgFirst.getTime()) / 86400000))
+            ? Math.max(1, Math.floor((Date.now() - lgFirst.getTime()) / 86400000))
             : null;
           longestGameStr = days !== null
-            ? `${lg.question_count} Questions / ${days} Days`
+            ? `${lg.question_count} Questions / ${days} Day${days !== 1 ? 's' : ''}`
             : `${lg.question_count} Questions`;
         }
         const weekTotal   = stats.total_questions_week || 0;
         const weekCorrect = stats.correct_answers_week || 0;
         const weekPct     = weekTotal > 0 ? Math.round((weekCorrect / weekTotal) * 100) : 0;
-        const weekStr     = weekTotal > 0 ? `${weekCorrect} / ${weekTotal} (${weekPct}%)` : '—';
+        const weekRow     = weekTotal > 0
+          ? `<div class="stats-streak-row">Past Week: <strong>${weekCorrect} / ${weekTotal} (${weekPct}%)</strong></div>`
+          : '';
         streaksEl.innerHTML = [
           `<div class="stats-streak-row">Correct Streak: <strong>${stats.longest_streak_overall || 0}</strong></div>`,
           `<div class="stats-streak-row">Correct Streak in a Game: <strong>${stats.longest_streak_single_game || 0}</strong></div>`,
-          `<div class="stats-streak-row">Past Week: <strong>${weekStr}</strong></div>`,
+          weekRow,
           `<div class="stats-streak-row">Longest Game: <strong>${longestGameStr}</strong></div>`,
-        ].join('');
+        ].filter(Boolean).join('');
         document.getElementById('stats-modal-backdrop').classList.add('open');
       } catch {}
       iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
