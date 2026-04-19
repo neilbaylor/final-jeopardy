@@ -1869,9 +1869,10 @@
           const days = lgFirst
             ? Math.max(1, Math.floor((Date.now() - lgFirst.getTime()) / 86400000))
             : null;
+          const qStr = `${lg.question_count} Question${lg.question_count !== 1 ? 's' : ''}`;
           longestGameStr = days !== null
-            ? `${lg.question_count} Questions / ${days} Day${days !== 1 ? 's' : ''}`
-            : `${lg.question_count} Questions`;
+            ? `${qStr} / ${days} Day${days !== 1 ? 's' : ''}`
+            : qStr;
         }
         const weekTotal   = stats.total_questions_week || 0;
         const weekCorrect = stats.correct_answers_week || 0;
