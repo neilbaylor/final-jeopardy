@@ -1854,7 +1854,9 @@
         coinEl.textContent = Math.min(correct, 999);
         coinEl.classList.toggle('coin-3digit', correct > 99);
         coinEl.style.display = correct === 0 ? 'none' : '';
-        document.getElementById('stats-modal-stat').textContent = gameCount === 0 ? 'Waiting' : `${correct} / ${total} (${pct}%)`;
+        document.getElementById('stats-modal-stat').textContent = gameCount === 0
+          ? 'Waiting'
+          : (total === 0 ? 'No Answers yet' : `${correct} / ${total} (${pct}%)`);
         const streaksEl = document.getElementById('stats-modal-streaks');
         streaksEl.style.display = gameCount === 0 ? 'none' : '';
         const lg = stats.longest_game;
