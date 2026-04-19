@@ -1484,7 +1484,18 @@
         });
       };
       const applyVVShift = () => {
-        const newOffset = Math.max(0, baseVVHeight - window.visualViewport.height);
+        const vvH = window.visualViewport.height;
+        let newOffset;
+        // iOS occasionally reports a bogus tiny visualViewport.height during focus
+        // transitions, which would compute a huge shift and push content off-screen.
+        // When that happens, fall back to where iOS has scrolled the input to:
+        // its bottom sits just above the keyboard.
+        if (vvH < 200 || vvH < baseVVHeight * 0.5) {
+          const inputBottom = answerInput.getBoundingClientRect().bottom;
+          newOffset = Math.max(0, window.innerHeight - inputBottom);
+        } else {
+          newOffset = Math.max(0, baseVVHeight - vvH);
+        }
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         applyShift();
