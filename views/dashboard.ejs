@@ -1702,10 +1702,14 @@
       const days = stats.first_question_date
         ? Math.max(0, Math.floor((Date.now() - new Date(stats.first_question_date).getTime()) / 86400000))
         : null;
+      const isToday = stats.first_question_date
+        ? new Date(stats.first_question_date).toDateString() === new Date().toDateString()
+        : false;
       let header;
-      if (days === null)    header = 'Stats for Game';
-      else if (days === 0)  header = 'Stats for Game Started Today';
-      else                  header = `Stats for Game over ${days} Day${days !== 1 ? 's' : ''}`;
+      if (days === null)       header = 'Stats for Game';
+      else if (isToday)        header = 'Stats for Game Started Today';
+      else if (days === 0)     header = 'Stats for Game Started Yesterday';
+      else                     header = `Stats for Game over ${days} Day${days !== 1 ? 's' : ''}`;
       document.getElementById('stats-modal-header-text').textContent = header;
 
       const firstName = p => ((p.display_name || '').trim().split(' ')[0] || '');
