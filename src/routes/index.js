@@ -830,29 +830,7 @@ router.get('/api/games', async (req, res) => {
             FROM game_answers ga
             WHERE ga.game_question_id = (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1)) AS answers,
            (SELECT COUNT(*) FROM game_answers ga3 JOIN game_questions gq3 ON ga3.game_question_id = gq3.id
-            WHERE gq3.game_id = g.id AND ga3.user_id = ${escapedUserId} AND ga3.is_correct = 1) AS my_score,
-           (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_id,
-           (SELECT gq.asked_at FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_asked_at,
-           (SELECT q.id FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_question_id,
-           (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_question,
-           (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_answer,
-           (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_category,
-           (SELECT q.originally_asked FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1) AS pq_originally_asked,
-           (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'user_id', ga.user_id, 'game_question_id', ga.game_question_id,
-                                             'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
-            FROM game_answers ga
-            WHERE ga.game_question_id = (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 1)) AS previous_answers,
-           (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 2) AS tpq_id,
-           (SELECT gq.asked_at FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 2) AS tpq_asked_at,
-           (SELECT q.id FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 2) AS tpq_question_id,
-           (SELECT q.question FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 2) AS tpq_question,
-           (SELECT q.answer FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 2) AS tpq_answer,
-           (SELECT q.category FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 2) AS tpq_category,
-           (SELECT q.originally_asked FROM game_questions gq JOIN questions q ON gq.question_id = q.id WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 2) AS tpq_originally_asked,
-           (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', ga.id, 'user_id', ga.user_id, 'game_question_id', ga.game_question_id,
-                                             'answer', ga.answer, 'is_correct', ga.is_correct, 'answered_at', ga.answered_at))
-            FROM game_answers ga
-            WHERE ga.game_question_id = (SELECT gq.id FROM game_questions gq WHERE gq.game_id = g.id ORDER BY gq.id DESC LIMIT 1 OFFSET 2)) AS two_previous_answers
+            WHERE gq3.game_id = g.id AND ga3.user_id = ${escapedUserId} AND ga3.is_correct = 1) AS my_score
          FROM games g
          WHERE g.id = ?`,
         [Number(gameId)]
@@ -884,26 +862,6 @@ router.get('/api/games', async (req, res) => {
         } : null,
         answers: parse(row.answers) || [],
         my_score: row.my_score || 0,
-        previous_question: row.pq_id ? {
-          game_question_id: row.pq_id,
-          asked_at: row.pq_asked_at,
-          question_id: row.pq_question_id,
-          question: row.pq_question,
-          answer: title(stripOneOf(row.pq_answer)),
-          category: title(row.pq_category),
-          originally_asked: row.pq_originally_asked || null,
-        } : null,
-        previous_answers: parse(row.previous_answers) || [],
-        two_previous_question: row.tpq_id ? {
-          game_question_id: row.tpq_id,
-          asked_at: row.tpq_asked_at,
-          question_id: row.tpq_question_id,
-          question: row.tpq_question,
-          answer: title(stripOneOf(row.tpq_answer)),
-          category: title(row.tpq_category),
-          originally_asked: row.tpq_originally_asked || null,
-        } : null,
-        two_previous_answers: parse(row.two_previous_answers) || [],
       });
     } catch (err) {
       console.error('Get game error:', err);
