@@ -716,10 +716,10 @@ router.post('/api/games', async (req, res) => {
       return res.status(409).json({ error: 'You have reached the maximum number of games' });
     }
 
-    // Check if any friend is at the game limit
+    // Check if any friend is at the game limit (admin user id 1 is exempt)
     const friendPlaceholders = friendIds.map(() => '?').join(',');
     const [friendCounts] = await conn.query(
-      `SELECT u.display_name, COUNT(gu.game_id) AS gameCount
+      `SELECT u.id, u.display_name, COUNT(gu.game_id) AS gameCount
        FROM users u
        LEFT JOIN game_users gu ON gu.user_id = u.id
        WHERE u.id IN (${friendPlaceholders})
@@ -727,7 +727,7 @@ router.post('/api/games', async (req, res) => {
       friendIds.map(Number)
     );
     for (const friend of friendCounts) {
-      if (friend.gameCount >= 10) {
+      if (Number(friend.id) !== 1 && friend.gameCount >= 10) {
         await conn.rollback();
         return res.status(409).json({ error: `Sorry, ${friend.display_name} has reached the maximum number of games` });
       }
