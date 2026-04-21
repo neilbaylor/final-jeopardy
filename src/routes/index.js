@@ -44,8 +44,11 @@ function normalizeAnswer(str) {
   str = str.replace(/['\u2018\u2019]/g, '');
   // Convert Roman numerals (all-uppercase tokens) before lowercasing
   str = str.replace(/\b([IVXLCDMivxlcdm]+)\b/g, (m, _p1, offset, original) => {
-    // Skip tokens that are part of dot-separated abbreviations (e.g. G.I., I.R.S., D.C.)
-    if (original[offset - 1] === '.' || original[offset + m.length] === '.') return m;
+    // Skip tokens that are part of punctuated abbreviations (e.g. G.I., I.R.S.,
+    // D.C.) or decorated titles like M*A*S*H — adjacency to any non-alphanumeric
+    // non-space character indicates the letter isn't meant as a Roman numeral.
+    const adj = c => c && !/[A-Za-z0-9\s]/.test(c);
+    if (adj(original[offset - 1]) || adj(original[offset + m.length])) return m;
     const u = m.toUpperCase();
     if (!_romanRe.test(u)) return m;
     const n = romanToNum(u);
@@ -59,7 +62,7 @@ function normalizeAnswer(str) {
     .replace(/\b(\d+)(?:st|nd|rd|th)\b/g, '$1') // strip ordinal suffixes: 8th → 8
     .replace(/\b(\d+)\b/g, (_, n) => numToWords(parseInt(n, 10))) // 7 → seven
     .replace(/['\u2018\u2019]/g, '') // strip apostrophes (ASCII + smart quotes)
-    .replace(/([a-z])\.([a-z])/g, '$1$2') // collapse abbreviation dots: e.t. → et, u.s.a. → usa
+    .replace(/[a-z](?:[^a-z0-9\s][a-z])+[^a-z0-9\s]?/g, m => m.replace(/[^a-z0-9]/g, '')) // collapse single-letter runs separated by punctuation: e.t. → et, u.s.a. → usa, m*a*s*h → mash
     .replace(/[^a-z0-9\s]/g, ' ') // non-alphanumeric → space
     .replace(/\b(the|a|an)\b/g, ' ')
     .replace(/\s+/g, ' ')
