@@ -980,7 +980,8 @@
         currentAnswer        = game.current_question.answer;
         currentOriginallyAsked = game.current_question.originally_asked || null;
         const origYear = currentOriginallyAsked ? new Date(currentOriginallyAsked + 'T12:00:00').getFullYear() : null;
-        const categoryDisplay = origYear ? `${category} (${origYear})` : category;
+        const categoryHasYear = /\b(19|20)\d{2}\b/.test(category);
+        const categoryDisplay = origYear && !categoryHasYear ? `${category} (${origYear})` : category;
         currentCategory      = categoryDisplay;
         if (currentOriginallyAsked) {
           const d = new Date(currentOriginallyAsked + 'T12:00:00');
@@ -1032,7 +1033,15 @@
 
         // Pre-calculate ALL top positions now, while elements are invisible but laid out.
         const cs = categoryStyle(categoryDisplay);
-        categoryEl.textContent = categoryDisplay;
+        if (origYear && !categoryHasYear) {
+          categoryEl.textContent = category + ' ';
+          const yearSpan = document.createElement('span');
+          yearSpan.style.color = 'rgba(255, 255, 255, 0.8)';
+          yearSpan.textContent = `(${origYear})`;
+          categoryEl.appendChild(yearSpan);
+        } else {
+          categoryEl.textContent = categoryDisplay;
+        }
         categoryEl.style.fontSize = cs.fontSize;
         categoryEl.style.top = cs.top;
         questionEl.textContent = currentQuestion;
