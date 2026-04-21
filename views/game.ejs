@@ -978,8 +978,10 @@
         const category = toTitleCase(game.current_question.category);
         currentQuestion      = game.current_question.question;
         currentAnswer        = game.current_question.answer;
-        currentCategory      = category;
         currentOriginallyAsked = game.current_question.originally_asked || null;
+        const origYear = currentOriginallyAsked ? new Date(currentOriginallyAsked + 'T12:00:00').getFullYear() : null;
+        const categoryDisplay = origYear ? `${category} (${origYear})` : category;
+        currentCategory      = categoryDisplay;
         if (currentOriginallyAsked) {
           const d = new Date(currentOriginallyAsked + 'T12:00:00');
           headerAiredEl.textContent = 'From ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -1029,8 +1031,8 @@
         }
 
         // Pre-calculate ALL top positions now, while elements are invisible but laid out.
-        const cs = categoryStyle(category);
-        categoryEl.textContent = category;
+        const cs = categoryStyle(categoryDisplay);
+        categoryEl.textContent = categoryDisplay;
         categoryEl.style.fontSize = cs.fontSize;
         categoryEl.style.top = cs.top;
         questionEl.textContent = currentQuestion;
