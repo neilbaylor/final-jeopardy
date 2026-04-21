@@ -626,6 +626,29 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
     }
   }
 
+  // Title + single-word name (e.g. "General MacArthur", "Sir Lancelot"):
+  // accept any user answer whose last word matches the name. So "Tyler MacArthur"
+  // or "Joe Lancelot" are accepted. Scoped to single-word names after the title
+  // to avoid confusing historical figures with matching surnames.
+  {
+    const withoutTitle = stripTitlePrefix(correctAnswer);
+    if (withoutTitle !== null) {
+      const dbWords = withoutTitle.trim().split(/\s+/);
+      if (dbWords.length === 1) {
+        const dbNameNorm = normalizeAnswer(dbWords[0]);
+        if (dbNameNorm) {
+          const userWords = userAnswer.trim().split(/\s+/);
+          if (userWords.length >= 2) {
+            const userLastNorm = normalizeAnswer(userWords[userWords.length - 1]);
+            if (userLastNorm === dbNameNorm) return true;
+            if (userLastNorm.length >= 4
+                && natural.JaroWinklerDistance(userLastNorm, dbNameNorm) >= 0.88) return true;
+          }
+        }
+      }
+    }
+  }
+
   return false;
 }
 
