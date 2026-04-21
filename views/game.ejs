@@ -32,7 +32,7 @@
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-    html { overflow: hidden; height: 100%; font-size: 16px; }
+    html { overflow: hidden; height: 100%; font-size: 16px; background: #07102e; }
 
     /* Slide in from right over dashboard; dashboard parallaxes left */
     @view-transition { navigation: auto; }
@@ -94,8 +94,8 @@
     body::before {
       content: '';
       position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 2px;
+      top: -2px; left: 0; right: 0;
+      height: 6px;
       background: #07102e;
       z-index: 9999;
       pointer-events: none;
