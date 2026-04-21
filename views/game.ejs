@@ -1444,6 +1444,7 @@
 
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseVVHeight = 0;
+      let baseInputBottom = 0;
       let kbOffset = 0;
 
       const blockScroll = e => e.preventDefault();
@@ -1487,12 +1488,17 @@
         const vvH = window.visualViewport.height;
         let newOffset;
         // iOS occasionally reports a bogus tiny visualViewport.height during focus
-        // transitions, which would compute a huge shift and push content off-screen.
-        // When that happens, fall back to where iOS has scrolled the input to:
-        // its bottom sits just above the keyboard.
+        // transitions, which would compute a huge shift. Also innerHeight is
+        // unreliable (shrinks with the keyboard in standalone). Fall back to
+        // how far iOS moved the input in viewport coordinates vs. its resting
+        // position captured on focus.
         if (vvH < 200 || vvH < baseVVHeight * 0.5) {
-          const inputBottom = answerInput.getBoundingClientRect().bottom;
-          newOffset = Math.max(0, window.innerHeight - inputBottom);
+          if (baseInputBottom > 0) {
+            const inputBottom = answerInput.getBoundingClientRect().bottom;
+            newOffset = Math.max(0, baseInputBottom - inputBottom);
+          } else {
+            newOffset = 0;
+          }
         } else {
           newOffset = Math.max(0, baseVVHeight - vvH);
         }
@@ -1501,18 +1507,26 @@
         applyShift();
       };
       const onVVResize = () => { applyVVShift(); };
+      const onInputFocus = () => {
+        baseInputBottom = answerInput.getBoundingClientRect().bottom;
+      };
       window._vvStart = () => {
         kbOffset = 0;
         baseVVHeight = window.visualViewport.height;
+        baseInputBottom = 0;
+        answerInput.removeEventListener('focus', onInputFocus);
+        answerInput.addEventListener('focus', onInputFocus);
         window.visualViewport.removeEventListener('resize', onVVResize);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
+        answerInput.removeEventListener('focus', onInputFocus);
         setTimeout(() => {
           window.visualViewport.removeEventListener('resize', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
+          baseInputBottom = 0;
         }, 1000);
       };
     }
