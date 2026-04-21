@@ -1491,7 +1491,7 @@
         // transitions, which would compute a huge shift. Also innerHeight is
         // unreliable (shrinks with the keyboard in standalone). Fall back to
         // how far iOS moved the input in viewport coordinates vs. its resting
-        // position captured on focus.
+        // position (captured in _vvStart by backing out the initial 140% slide-in).
         if (vvH < 200 || vvH < baseVVHeight * 0.5) {
           if (baseInputBottom > 0) {
             const inputBottom = answerInput.getBoundingClientRect().bottom;
@@ -1507,20 +1507,17 @@
         applyShift();
       };
       const onVVResize = () => { applyVVShift(); };
-      const onInputFocus = () => {
-        baseInputBottom = answerInput.getBoundingClientRect().bottom;
-      };
       window._vvStart = () => {
         kbOffset = 0;
         baseVVHeight = window.visualViewport.height;
-        baseInputBottom = 0;
-        answerInput.removeEventListener('focus', onInputFocus);
-        answerInput.addEventListener('focus', onInputFocus);
+        // Input is mid slide-in (translateY(140%)). Back that out to get the
+        // resting viewport-bottom we'll compare against once iOS moves things.
+        const rect = answerInputWrap.getBoundingClientRect();
+        baseInputBottom = rect.bottom - rect.height * 1.4;
         window.visualViewport.removeEventListener('resize', onVVResize);
         window.visualViewport.addEventListener('resize', onVVResize);
       };
       window._vvStop = () => {
-        answerInput.removeEventListener('focus', onInputFocus);
         setTimeout(() => {
           window.visualViewport.removeEventListener('resize', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
