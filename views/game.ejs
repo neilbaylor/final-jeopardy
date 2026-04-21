@@ -979,7 +979,13 @@
         currentQuestion      = game.current_question.question;
         currentAnswer        = game.current_question.answer;
         currentOriginallyAsked = game.current_question.originally_asked || null;
-        const origYear = currentOriginallyAsked ? new Date(currentOriginallyAsked + 'T12:00:00').getFullYear() : null;
+        const origYear = (() => {
+          if (!currentOriginallyAsked) return null;
+          const d = new Date(currentOriginallyAsked + 'T12:00:00');
+          if (isNaN(d.getTime())) return null;
+          const y = d.getFullYear();
+          return (y >= 1900 && y <= 2100) ? y : null;
+        })();
         const categoryHasYear = /\b(19|20)\d{2}\b/.test(category);
         const categoryDisplay = origYear && !categoryHasYear ? `${category} (${origYear})` : category;
         currentCategory      = categoryDisplay;
