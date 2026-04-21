@@ -80,7 +80,7 @@ const COMMON_FIRST_NAMES = new Set([
   'clark','clayton','clifford','clinton','cody','colin','conner','connor','corey','craig',
   'dale','dallas','dan','daniel','danny','darrell','darren','dave','david','dean','dennis',
   'derek','dick','diego','dominic','donald','douglas','drew','dustin','dylan',
-  'earl','eddie','edgar','edward','eli','elijah','elton','elvis','eric','ernest','ethan','eugene','evan',
+  'earl','ebenezer','eddie','edgar','edward','eli','elijah','elton','elvis','eric','ernest','ethan','eugene','evan',
   'felix','floyd','frank','franklin','fred','freddie','frederic','frederick',
   'gabriel','gary','gene','geoffrey','george','gerald','gilbert','glen','gordon','graham','grant','gregory',
   'hannibal','harold','harry','harvey','henry','herbert','homer','howard','hugo',
