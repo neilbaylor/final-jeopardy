@@ -1363,6 +1363,38 @@
       align-items: center;
       justify-content: center;
     }
+    .user-row-stats-action {
+      position: absolute;
+      right: 80px;
+      height: 54px;
+      width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #888;
+      opacity: 0;
+      z-index: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      will-change: opacity;
+      transform: translateY(-100%);
+    }
+    .stats-user-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      pointer-events: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .stats-user-btn .btn-spinner {
+      width: 18px;
+      height: 18px;
+      border-color: rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+    }
 
     /* Delete user confirmation modal */
     #delete-user-modal-backdrop {
@@ -1796,6 +1828,103 @@
       document.getElementById('stats-modal-backdrop').classList.add('open');
     }
 
+    // Populate and open the stats modal for a specific user.
+    // Pass { user, games, stats, selfView }. selfView=true uses "Your Stats" phrasing.
+    function populateUserStatsModal({ user, games, stats, selfView }) {
+      document.getElementById('stats-modal-content').style.display = '';
+      document.getElementById('stats-modal-players').style.display = 'none';
+      const correct = stats.correct_answers || 0;
+      const total = stats.total_questions || 0;
+      const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+      const gameCount = games.length;
+      const firstName = (user?.display_name || '').trim().split(/\s+/)[0] || '';
+      if (gameCount === 0) {
+        document.getElementById('stats-modal-header-text').textContent =
+          selfView ? 'You have no Stats' : `${firstName} has no Stats`;
+        document.getElementById('stats-modal-subheading').textContent = 'No games yet';
+      } else {
+        const header = selfView
+          ? `Your Stats Over ${gameCount} Game${gameCount !== 1 ? 's' : ''}`
+          : `${firstName}'s Stats Over ${gameCount} Game${gameCount !== 1 ? 's' : ''}`;
+        document.getElementById('stats-modal-header-text').textContent = header;
+        let leading = 0, tied = 0;
+        for (const g of games) {
+          const mine = g.my_score || 0;
+          const maxOther = Math.max(0, ...(g.players || []).map(p => p.score || 0));
+          if (mine > 0 && mine > maxOther) leading++;
+          else if (mine > 0 && mine === maxOther) tied++;
+          else if (mine === 0 && maxOther === 0 && (g.players || []).length > 0) tied++;
+        }
+        let sub;
+        if (gameCount === 1) {
+          sub = leading === 1 ? "Leading in 1 Game"
+              : tied === 1    ? "Tied in 1 Game"
+              :                 "Trailing in 1 Game";
+        } else {
+          const all = gameCount;
+          if (leading === 0 && tied === 0) {
+            sub = `Trailing in ${all} Games`;
+          } else if (leading === all) {
+            sub = `Leading in all ${all} Games`;
+          } else if (tied === all) {
+            sub = `Tied in all ${all} Games`;
+          } else if (leading + tied === all) {
+            sub = leading === 0 ? `Tied in ${all} Games`
+                : tied === 0    ? `Leading in ${all} Games`
+                : `Leading in ${leading} Games, Tied in ${tied}`;
+          } else if (leading === 0) {
+            sub = `Tied in ${tied} Game${tied !== 1 ? 's' : ''}`;
+          } else if (tied === 0) {
+            sub = `Leading in ${leading} Game${leading !== 1 ? 's' : ''}`;
+          } else {
+            sub = `Leading in ${leading} Games, Tied in ${tied}`;
+          }
+        }
+        document.getElementById('stats-modal-subheading').textContent = sub;
+      }
+      const avatarEl = document.getElementById('stats-modal-avatar');
+      avatarEl.innerHTML = user?.avatar_url
+        ? `<img class="player-avatar" src="${user.avatar_url}" alt="${user.display_name || ''}" />`
+        : `<div class="player-avatar-placeholder">👤</div>`;
+      document.getElementById('stats-modal-name').textContent = user?.display_name || '';
+      const coinEl = document.getElementById('stats-modal-coin');
+      coinEl.textContent = Math.min(correct, 999);
+      coinEl.classList.toggle('coin-3digit', correct > 99);
+      coinEl.style.display = correct === 0 ? 'none' : '';
+      document.getElementById('stats-modal-stat').textContent = gameCount === 0
+        ? 'Waiting'
+        : (total === 0 ? 'No Answers yet' : `${correct} / ${total} (${pct}%)`);
+      const streaksEl = document.getElementById('stats-modal-streaks');
+      streaksEl.style.display = gameCount === 0 ? 'none' : '';
+      const lg = stats.longest_game;
+      let longestGameStr = '—';
+      if (lg && lg.question_count > 0) {
+        const lgFirst = lg.first_question_date
+          ? new Date(lg.first_question_date.replace(' ', 'T') + 'Z')
+          : null;
+        const days = lgFirst
+          ? Math.max(1, Math.floor((Date.now() - lgFirst.getTime()) / 86400000))
+          : null;
+        const qStr = `${lg.question_count} Question${lg.question_count !== 1 ? 's' : ''}`;
+        longestGameStr = days !== null
+          ? `${qStr} / ${days} Day${days !== 1 ? 's' : ''}`
+          : qStr;
+      }
+      const weekTotal   = stats.total_questions_week || 0;
+      const weekCorrect = stats.correct_answers_week || 0;
+      const weekPct     = weekTotal > 0 ? Math.round((weekCorrect / weekTotal) * 100) : 0;
+      const weekRow     = weekTotal > 0
+        ? `<div class="stats-streak-row">Past Week: <strong>${weekCorrect} / ${weekTotal} (${weekPct}%)</strong></div>`
+        : '';
+      streaksEl.innerHTML = [
+        `<div class="stats-streak-row">Correct Streak: <strong>${stats.longest_streak_overall || 0}</strong></div>`,
+        `<div class="stats-streak-row">Correct Streak in a Game: <strong>${stats.longest_streak_single_game || 0}</strong></div>`,
+        weekRow,
+        `<div class="stats-streak-row">Longest Game: <strong>${longestGameStr}</strong></div>`,
+      ].filter(Boolean).join('');
+      document.getElementById('stats-modal-backdrop').classList.add('open');
+    }
+
     let statsFetching = false;
     document.getElementById('stats-btn').addEventListener('click', async e => {
       e.stopPropagation();
@@ -1804,96 +1933,9 @@
       const iconEl = document.getElementById('stats-btn-icon');
       iconEl.innerHTML = '<div class="stats-spin"></div>';
       try {
-        document.getElementById('stats-modal-content').style.display = '';
-        document.getElementById('stats-modal-players').style.display = 'none';
         const statsRes = await fetch(`/api/stats?userId=${userId}`);
         const stats = await statsRes.json();
-        const correct = stats.correct_answers || 0;
-        const total = stats.total_questions || 0;
-        const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
-        const gameCount = currentGames.length;
-        if (gameCount === 0) {
-          document.getElementById('stats-modal-header-text').textContent = 'You have no Stats';
-          document.getElementById('stats-modal-subheading').textContent = 'No games yet';
-        } else {
-          document.getElementById('stats-modal-header-text').textContent = `Your Stats Over ${gameCount} Game${gameCount !== 1 ? 's' : ''}`;
-          let leading = 0, tied = 0;
-          for (const g of currentGames) {
-            const mine = g.my_score || 0;
-            const maxOther = Math.max(0, ...(g.players || []).map(p => p.score || 0));
-            if (mine > 0 && mine > maxOther) leading++;
-            else if (mine > 0 && mine === maxOther) tied++;
-            else if (mine === 0 && maxOther === 0 && (g.players || []).length > 0) tied++;
-          }
-          let sub;
-          if (gameCount === 1) {
-            sub = leading === 1 ? "Leading in 1 Game"
-                : tied === 1    ? "Tied in 1 Game"
-                :                 "Trailing in 1 Game";
-          } else {
-            const all = gameCount;
-            if (leading === 0 && tied === 0) {
-              sub = `Trailing in ${all} Games`;
-            } else if (leading === all) {
-              sub = `Leading in all ${all} Games`;
-            } else if (tied === all) {
-              sub = `Tied in all ${all} Games`;
-            } else if (leading + tied === all) {
-              sub = leading === 0 ? `Tied in ${all} Games`
-                  : tied === 0    ? `Leading in ${all} Games`
-                  : `Leading in ${leading} Games, Tied in ${tied}`;
-            } else if (leading === 0) {
-              sub = `Tied in ${tied} Game${tied !== 1 ? 's' : ''}`;
-            } else if (tied === 0) {
-              sub = `Leading in ${leading} Game${leading !== 1 ? 's' : ''}`;
-            } else {
-              sub = `Leading in ${leading} Games, Tied in ${tied}`;
-            }
-          }
-          document.getElementById('stats-modal-subheading').textContent = sub;
-        }
-        const avatarEl = document.getElementById('stats-modal-avatar');
-        avatarEl.innerHTML = currentUser?.avatar_url
-          ? `<img class="player-avatar" src="${currentUser.avatar_url}" alt="${currentUser.display_name || ''}" />`
-          : `<div class="player-avatar-placeholder">👤</div>`;
-        document.getElementById('stats-modal-name').textContent = currentUser?.display_name || '';
-        const coinEl = document.getElementById('stats-modal-coin');
-        coinEl.textContent = Math.min(correct, 999);
-        coinEl.classList.toggle('coin-3digit', correct > 99);
-        coinEl.style.display = correct === 0 ? 'none' : '';
-        document.getElementById('stats-modal-stat').textContent = gameCount === 0
-          ? 'Waiting'
-          : (total === 0 ? 'No Answers yet' : `${correct} / ${total} (${pct}%)`);
-        const streaksEl = document.getElementById('stats-modal-streaks');
-        streaksEl.style.display = gameCount === 0 ? 'none' : '';
-        const lg = stats.longest_game;
-        let longestGameStr = '—';
-        if (lg && lg.question_count > 0) {
-          // DB DATETIMEs are UTC but come back without a timezone suffix; force UTC parsing.
-          const lgFirst = lg.first_question_date
-            ? new Date(lg.first_question_date.replace(' ', 'T') + 'Z')
-            : null;
-          const days = lgFirst
-            ? Math.max(1, Math.floor((Date.now() - lgFirst.getTime()) / 86400000))
-            : null;
-          const qStr = `${lg.question_count} Question${lg.question_count !== 1 ? 's' : ''}`;
-          longestGameStr = days !== null
-            ? `${qStr} / ${days} Day${days !== 1 ? 's' : ''}`
-            : qStr;
-        }
-        const weekTotal   = stats.total_questions_week || 0;
-        const weekCorrect = stats.correct_answers_week || 0;
-        const weekPct     = weekTotal > 0 ? Math.round((weekCorrect / weekTotal) * 100) : 0;
-        const weekRow     = weekTotal > 0
-          ? `<div class="stats-streak-row">Past Week: <strong>${weekCorrect} / ${weekTotal} (${weekPct}%)</strong></div>`
-          : '';
-        streaksEl.innerHTML = [
-          `<div class="stats-streak-row">Correct Streak: <strong>${stats.longest_streak_overall || 0}</strong></div>`,
-          `<div class="stats-streak-row">Correct Streak in a Game: <strong>${stats.longest_streak_single_game || 0}</strong></div>`,
-          weekRow,
-          `<div class="stats-streak-row">Longest Game: <strong>${longestGameStr}</strong></div>`,
-        ].filter(Boolean).join('');
-        document.getElementById('stats-modal-backdrop').classList.add('open');
+        populateUserStatsModal({ user: currentUser, games: currentGames, stats, selfView: true });
       } catch {}
       iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
       document.getElementById('user-popover').classList.remove('open');
@@ -2651,6 +2693,7 @@
               .map(cb => cb.closest('.user-row').dataset.userId));
             const userStaggerMs = (!cached && !silent && users.length > 1) ? Math.max(22, Math.round(55 / Math.sqrt(users.length - 1))) : 0;
             const trashIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+            const statsIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="12"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="18" y1="20" x2="18" y2="8"></line></svg>`;
             scroller.innerHTML = users.map((u, i) => {
               const rowHtml = `<div class="user-row" data-user-id="${u.id}"${isAdmin ? '' : ` onclick="this.querySelector('input').click()"`} style="animation-delay:${(i * userStaggerMs / 1000).toFixed(3)}s">
                 ${u.avatar_url
@@ -2660,7 +2703,7 @@
                 <input type="checkbox" onclick="event.stopPropagation()" onchange="updateCreateBtn()" />
               </div>`;
               if (!isAdmin) return rowHtml;
-              return `<div class="user-row-wrapper" data-user-id="${u.id}">${rowHtml}<div class="user-row-delete-action"><button class="delete-user-btn" aria-label="Delete user">${trashIcon}</button></div></div>`;
+              return `<div class="user-row-wrapper" data-user-id="${u.id}" data-display-name="${u.display_name || ''}" data-avatar-url="${u.avatar_url || ''}">${rowHtml}<div class="user-row-stats-action"><button class="stats-user-btn" aria-label="User stats">${statsIcon}</button></div><div class="user-row-delete-action"><button class="delete-user-btn" aria-label="Delete user">${trashIcon}</button></div></div>`;
             }).join('');
             scroller.querySelectorAll('.user-row').forEach(row => {
               if (selected.has(row.dataset.userId)) row.querySelector('input').checked = true;
@@ -2684,15 +2727,19 @@
 
     function setupUserSwipe() {
       const scroller = document.getElementById('users-list-scroller');
-      const USER_DELETE_WIDTH = 80;
+      const USER_ACTIONS_WIDTH = 160;
       scroller.querySelectorAll('.user-row-wrapper').forEach(wrapper => {
         const row = wrapper.querySelector('.user-row');
         const deleteAction = wrapper.querySelector('.user-row-delete-action');
-        let startX = 0, startY = 0, dirLocked = null, active = false, deleteRevealed = false;
+        const statsAction  = wrapper.querySelector('.user-row-stats-action');
+        let startX = 0, startY = 0, dirLocked = null, active = false, actionsRevealed = false;
         const ease = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        const setDeleteOpacity = show => {
-          deleteAction.style.transition = show ? 'none' : 'opacity 0s 300ms';
-          deleteAction.style.opacity = show ? '1' : '0';
+        const setActionsOpacity = show => {
+          [statsAction, deleteAction].forEach(el => {
+            if (!el) return;
+            el.style.transition = show ? 'none' : 'opacity 0s 300ms';
+            el.style.opacity = show ? '1' : '0';
+          });
         };
         const setTx = (tx, animated) => {
           row.style.transition = animated ? ease : 'none';
@@ -2701,9 +2748,9 @@
         };
 
         row.addEventListener('click', () => {
-          if (deleteRevealed) {
-            deleteRevealed = false;
-            setDeleteOpacity(false);
+          if (actionsRevealed) {
+            actionsRevealed = false;
+            setActionsOpacity(false);
             setTx(0, true);
           } else {
             row.querySelector('input').click();
@@ -2731,17 +2778,17 @@
           }
           if (dirLocked !== 'h') return;
           e.preventDefault();
-          if (deleteRevealed) {
-            const tx = Math.max(-USER_DELETE_WIDTH, Math.min(0, -USER_DELETE_WIDTH + dx));
+          if (actionsRevealed) {
+            const tx = Math.max(-USER_ACTIONS_WIDTH, Math.min(0, -USER_ACTIONS_WIDTH + dx));
             row.style.transform = `translateX(${tx}px)`;
-            setDeleteOpacity(tx < 0);
+            setActionsOpacity(tx < 0);
           } else if (dx < 0) {
-            const tx = Math.max(-USER_DELETE_WIDTH, dx);
+            const tx = Math.max(-USER_ACTIONS_WIDTH, dx);
             row.style.transform = `translateX(${tx}px)`;
-            setDeleteOpacity(true);
+            setActionsOpacity(true);
           } else {
             row.style.transform = '';
-            setDeleteOpacity(false);
+            setActionsOpacity(false);
           }
         }, { passive: false });
 
@@ -2751,12 +2798,12 @@
           cardSwiping = false;
           if (dirLocked !== 'h') return;
           const dx = e.changedTouches[0].clientX - startX;
-          if (deleteRevealed) {
-            if (dx > 40) { deleteRevealed = false; setDeleteOpacity(false); setTx(0, true); }
-            else { setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
+          if (actionsRevealed) {
+            if (dx > 40) { actionsRevealed = false; setActionsOpacity(false); setTx(0, true); }
+            else { setActionsOpacity(true); setTx(-USER_ACTIONS_WIDTH, true); }
           } else {
-            if (dx < -40) { deleteRevealed = true; setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
-            else { setDeleteOpacity(false); setTx(0, true); }
+            if (dx < -40) { actionsRevealed = true; setActionsOpacity(true); setTx(-USER_ACTIONS_WIDTH, true); }
+            else { setActionsOpacity(false); setTx(0, true); }
           }
         };
         wrapper.addEventListener('touchend', onTouchEnd, { passive: true });
@@ -2764,8 +2811,8 @@
           if (!active) return;
           active = false;
           cardSwiping = false;
-          if (deleteRevealed) { setDeleteOpacity(true); setTx(-USER_DELETE_WIDTH, true); }
-          else { setDeleteOpacity(false); setTx(0, true); }
+          if (actionsRevealed) { setActionsOpacity(true); setTx(-USER_ACTIONS_WIDTH, true); }
+          else { setActionsOpacity(false); setTx(0, true); }
         }, { passive: true });
 
         deleteAction.addEventListener('click', () => {
@@ -2775,6 +2822,42 @@
           document.getElementById('delete-user-modal-msg').textContent = `Are you sure you want to delete ${firstName}?`;
           backdrop.classList.add('open');
         });
+
+        if (statsAction) {
+          const statsBtn = statsAction.querySelector('.stats-user-btn');
+          const statsIconHtml = statsBtn.innerHTML;
+          let statsLoading = false;
+          statsAction.addEventListener('click', async () => {
+            if (statsLoading) return;
+            statsLoading = true;
+            statsBtn.innerHTML = '<span class="btn-spinner"></span>';
+            try {
+              const targetUserId = wrapper.dataset.userId;
+              const [statsRes, gamesRes] = await Promise.all([
+                fetch(`/api/stats?userId=${encodeURIComponent(targetUserId)}`),
+                fetch(`/api/games?userId=${encodeURIComponent(targetUserId)}`),
+              ]);
+              if (!statsRes.ok || !gamesRes.ok) throw new Error('user stats fetch failed');
+              const stats = await statsRes.json();
+              const games = await gamesRes.json();
+              populateUserStatsModal({
+                user: {
+                  id: targetUserId,
+                  display_name: wrapper.dataset.displayName,
+                  avatar_url: wrapper.dataset.avatarUrl,
+                },
+                games: Array.isArray(games) ? games : [],
+                stats,
+                selfView: false,
+              });
+            } catch (err) {
+              console.error('User stats error:', err);
+            } finally {
+              statsBtn.innerHTML = statsIconHtml;
+              statsLoading = false;
+            }
+          });
+        }
       });
     }
 
