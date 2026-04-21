@@ -132,6 +132,7 @@ const tests = [
   { correct: 'Edgar Allan Poe',          user: 'Poe',                 expect: true,  note: '3-word name — Edgar Allan Poe → Poe' },
   { correct: 'John Wilkes Booth',        user: 'Booth',               expect: true,  note: '3-word name — John Wilkes Booth → Booth' },
   { correct: 'Ralph Waldo Emerson',      user: 'Emerson',             expect: true,  note: '3-word name — Ralph Waldo Emerson → Emerson' },
+  { correct: 'Ebenezer Scrooge',         user: 'Scrooge',             expect: true,  note: 'last-name — Ebenezer is a known first name' },
   { correct: 'Henry Wadsworth Longfellow', user: 'Longfellow',        expect: true,  note: '3-word name — Henry Wadsworth Longfellow → Longfellow' },
   { correct: 'Mary Tyler Moore',         user: 'Moore',               expect: true,  note: '3-word name — Mary Tyler Moore → Moore' },
 
