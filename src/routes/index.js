@@ -614,6 +614,15 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
     }
   }
 
+  // User supplied a title the correct answer doesn't have:
+  // "Sir Arthur Conan Doyle" → "Arthur Conan Doyle".
+  {
+    const userWithoutTitle = stripTitlePrefix(userAnswer);
+    if (userWithoutTitle !== null && userWithoutTitle !== userAnswer) {
+      if (isAnswerCorrect(userWithoutTitle, correctAnswer, questionText)) return true;
+    }
+  }
+
   return false;
 }
 
