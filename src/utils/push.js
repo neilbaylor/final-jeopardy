@@ -20,10 +20,8 @@ async function sendPush(userId, payload, db) {
   try {
     const [[row]] = await db.query('SELECT subscription FROM push_subscriptions WHERE user_id = ?', [userId]);
     if (!row) { console.log(`[push] no subscription for user ${userId}`); return; }
-    console.log(`[push] sending to user ${userId}`);
     const sub = typeof row.subscription === 'string' ? JSON.parse(row.subscription) : row.subscription;
     await webpush.sendNotification(sub, JSON.stringify(payload));
-    console.log(`[push] sent ok to user ${userId}`);
   } catch (err) {
     console.error(`[push] failed for user ${userId}:`, err.statusCode, err.message);
     if (err.statusCode === 410 || err.statusCode === 404) {
