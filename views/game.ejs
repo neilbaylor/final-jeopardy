@@ -1515,6 +1515,31 @@
         applyShift();
       };
       const onVVResize = () => { applyVVShift(); };
+
+      // Focus fallback: iOS sometimes skips the visualViewport resize event
+      // entirely. 500ms after focus, if no shift has been applied, measure the
+      // input's current bottom against its resting position and shift manually.
+      let fallbackTimerId = null;
+      const startFallbackTimer = () => {
+        clearTimeout(fallbackTimerId);
+        fallbackTimerId = setTimeout(() => {
+          if (kbOffset > 0 || document.activeElement !== answerInput) return;
+          if (baseInputBottom <= 0) return;
+          const inputBottom = answerInput.getBoundingClientRect().bottom;
+          const newOffset = Math.max(0, baseInputBottom - inputBottom);
+          if (newOffset > 0) {
+            kbOffset = newOffset;
+            applyShift();
+          }
+        }, 500);
+      };
+      const cancelFallbackTimer = () => {
+        clearTimeout(fallbackTimerId);
+        fallbackTimerId = null;
+      };
+      answerInput.addEventListener('focus', startFallbackTimer);
+      answerInput.addEventListener('blur', cancelFallbackTimer);
+
       window._vvStart = () => {
         kbOffset = 0;
         baseVVHeight = window.visualViewport.height;
