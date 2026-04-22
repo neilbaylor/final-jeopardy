@@ -986,7 +986,7 @@
           const y = d.getFullYear();
           return (y >= 1900 && y <= 2100) ? y : null;
         })();
-        const categoryHasYear = /\b(19|20)\d{2}\b/.test(category);
+        const categoryHasYear = /\b\d{4}s?\b/.test(category);
         const categoryDisplay = origYear && !categoryHasYear ? `${category} (${origYear})` : category;
         currentCategory      = categoryDisplay;
         if (currentOriginallyAsked) {
