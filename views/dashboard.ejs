@@ -1342,7 +1342,7 @@
       position: absolute;
       right: 0;
       top: 0;
-      height: 54px;
+      height: 100%;
       width: 55px;
       display: flex;
       align-items: center;
@@ -1368,7 +1368,7 @@
       position: absolute;
       right: 55px;
       top: 0;
-      height: 54px;
+      height: 100%;
       width: 55px;
       display: flex;
       align-items: center;
@@ -1914,7 +1914,8 @@
       const weekTotal   = stats.total_questions_week || 0;
       const weekCorrect = stats.correct_answers_week || 0;
       const weekPct     = weekTotal > 0 ? Math.round((weekCorrect / weekTotal) * 100) : 0;
-      const weekRow     = weekTotal > 0
+      const sameAsOverall = weekTotal === total && weekCorrect === correct;
+      const weekRow     = (weekTotal > 0 && !sameAsOverall)
         ? `<div class="stats-streak-row">Past Week: <strong>${weekCorrect} / ${weekTotal} (${weekPct}%)</strong></div>`
         : '';
       streaksEl.innerHTML = [
