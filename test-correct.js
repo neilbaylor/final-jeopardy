@@ -583,6 +583,47 @@ const tests = [
   { correct: '42',     user: '42',     expect: true,  note: 'numeric: exact small number match' },
   { correct: '42',     user: '43',     expect: false, note: 'numeric: adjacent small number rejected' },
   { correct: '100',    user: '1000',   expect: false, note: 'numeric: different magnitude rejected' },
+
+  // ── Institution shorthand (university/college/school/academy/institute) ──────
+  { correct: 'University of Oregon',        user: 'Oregon',                expect: true,  note: 'institution: University of X → X' },
+  { correct: 'Oregon University',           user: 'Oregon',                expect: true,  note: 'institution: X University → X' },
+  { correct: 'Oregon College',              user: 'Oregon',                expect: true,  note: 'institution: X College → X' },
+  { correct: 'College of Oregon',           user: 'Oregon',                expect: true,  note: 'institution: College of X → X' },
+  { correct: 'Stanford University',         user: 'Stanford',              expect: true,  note: 'institution: Stanford University → Stanford' },
+  { correct: 'Harvard University',          user: 'Harvard',               expect: true,  note: 'institution: Harvard University → Harvard' },
+  { correct: 'Yale University',             user: 'Yale',                  expect: true,  note: 'institution: Yale University → Yale' },
+  { correct: 'University of California',    user: 'California',            expect: true,  note: 'institution: UC → California' },
+  { correct: 'Ohio State University',       user: 'Ohio State',            expect: true,  note: 'institution: multi-word core OSU' },
+  { correct: 'Juilliard School',            user: 'Juilliard',             expect: true,  note: 'institution: X School → X' },
+  { correct: 'School of Hard Knocks',       user: 'Hard Knocks',           expect: true,  note: 'institution: School of X → X' },
+  { correct: 'Naval Academy',               user: 'Naval',                 expect: true,  note: 'institution: X Academy → X' },
+  { correct: 'West Point Academy',          user: 'West Point',            expect: true,  note: 'institution: X Academy → multi-word X' },
+  { correct: 'Institute of Technology',     user: 'Technology',            expect: true,  note: 'institution: Institute of X → X' },
+  { correct: 'Massachusetts Institute of Technology', user: 'Massachusetts Technology', expect: true, note: 'institution: MIT long form core' },
+  { correct: 'Stanford University',         user: 'stanford',              expect: true,  note: 'institution: lowercase' },
+  { correct: 'Stanford University',         user: 'Stamford',              expect: true,  note: 'institution: typo via JW' },
+  // Negatives — wrong school / insufficient word
+  { correct: 'Stanford University',         user: 'Yale',                  expect: false, note: 'institution: wrong school rejected' },
+  { correct: 'Oregon University',           user: 'California',            expect: false, note: 'institution: wrong state rejected' },
+  { correct: 'Harvard University',          user: 'Howard',                expect: false, note: 'institution: Howard rejected for Harvard (JW close)' },
+
+  // ── Institution shorthand inside multi-part answers ──────────────────────────
+  { correct: 'University of Oregon & Stanford University', user: 'Stanford and Oregon',       expect: true, note: 'multi-part institutions: shorthand both, swapped' },
+  { correct: 'University of Oregon & Stanford University', user: 'Oregon and Stanford',       expect: true, note: 'multi-part institutions: shorthand both, in order' },
+  { correct: 'University of Oregon & Stanford University', user: 'Oregon & Stanford',         expect: true, note: 'multi-part institutions: & connector' },
+  { correct: 'University of Oregon & Stanford University', user: 'Oregon, Stanford',          expect: true, note: 'multi-part institutions: comma connector' },
+  { correct: 'University of Oregon & Stanford University', user: 'Stanford University and University of Oregon', expect: true, note: 'multi-part institutions: full forms swapped' },
+  { correct: 'University of Oregon and Stanford University', user: 'Stanford and Oregon',     expect: true, note: 'multi-part institutions: and-joined DB' },
+  { correct: 'Harvard University and Yale University',    user: 'Harvard and Yale',           expect: true, note: 'multi-part institutions: two universities' },
+  { correct: 'Oregon College & Stanford University',      user: 'Oregon and Stanford',        expect: true, note: 'multi-part institutions: mixed types' },
+  // Multi-part negatives
+  { correct: 'University of Oregon & Stanford University', user: 'Oregon',                    expect: false, note: 'multi-part institutions: only 1 of 2 rejected' },
+  { correct: 'University of Oregon & Stanford University', user: 'Oregon and Yale',           expect: false, note: 'multi-part institutions: 1 right 1 wrong' },
+  { correct: 'University of Oregon & Stanford University', user: 'Yale and Harvard',          expect: false, note: 'multi-part institutions: both wrong' },
+
+  // ── Non-institution answers unaffected ───────────────────────────────────────
+  { correct: 'Abraham Lincoln',             user: 'Lincoln',               expect: true,  note: 'institution: non-institution still works (Lincoln)' },
+  { correct: 'Ebenezer Scrooge',            user: 'Scrooge',               expect: true,  note: 'institution: non-institution still works (Scrooge)' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

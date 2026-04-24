@@ -218,6 +218,26 @@ function extractCompoundSurname(name) {
   return words.slice(1).join(' ');
 }
 
+// Institution words that can be stripped from a name to get its core.
+// e.g. "University of Oregon" → "Oregon"; "Stanford University" → "Stanford".
+const INSTITUTION_WORDS = new Set([
+  'university', 'college', 'school', 'academy', 'institute',
+]);
+const INSTITUTION_FILLERS = new Set(['of', 'at', 'the']);
+
+function extractInstitutionCore(name) {
+  // Skip multi-part answers; those are handled by the multi-part path, which
+  // calls this per-part via matchesPart.
+  if (/[&,]|\band\b|\bor\b/i.test(name)) return null;
+  const words = name.trim().split(/\s+/);
+  if (words.length < 2) return null;
+  const lower = words.map(w => w.toLowerCase());
+  if (!lower.some(w => INSTITUTION_WORDS.has(w))) return null;
+  const core = words.filter((_, i) => !INSTITUTION_WORDS.has(lower[i]) && !INSTITUTION_FILLERS.has(lower[i]));
+  if (core.length === 0) return null;
+  return core.join(' ');
+}
+
 // Compare a normalized user part against a correct part (also normalized).
 // Also accepts just the last name when correctPartOrig is a "FirstName LastName",
 // and the compound surname (or bare surname) for "FirstName [particle] Surname" names.
@@ -240,6 +260,14 @@ function matchesPart(userNorm, correctNorm, correctPartOrig) {
     const finalNorm = normalizeAnswer(cs.split(/\s+/).pop());
     if (userNorm === finalNorm) return true;
     if (natural.JaroWinklerDistance(userNorm, finalNorm) >= 0.88) return true;
+  }
+  // Institution shorthand: "Stanford University" → accept "Stanford";
+  // "University of Oregon" → accept "Oregon".
+  const inst = extractInstitutionCore(correctPartOrig);
+  if (inst !== null) {
+    const instNorm = normalizeAnswer(inst);
+    if (userNorm === instNorm) return true;
+    if (natural.JaroWinklerDistance(userNorm, instNorm) >= 0.88) return true;
   }
   return false;
 }
@@ -646,6 +674,17 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
           }
         }
       }
+    }
+  }
+
+  // Institution shorthand: "University of Oregon" → accept "Oregon";
+  // "Stanford University" → accept "Stanford"; "Oregon College" → "Oregon".
+  {
+    const core = extractInstitutionCore(correctAnswer);
+    if (core !== null) {
+      const coreNorm = normalizeAnswer(core);
+      if (a === coreNorm) return true;
+      if (natural.JaroWinklerDistance(a, coreNorm) >= 0.88) return true;
     }
   }
 
