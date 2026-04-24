@@ -1498,16 +1498,15 @@
         // iOS occasionally reports a bogus tiny visualViewport.height during focus
         // transitions, which would compute a huge shift. Guard against it.
         const isBogusVV = vvH < 200 || vvH < baseVVHeight * 0.5;
-        const viewportDiff = isBogusVV ? 0 : Math.max(0, baseVVHeight - vvH);
-        const innerHeightDiff = baseInnerHeight > 0
-          ? Math.max(0, baseInnerHeight - window.innerHeight)
-          : 0;
-        const inputDiff = baseInputBottom > 0
-          ? Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom)
-          : 0;
-        // Prefer VV diff; if VV didn't budge (or was bogus), try innerHeight
-        // delta; if that's also 0, fall back to the input-rect delta.
-        const newOffset = viewportDiff || innerHeightDiff || inputDiff;
+        let newOffset = isBogusVV ? 0 : Math.max(0, baseVVHeight - vvH);
+        // If VV didn't budge (or was bogus), try innerHeight delta; then
+        // input-rect delta as a last resort.
+        if (newOffset === 0 && baseInnerHeight > 0) {
+          newOffset = Math.max(0, baseInnerHeight - window.innerHeight);
+        }
+        if (newOffset === 0 && baseInputBottom > 0) {
+          newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
+        }
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         applyShift();
@@ -1523,13 +1522,12 @@
         clearTimeout(fallbackTimerId);
         fallbackTimerId = setTimeout(() => {
           if (kbOffset > 0 || document.activeElement !== answerInput) return;
-          const innerHeightDiff = baseInnerHeight > 0
+          let newOffset = baseInnerHeight > 0
             ? Math.max(0, baseInnerHeight - window.innerHeight)
             : 0;
-          const inputDiff = baseInputBottom > 0
-            ? Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom)
-            : 0;
-          const newOffset = innerHeightDiff || inputDiff;
+          if (newOffset === 0 && baseInputBottom > 0) {
+            newOffset = Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom);
+          }
           if (newOffset > 0) {
             kbOffset = newOffset;
             applyShift();
