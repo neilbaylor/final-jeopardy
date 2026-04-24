@@ -1495,19 +1495,19 @@
       };
       const applyVVShift = () => {
         const vvH = window.visualViewport.height;
-        let newOffset;
         // iOS occasionally reports a bogus tiny visualViewport.height during focus
-        // transitions, which would compute a huge shift. Also innerHeight is
-        // unreliable (shrinks with the keyboard in standalone). Fall back to
-        // how far iOS moved the input in viewport coordinates vs. its resting
-        // position (captured in _vvStart by backing out the initial 140% slide-in).
-        if (vvH < 200 || vvH < baseVVHeight * 0.5) {
-          newOffset = baseInnerHeight > 0
-            ? Math.max(0, baseInnerHeight - window.innerHeight)
-            : 0;
-        } else {
-          newOffset = Math.max(0, baseVVHeight - vvH);
-        }
+        // transitions, which would compute a huge shift. Guard against it.
+        const isBogusVV = vvH < 200 || vvH < baseVVHeight * 0.5;
+        const viewportDiff = isBogusVV ? 0 : Math.max(0, baseVVHeight - vvH);
+        const innerHeightDiff = baseInnerHeight > 0
+          ? Math.max(0, baseInnerHeight - window.innerHeight)
+          : 0;
+        const inputDiff = baseInputBottom > 0
+          ? Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom)
+          : 0;
+        // Prefer VV diff; if VV didn't budge (or was bogus), try innerHeight
+        // delta; if that's also 0, fall back to the input-rect delta.
+        const newOffset = viewportDiff || innerHeightDiff || inputDiff;
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         applyShift();
@@ -1515,16 +1515,21 @@
       const onVVResize = () => { applyVVShift(); };
 
       // Focus fallback: iOS sometimes skips the visualViewport resize event
-      // entirely. 500ms after focus, if no shift has been applied, derive the
-      // offset from the innerHeight delta (innerHeight shrinks with the keyboard
-      // in standalone) and shift manually.
+      // entirely. 500ms after focus, if no shift has been applied, try the
+      // innerHeight delta (innerHeight shrinks with the keyboard in standalone);
+      // if that's 0, fall back to the input-rect delta.
       let fallbackTimerId = null;
       const startFallbackTimer = () => {
         clearTimeout(fallbackTimerId);
         fallbackTimerId = setTimeout(() => {
           if (kbOffset > 0 || document.activeElement !== answerInput) return;
-          if (baseInnerHeight <= 0) return;
-          const newOffset = Math.max(0, baseInnerHeight - window.innerHeight);
+          const innerHeightDiff = baseInnerHeight > 0
+            ? Math.max(0, baseInnerHeight - window.innerHeight)
+            : 0;
+          const inputDiff = baseInputBottom > 0
+            ? Math.max(0, baseInputBottom - answerInput.getBoundingClientRect().bottom)
+            : 0;
+          const newOffset = innerHeightDiff || inputDiff;
           if (newOffset > 0) {
             kbOffset = newOffset;
             applyShift();
