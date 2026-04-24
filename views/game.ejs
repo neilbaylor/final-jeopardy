@@ -1452,6 +1452,7 @@
 
     if (/iP(hone|ad|od)/.test(navigator.userAgent) && window.visualViewport) {
       let baseVVHeight = 0;
+      let baseInnerHeight = 0;
       let baseInputBottom = 0;
       let kbOffset = 0;
 
@@ -1501,12 +1502,9 @@
         // how far iOS moved the input in viewport coordinates vs. its resting
         // position (captured in _vvStart by backing out the initial 140% slide-in).
         if (vvH < 200 || vvH < baseVVHeight * 0.5) {
-          if (baseInputBottom > 0) {
-            const inputBottom = answerInput.getBoundingClientRect().bottom;
-            newOffset = Math.max(0, baseInputBottom - inputBottom);
-          } else {
-            newOffset = 0;
-          }
+          newOffset = baseInnerHeight > 0
+            ? Math.max(0, baseInnerHeight - window.innerHeight)
+            : 0;
         } else {
           newOffset = Math.max(0, baseVVHeight - vvH);
         }
@@ -1517,16 +1515,16 @@
       const onVVResize = () => { applyVVShift(); };
 
       // Focus fallback: iOS sometimes skips the visualViewport resize event
-      // entirely. 500ms after focus, if no shift has been applied, measure the
-      // input's current bottom against its resting position and shift manually.
+      // entirely. 500ms after focus, if no shift has been applied, derive the
+      // offset from the innerHeight delta (innerHeight shrinks with the keyboard
+      // in standalone) and shift manually.
       let fallbackTimerId = null;
       const startFallbackTimer = () => {
         clearTimeout(fallbackTimerId);
         fallbackTimerId = setTimeout(() => {
           if (kbOffset > 0 || document.activeElement !== answerInput) return;
-          if (baseInputBottom <= 0) return;
-          const inputBottom = answerInput.getBoundingClientRect().bottom;
-          const newOffset = Math.max(0, baseInputBottom - inputBottom);
+          if (baseInnerHeight <= 0) return;
+          const newOffset = Math.max(0, baseInnerHeight - window.innerHeight);
           if (newOffset > 0) {
             kbOffset = newOffset;
             applyShift();
@@ -1543,6 +1541,7 @@
       window._vvStart = () => {
         kbOffset = 0;
         baseVVHeight = window.visualViewport.height;
+        baseInnerHeight = window.innerHeight;
         // Input is mid slide-in (translateY(140%)). Back that out to get the
         // resting viewport-bottom we'll compare against once iOS moves things.
         const rect = answerInputWrap.getBoundingClientRect();
@@ -1557,6 +1556,7 @@
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
           baseInputBottom = 0;
+          baseInnerHeight = 0;
         }, 1000);
       };
     }
