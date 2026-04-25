@@ -643,6 +643,38 @@ const tests = [
   // Sanity: different last name should still reject
   { correct: 'Caitlin Clark',  user: 'Kaitlyn Smith',  expect: false, note: 'first-name variant: wrong last name rejected' },
   { correct: 'Caitlin Clark',  user: 'Katelyn',        expect: false, note: 'first-name variant: only first name rejected' },
+
+  // ── Other first-name spelling variants ───────────────────────────────────────
+  { correct: 'Eric Cartman',     user: 'Erik Cartman',     expect: true,  note: 'first-name variant: Erik for Eric' },
+  { correct: 'Eric Cartman',     user: 'Erick Cartman',    expect: true,  note: 'first-name variant: Erick for Eric' },
+  { correct: 'Sean Connery',     user: 'Shawn Connery',    expect: true,  note: 'first-name variant: Shawn for Sean' },
+  { correct: 'Sean Connery',     user: 'Shaun Connery',    expect: true,  note: 'first-name variant: Shaun for Sean' },
+  { correct: 'Michael Jordan',   user: 'Micheal Jordan',   expect: true,  note: 'first-name variant: Micheal for Michael' },
+  { correct: 'Allen Iverson',    user: 'Alan Iverson',     expect: true,  note: 'first-name variant: Alan for Allen' },
+  { correct: 'Allen Iverson',    user: 'Allan Iverson',    expect: true,  note: 'first-name variant: Allan for Allen' },
+  { correct: 'Brittany Spears',  user: 'Britney Spears',   expect: true,  note: 'first-name variant: Britney for Brittany' },
+  { correct: 'Megan Rapinoe',    user: 'Meghan Rapinoe',   expect: true,  note: 'first-name variant: Meghan for Megan' },
+  { correct: 'Hannah Storm',     user: 'Hanna Storm',      expect: true,  note: 'first-name variant: Hanna for Hannah' },
+  { correct: 'Rachel Green',     user: 'Rachael Green',    expect: true,  note: 'first-name variant: Rachael for Rachel' },
+  { correct: 'Rebecca Black',    user: 'Rebekah Black',    expect: true,  note: 'first-name variant: Rebekah for Rebecca' },
+  { correct: 'Crystal Smith',    user: 'Krystal Smith',    expect: true,  note: 'first-name variant: Krystal for Crystal' },
+  { correct: 'Jacob Black',      user: 'Jakob Black',      expect: true,  note: 'first-name variant: Jakob for Jacob' },
+  { correct: 'Joseph Stalin',    user: 'Josef Stalin',     expect: true,  note: 'first-name variant: Josef for Joseph' },
+  { correct: 'Stephen Hawking',  user: 'Stephan Hawking',  expect: true,  note: 'first-name variant: Stephan for Stephen' },
+  { correct: 'Stephanie Powers', user: 'Stefanie Powers',  expect: true,  note: 'first-name variant: Stefanie for Stephanie' },
+  { correct: 'Lindsay Lohan',    user: 'Lindsey Lohan',    expect: true,  note: 'first-name variant: Lindsey for Lindsay' },
+  { correct: 'Hailey Bieber',    user: 'Haley Bieber',     expect: true,  note: 'first-name variant: Haley for Hailey' },
+  { correct: 'Hailey Bieber',    user: 'Hayley Bieber',    expect: true,  note: 'first-name variant: Hayley for Hailey' },
+  { correct: 'Michelle Obama',   user: 'Michele Obama',    expect: true,  note: 'first-name variant: Michele for Michelle' },
+  { correct: 'Catherine Smith',  user: 'Katharine Smith',  expect: true,  note: 'first-name variant: Katharine for Catherine' },
+  { correct: 'Nicholas Cage',    user: 'Nicolas Cage',     expect: true,  note: 'first-name variant: Nicolas for Nicholas' },
+  { correct: 'Thomas Edison',    user: 'Tomas Edison',     expect: true,  note: 'first-name variant: Tomas for Thomas' },
+  { correct: 'Zachary Taylor',   user: 'Zackary Taylor',   expect: true,  note: 'first-name variant: Zackary for Zachary' },
+  { correct: 'Derek Jeter',      user: 'Derrick Jeter',    expect: true,  note: 'first-name variant: Derrick for Derek' },
+  { correct: 'Dylan Thomas',     user: 'Dillon Thomas',    expect: true,  note: 'first-name variant: Dillon for Dylan' },
+  // Sanity rejects
+  { correct: 'Eric Cartman',     user: 'Erik Smith',       expect: false, note: 'first-name variant: variant + wrong last name rejected' },
+  { correct: 'Sean Connery',     user: 'Shawn',            expect: false, note: 'first-name variant: variant first name alone rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
