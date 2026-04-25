@@ -126,7 +126,7 @@ const COMMON_FIRST_NAMES = new Set([
   'allison','alma','alyssa','amanda','amber','amelia','amy','ana','andrea','angela','anita',
   'ann','anna','anne','annie','april','ashley','audrey','aurora','ava',
   'barbara','beatrice','becky','bernadette','bernice','beth','betty','beverly','bonnie','brenda','brittany',
-  'brooke','caitlin','camille','candice','carol','carolyn','carrie','cassandra','catherine','cecilia',
+  'brooke','caitlin','caitlyn','kaitlin','kaitlyn','katelyn','katelynn','camille','candice','carol','carolyn','carrie','cassandra','catherine','cathryn','cecilia',
   'charlene','charlotte','cheryl','chloe','christal','christina','christine','cindy','claire',
   'claudia','colleen','connie','constance','courtney','crystal','cynthia',
   'daisy','danielle','dawn','deanna','deborah','debra','denise','diana','diane','dolores','donna','doris','dorothy',

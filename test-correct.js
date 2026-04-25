@@ -624,6 +624,25 @@ const tests = [
   // ── Non-institution answers unaffected ───────────────────────────────────────
   { correct: 'Abraham Lincoln',             user: 'Lincoln',               expect: true,  note: 'institution: non-institution still works (Lincoln)' },
   { correct: 'Ebenezer Scrooge',            user: 'Scrooge',               expect: true,  note: 'institution: non-institution still works (Scrooge)' },
+
+  // ── First-name spelling variants (Caitlin/Kaitlin/Kaitlyn/Katelyn/etc.) ──────
+  { correct: 'Caitlin Clark',  user: 'Caitlin Clark',  expect: true,  note: 'first-name variant: exact' },
+  { correct: 'Caitlin Clark',  user: 'Clark',          expect: true,  note: 'first-name variant: bare last name' },
+  { correct: 'Caitlin Clark',  user: 'Kaitlin Clark',  expect: true,  note: 'first-name variant: Kaitlin spelling' },
+  { correct: 'Caitlin Clark',  user: 'Kaitlyn Clark',  expect: true,  note: 'first-name variant: Kaitlyn spelling' },
+  { correct: 'Caitlin Clark',  user: 'Katelyn Clark',  expect: true,  note: 'first-name variant: Katelyn spelling' },
+  { correct: 'Caitlin Clark',  user: 'Caitlyn Clark',  expect: true,  note: 'first-name variant: Caitlyn spelling' },
+  { correct: 'Caitlin Clark',  user: 'Katelynn Clark', expect: true,  note: 'first-name variant: Katelynn spelling' },
+  { correct: 'Caitlin Clark',  user: 'kaitlyn clark',  expect: true,  note: 'first-name variant: lowercase' },
+  // Reverse — DB has the variant, user has the canonical
+  { correct: 'Kaitlyn Clark',  user: 'Caitlin Clark',  expect: true,  note: 'first-name variant: reverse direction' },
+  { correct: 'Katelyn Clark',  user: 'Clark',          expect: true,  note: 'first-name variant: variant DB → bare last name' },
+  // Catherine/Cathryn — both canonical now
+  { correct: 'Catherine Smith', user: 'Cathryn Smith', expect: true,  note: 'first-name variant: Cathryn for Catherine' },
+  { correct: 'Cathryn Smith',   user: 'Smith',         expect: true,  note: 'first-name variant: Cathryn DB recognized' },
+  // Sanity: different last name should still reject
+  { correct: 'Caitlin Clark',  user: 'Kaitlyn Smith',  expect: false, note: 'first-name variant: wrong last name rejected' },
+  { correct: 'Caitlin Clark',  user: 'Katelyn',        expect: false, note: 'first-name variant: only first name rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
