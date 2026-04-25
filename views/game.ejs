@@ -1559,18 +1559,25 @@
 
       window._vvStart = () => {
         kbOffset = 0;
-        baseVVHeight = window.visualViewport.height;
-        baseInnerHeight = window.innerHeight;
-        // Input is mid slide-in (translateY(140%)). Back that out to get the
-        // resting viewport-bottom we'll compare against once iOS moves things.
-        const rect = answerInputWrap.getBoundingClientRect();
-        baseInputBottom = rect.bottom - rect.height * 1.4;
-        window.visualViewport.removeEventListener('resize', onVVResize);
-        window.visualViewport.addEventListener('resize', onVVResize);
+        // Defer one frame so layout has a chance to settle (insets, chrome,
+        // slide-in transform) before we capture baselines.
+        requestAnimationFrame(() => {
+          baseVVHeight = window.visualViewport.height;
+          baseInnerHeight = window.innerHeight;
+          // Input is mid slide-in (translateY(140%)). Back that out to get the
+          // resting viewport-bottom we'll compare against once iOS moves things.
+          const rect = answerInputWrap.getBoundingClientRect();
+          baseInputBottom = rect.bottom - rect.height * 1.4;
+          window.visualViewport.removeEventListener('resize', onVVResize);
+          window.visualViewport.removeEventListener('scroll', onVVResize);
+          window.visualViewport.addEventListener('resize', onVVResize);
+          window.visualViewport.addEventListener('scroll', onVVResize);
+        });
       };
       window._vvStop = () => {
         setTimeout(() => {
           window.visualViewport.removeEventListener('resize', onVVResize);
+          window.visualViewport.removeEventListener('scroll', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
