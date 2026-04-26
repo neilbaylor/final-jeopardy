@@ -1516,9 +1516,6 @@
             newOffset = Math.max(0, baseInnerHeight - innerH);
           }
         }
-        // If iOS already shifted the visual viewport down (rare in standalone,
-        // common in regular Safari), back that out so we don't double-shift.
-        newOffset = Math.max(0, newOffset - window.visualViewport.offsetTop);
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         applyShift();
@@ -1547,7 +1544,6 @@
               newOffset = Math.max(0, baseInnerHeight - innerH);
             }
           }
-          newOffset = Math.max(0, newOffset - window.visualViewport.offsetTop);
           if (newOffset > 0) {
             kbOffset = newOffset;
             applyShift();
