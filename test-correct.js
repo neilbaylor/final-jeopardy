@@ -694,6 +694,13 @@ const tests = [
   { correct: 'Department of Homeland Security',     user: 'Department',            expect: false, note: 'department: just "Department" rejected' },
   { correct: 'Department of Homeland Security',     user: 'Justice',               expect: false, note: 'department: wrong department rejected' },
   { correct: 'Department of State',                 user: 'Defense',               expect: false, note: 'department: wrong word rejected' },
+
+  // ── Nickname ↔ formal name (Teddy ↔ Theodore) ────────────────────────────────
+  { correct: 'Theodore Roosevelt', user: 'Teddy Roosevelt',     expect: true,  note: 'nickname: Teddy accepted for Theodore DB' },
+  { correct: 'Teddy Roosevelt',    user: 'Theodore Roosevelt',  expect: true,  note: 'nickname: Theodore accepted for Teddy DB' },
+  { correct: 'Teddy Roosevelt',    user: 'Roosevelt',           expect: true,  note: 'nickname: Teddy DB still accepts bare last name' },
+  { correct: 'Teddy Roosevelt',    user: 'Tyler Roosevelt',     expect: true,  note: 'nickname: Teddy DB accepts any first + Roosevelt' },
+  { correct: 'Teddy Roosevelt',    user: 'Teddy Smith',         expect: false, note: 'nickname: Teddy DB rejects wrong last name' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

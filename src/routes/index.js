@@ -98,7 +98,7 @@ const COMMON_FIRST_NAMES = new Set([
   'ralph','ray','raymond','reginald','richard','rick','robert','robin','roger','roland','ronald',
   'ross','roy','ruben','russell','ryan',
   'sam','samuel','scott','sean','shawn','shaun','seth','simon','stanley','stephen','stephan','steve','steven','stuart',
-  'ted','terry','theodore','thomas','tomas','timothy','tom','tony','travis','trevor','troy','tyler',
+  'ted','teddy','terry','theodore','thomas','tomas','timothy','tom','tony','travis','trevor','troy','tyler',
   'victor','vincent','wade','walter','warren','wayne','wesley','william','winston','wyatt',
   'zachary','zackary','zach',
   // Male — French
