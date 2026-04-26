@@ -219,9 +219,11 @@ function extractCompoundSurname(name) {
 }
 
 // Institution words that can be stripped from a name to get its core.
-// e.g. "University of Oregon" → "Oregon"; "Stanford University" → "Stanford".
+// e.g. "University of Oregon" → "Oregon"; "Stanford University" → "Stanford";
+// "Department of Homeland Security" → "Homeland Security".
 const INSTITUTION_WORDS = new Set([
   'university', 'college', 'school', 'academy', 'institute',
+  'department', 'ministry',
 ]);
 const INSTITUTION_FILLERS = new Set(['of', 'at', 'the']);
 

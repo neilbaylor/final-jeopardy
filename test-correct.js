@@ -675,6 +675,25 @@ const tests = [
   // Sanity rejects
   { correct: 'Eric Cartman',     user: 'Erik Smith',       expect: false, note: 'first-name variant: variant + wrong last name rejected' },
   { correct: 'Sean Connery',     user: 'Shawn',            expect: false, note: 'first-name variant: variant first name alone rejected' },
+
+  // ── Government departments / ministries ──────────────────────────────────────
+  { correct: 'Department of Homeland Security',     user: 'Homeland Security',     expect: true,  note: 'department: Dept of X → X' },
+  { correct: 'Department of Homeland Security',     user: 'homeland security',     expect: true,  note: 'department: lowercase' },
+  { correct: 'The Department of Homeland Security', user: 'Homeland Security',     expect: true,  note: 'department: with leading "The"' },
+  { correct: 'Department of State',                 user: 'State',                 expect: true,  note: 'department: Dept of State' },
+  { correct: 'Department of Defense',               user: 'Defense',               expect: true,  note: 'department: Dept of Defense' },
+  { correct: 'Department of the Treasury',          user: 'Treasury',              expect: true,  note: 'department: Dept of the X' },
+  { correct: 'Department of Justice',               user: 'Justice',               expect: true,  note: 'department: Dept of Justice' },
+  { correct: 'Department of Education',             user: 'Education',             expect: true,  note: 'department: Dept of Education' },
+  { correct: 'Ministry of Defence',                 user: 'Defence',               expect: true,  note: 'department: Ministry of X' },
+  { correct: 'Ministry of Magic',                   user: 'Magic',                 expect: true,  note: 'department: fictional Ministry of X' },
+  // Multi-part
+  { correct: 'Department of State & Department of Defense', user: 'State and Defense', expect: true, note: 'department: multi-part shorthand' },
+  { correct: 'Department of State & Department of Defense', user: 'Defense and State', expect: true, note: 'department: multi-part swapped' },
+  // Negatives
+  { correct: 'Department of Homeland Security',     user: 'Department',            expect: false, note: 'department: just "Department" rejected' },
+  { correct: 'Department of Homeland Security',     user: 'Justice',               expect: false, note: 'department: wrong department rejected' },
+  { correct: 'Department of State',                 user: 'Defense',               expect: false, note: 'department: wrong word rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
