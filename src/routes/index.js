@@ -1163,10 +1163,17 @@ router.get('/api/games/:gameId/stats', async (req, res) => {
 // API: submit an answer for a game question
 router.post('/api/games/:gameId/answers', async (req, res) => {
   const gameId = Number(req.params.gameId);
-  const { playerId, questionId, answer } = req.body;
+  const { playerId, questionId, answer, kbDebug } = req.body;
 
   if (!playerId || !questionId || answer === undefined) {
     return res.status(400).json({ error: 'Missing required fields: playerId, questionId, answer' });
+  }
+
+  if (Array.isArray(kbDebug) && kbDebug.length) {
+    console.log(`[kbDebug] user=${playerId} game=${gameId} q=${questionId} answer=${JSON.stringify(answer)}`);
+    for (const entry of kbDebug) {
+      console.log(`[kbDebug]   ${JSON.stringify(entry)}`);
+    }
   }
 
   const conn = await db.getConnection();
