@@ -701,6 +701,17 @@ const tests = [
   { correct: 'Teddy Roosevelt',    user: 'Roosevelt',           expect: true,  note: 'nickname: Teddy DB still accepts bare last name' },
   { correct: 'Teddy Roosevelt',    user: 'Tyler Roosevelt',     expect: true,  note: 'nickname: Teddy DB accepts any first + Roosevelt' },
   { correct: 'Teddy Roosevelt',    user: 'Teddy Smith',         expect: false, note: 'nickname: Teddy DB rejects wrong last name' },
+
+  // ── Multi-part with no connectors, uniform word counts ──────────────────────
+  { correct: 'Condoleeza Rice & James Buchanan', user: 'Condoleeza Rice James Buchanan', expect: true,  note: 'multi-part: uniform 2-word parts, no connector' },
+  { correct: 'Condoleeza Rice & James Buchanan', user: 'condeleza rice james buchanan',   expect: true,  note: 'multi-part: typo via JW per part' },
+  { correct: 'Condoleeza Rice & James Buchanan', user: 'James Buchanan Condoleeza Rice',  expect: true,  note: 'multi-part: order swapped, no connector' },
+  { correct: 'Condoleeza Rice & James Buchanan', user: 'james buchanan condeleza rice',   expect: true,  note: 'multi-part: swapped + typo + lowercase' },
+  { correct: 'Neil Taylor & Joe Ross',           user: 'Neil Taylor Joe Ross',            expect: true,  note: 'multi-part: 2-word parts, no connector' },
+  { correct: 'Neil Taylor & Joe Ross',           user: 'Joe Ross Neil Taylor',            expect: true,  note: 'multi-part: 2-word parts, swapped order' },
+  // Negatives for new path
+  { correct: 'Condoleeza Rice & James Buchanan', user: 'Condoleeza Rice Yale Harvard',    expect: false, note: 'multi-part: half wrong rejected' },
+  { correct: 'Condoleeza Rice & James Buchanan', user: 'Condoleeza Rice James',           expect: false, note: 'multi-part: short by one word rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

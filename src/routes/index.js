@@ -474,6 +474,24 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
       const stripped = userAnswer.trim().split(/\s+/).filter(w => !/^(and|or)$/i.test(w));
       if (stripped.length === correctParts.length) userParts = stripped;
     }
+    // If user used no connectors and has exactly N×W words where each correct
+    // part has the same W words, group them in order. The greedy bipartite
+    // match below handles re-ordering.
+    // e.g. correct "Condoleeza Rice & James Buchanan" (2-word parts), user
+    // "condeleza rice james buchanan" → group ["condeleza rice","james buchanan"].
+    if (userParts.length !== correctParts.length) {
+      const userWords = userAnswer.trim().split(/\s+/).filter(w => !/^(and|or)$/i.test(w));
+      const correctWordCounts = correctParts.map(p => p.trim().split(/\s+/).length);
+      const W = correctWordCounts[0];
+      const allSame = W > 1 && correctWordCounts.every(c => c === W);
+      if (allSame && userWords.length === correctParts.length * W) {
+        const grouped = [];
+        for (let i = 0; i < correctParts.length; i++) {
+          grouped.push(userWords.slice(i * W, (i + 1) * W).join(' '));
+        }
+        userParts = grouped;
+      }
+    }
     if (userParts.length === correctParts.length) {
       const normUser = userParts.map(normalizeAnswer);
       const normCorrect = correctParts.map(normalizeAnswer);
