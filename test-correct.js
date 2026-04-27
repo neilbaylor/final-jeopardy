@@ -712,6 +712,13 @@ const tests = [
   // Negatives for new path
   { correct: 'Condoleeza Rice & James Buchanan', user: 'Condoleeza Rice Yale Harvard',    expect: false, note: 'multi-part: half wrong rejected' },
   { correct: 'Condoleeza Rice & James Buchanan', user: 'Condoleeza Rice James',           expect: false, note: 'multi-part: short by one word rejected' },
+
+  // ── Roald Dahl recognized as first name ──────────────────────────────────────
+  { correct: 'Roald Dahl', user: 'Dahl',           expect: true,  note: 'roald: bare last name accepted' },
+  { correct: 'Roald Dahl', user: 'Roald Dahl',     expect: true,  note: 'roald: full name accepted' },
+  { correct: 'Roald Dahl', user: 'roald dahl',     expect: true,  note: 'roald: lowercase' },
+  { correct: 'Roald Dahl', user: 'Tyler Dahl',     expect: true,  note: 'roald: any first + Dahl' },
+  { correct: 'Roald Dahl', user: 'Smith',          expect: false, note: 'roald: wrong last name rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
