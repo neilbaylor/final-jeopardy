@@ -1520,27 +1520,8 @@
         });
       };
       const applyVVShift = () => {
-        const vvH = window.visualViewport.height;
-        const isBogusVV = vvH < 200 || vvH < baseVVHeight * 0.5;
-        let newOffset = isBogusVV ? 0 : Math.max(0, baseVVHeight - vvH);
-        let path = isBogusVV ? 'bogusVV' : (newOffset > 0 ? 'vv' : 'vvZero');
-        let inputBottomRead = null;
-        if (newOffset === 0 && baseInputBottom > 0) {
-          const inputBottom = answerInput.getBoundingClientRect().bottom;
-          inputBottomRead = inputBottom;
-          if (inputBottom >= 50 && inputBottom >= baseInputBottom * 0.3) {
-            newOffset = Math.max(0, baseInputBottom - inputBottom);
-            if (newOffset > 0) path = 'input';
-          }
-        }
-        if (newOffset === 0 && baseInnerHeight > 0) {
-          const innerH = window.innerHeight;
-          if (innerH >= 200 && innerH >= baseInnerHeight * 0.5) {
-            newOffset = Math.max(0, baseInnerHeight - innerH);
-            if (newOffset > 0) path = 'innerH';
-          }
-        }
-        _kbDbg('applyVVShift', { newOffset, path, isBogusVV, inputBottomRead });
+        const newOffset = window.visualViewport.offsetTop;
+        _kbDbg('applyVVShift', { newOffset });
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         applyShift('vvShift');
@@ -1559,25 +1540,8 @@
             _kbDbg('focusFallback:skip', { reason: kbOffset > 0 ? 'kbOffset>0' : 'notFocused' });
             return;
           }
-          let newOffset = 0;
-          let path = 'none';
-          let inputBottomRead = null;
-          if (baseInputBottom > 0) {
-            const inputBottom = answerInput.getBoundingClientRect().bottom;
-            inputBottomRead = inputBottom;
-            if (inputBottom >= 50 && inputBottom >= baseInputBottom * 0.3) {
-              newOffset = Math.max(0, baseInputBottom - inputBottom);
-              if (newOffset > 0) path = 'input';
-            }
-          }
-          if (newOffset === 0 && baseInnerHeight > 0) {
-            const innerH = window.innerHeight;
-            if (innerH >= 200 && innerH >= baseInnerHeight * 0.5) {
-              newOffset = Math.max(0, baseInnerHeight - innerH);
-              if (newOffset > 0) path = 'innerH';
-            }
-          }
-          _kbDbg('focusFallback', { newOffset, path, inputBottomRead });
+          const newOffset = window.visualViewport.offsetTop;
+          _kbDbg('focusFallback', { newOffset });
           if (newOffset > 0) {
             kbOffset = newOffset;
             applyShift('focusFallback');
