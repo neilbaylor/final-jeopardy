@@ -21,6 +21,24 @@ function numToWords(n) {
   return String(n);
 }
 
+// "Year-style" reading of 4-digit numbers in 1100..2099: 1984 → "nineteen eighty four",
+// 1900 → "nineteen hundred", 1905 → "nineteen oh five". Returns the original string
+// if no in-range number found.
+function expandYearStyle(str) {
+  let modified = false;
+  const out = str.replace(/\b(\d{4})\b/g, (m, d) => {
+    const n = parseInt(d, 10);
+    if (n < 1100 || n > 2099) return m;
+    const high = Math.floor(n / 100);
+    const low = n % 100;
+    modified = true;
+    if (low === 0) return numToWords(high) + ' hundred';
+    if (low < 10) return numToWords(high) + ' oh ' + numToWords(low);
+    return numToWords(high) + ' ' + numToWords(low);
+  });
+  return modified ? out : null;
+}
+
 function stripOneOf(str) {
   return str.replace(/^\(\d+\s+of(?:\s+\d+)?\)\s*/i, '');
 }
@@ -62,7 +80,7 @@ function normalizeAnswer(str) {
     .replace(/\b(\d+)(?:st|nd|rd|th)\b/g, '$1') // strip ordinal suffixes: 8th → 8
     .replace(/\b(\d+)\b/g, (_, n) => numToWords(parseInt(n, 10))) // 7 → seven
     .replace(/['\u2018\u2019]/g, '') // strip apostrophes (ASCII + smart quotes)
-    .replace(/[a-z](?:[^a-z0-9\s][a-z])+[^a-z0-9\s]?/g, m => m.replace(/[^a-z0-9]/g, '')) // collapse single-letter runs separated by punctuation: e.t. → et, u.s.a. → usa, m*a*s*h → mash
+    .replace(/(?<![a-z])[a-z](?:[^a-z0-9\s][a-z])+[^a-z0-9\s]?(?![a-z])/g, m => m.replace(/[^a-z0-9]/g, '')) // collapse single-letter runs separated by punctuation: e.t. → et, u.s.a. → usa, m*a*s*h → mash
     .replace(/[^a-z0-9\s]/g, ' ') // non-alphanumeric → space
     .replace(/\b(the|a|an)\b/g, ' ')
     .replace(/\s+/g, ' ')
@@ -411,6 +429,19 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   const a = normalizeAnswer(userAnswer);
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;
+
+  // Year-style reading: "1984" ↔ "nineteen eighty four". Only triggers when at
+  // least one side contains a 4-digit number in 1100..2099. The default cardinal
+  // path ("two thousand one") still runs via normalizeAnswer above.
+  {
+    const userYear = expandYearStyle(userAnswer);
+    const correctYear = expandYearStyle(correctAnswer);
+    if (userYear !== null || correctYear !== null) {
+      const aY = userYear !== null ? normalizeAnswer(userYear) : a;
+      const bY = correctYear !== null ? normalizeAnswer(correctYear) : b;
+      if (aY === bY) return true;
+    }
+  }
 
   // Hoist multi-part detection so the JW guard below can use it.
   const splitConnectors = s => s.split(/\s*(?:\band\b|\bor\b|[&,])\s*/i).map(p => p.trim()).filter(Boolean);

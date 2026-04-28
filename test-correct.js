@@ -259,7 +259,7 @@ const tests = [
   { correct: '1st',                user: 'first',              expect: false, note: 'ordinal — ordinal stripped, word form does not match' },
   { correct: 'Apollo 100',         user: 'Apollo One Hundred', expect: true,  note: 'number norm — 100 = one hundred' },
   { correct: '1776',               user: 'One Thousand Seven Hundred Seventy Six', expect: true, note: 'number norm — full word form of 1776' },
-  { correct: '1776',               user: 'Seventeen Seventy Six', expect: false, note: 'number norm — spoken shorthand ≠ literal word form' },
+  { correct: '1776',               user: 'Seventeen Seventy Six', expect: true,  note: 'year-style: 1776 ↔ Seventeen Seventy Six' },
 
   // ── Apostrophe normalization ──────────────────────────────────────────────
   { correct: "Rock 'n' Roll",      user: "Rock n Roll",        expect: true,  note: "apostrophe — curly apostrophe stripped" },
@@ -719,6 +719,21 @@ const tests = [
   { correct: 'Roald Dahl', user: 'roald dahl',     expect: true,  note: 'roald: lowercase' },
   { correct: 'Roald Dahl', user: 'Tyler Dahl',     expect: true,  note: 'roald: any first + Dahl' },
   { correct: 'Roald Dahl', user: 'Smith',          expect: false, note: 'roald: wrong last name rejected' },
+
+  // ── Year-style number reading (1984 ↔ "Nineteen Eighty-Four") ───────────────
+  { correct: 'Nineteen Eighty-Four', user: '1984',                  expect: true,  note: 'year-style: digit → words' },
+  { correct: '1984',                 user: 'Nineteen Eighty-Four',  expect: true,  note: 'year-style: words → digit' },
+  { correct: '1984',                 user: 'nineteen eighty four',  expect: true,  note: 'year-style: spaces, lowercase' },
+  { correct: 'Nineteen Eighty-Four', user: 'nineteen eighty four',  expect: true,  note: 'year-style: hyphen vs space' },
+  { correct: 'Nineteen Hundred',     user: '1900',                  expect: true,  note: 'year-style: nineteen hundred' },
+  { correct: 'Nineteen Oh Five',     user: '1905',                  expect: true,  note: 'year-style: nineteen oh five' },
+  { correct: 'twenty twenty-three',  user: '2023',                  expect: true,  note: 'year-style: twenty twenty three' },
+  // Existing cardinal path still works
+  { correct: '2001 a space odyssey', user: 'two thousand and one a space odyssey', expect: true, note: 'cardinal: 2001 a space odyssey' },
+  { correct: '17 candles',           user: 'seventeen candles',     expect: true,  note: 'cardinal: small number' },
+  // Negative — different years rejected
+  { correct: 'Nineteen Eighty-Four', user: '1985',                  expect: false, note: 'year-style: different year rejected' },
+  { correct: '1984',                 user: 'Nineteen Eighty-Five',  expect: false, note: 'year-style: different word year rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
