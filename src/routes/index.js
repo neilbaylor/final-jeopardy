@@ -1328,6 +1328,22 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
   }
 });
 
+router.post('/api/dispute-answer', async (req, res) => {
+  const answerId = Number(req.body.answerId);
+  if (!answerId) return res.status(400).json({ error: 'Missing required field: answerId' });
+  try {
+    const [result] = await db.query(
+      'UPDATE game_answers SET is_disputed = TRUE WHERE id = ?',
+      [answerId]
+    );
+    if (result.affectedRows === 0) return res.status(404).json({ error: 'Answer not found' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Dispute answer error:', err);
+    res.status(500).json({ error: 'Failed to dispute answer' });
+  }
+});
+
 router.delete('/api/games/:gameId', async (req, res) => {
   const { gameId } = req.params;
   try {
