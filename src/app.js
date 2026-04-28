@@ -109,6 +109,7 @@ async function initDB() {
       user_id INT UNSIGNED NOT NULL,
       answer TEXT,
       is_correct BOOLEAN DEFAULT NULL,
+      is_disputed BOOLEAN NOT NULL DEFAULT FALSE,
       answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE KEY uq_game_answer (game_question_id, user_id),
       FOREIGN KEY (game_question_id) REFERENCES game_questions(id) ON DELETE CASCADE,
@@ -138,6 +139,12 @@ async function initDB() {
   const [cols] = await conn.query(`SHOW COLUMNS FROM questions LIKE 'originally_asked'`);
   if (cols.length === 0) {
     await conn.query(`ALTER TABLE questions ADD COLUMN originally_asked DATE NULL`);
+  }
+
+  // Add is_disputed column if not present (idempotent migration)
+  const [disputedCols] = await conn.query(`SHOW COLUMNS FROM game_answers LIKE 'is_disputed'`);
+  if (disputedCols.length === 0) {
+    await conn.query(`ALTER TABLE game_answers ADD COLUMN is_disputed BOOLEAN NOT NULL DEFAULT FALSE`);
   }
 
   // Idempotent index additions
