@@ -734,6 +734,16 @@ const tests = [
   // Negative — different years rejected
   { correct: 'Nineteen Eighty-Four', user: '1985',                  expect: false, note: 'year-style: different year rejected' },
   { correct: '1984',                 user: 'Nineteen Eighty-Five',  expect: false, note: 'year-style: different word year rejected' },
+
+  // ── Foreign leading articles ─────────────────────────────────────────────
+  { correct: 'la Marseillaise',      user: 'Marseillaise',          expect: true,  note: 'foreign article: la stripped' },
+  { correct: 'La Marseillaise',      user: 'la Marseillaise',       expect: true,  note: 'foreign article: full form still matches' },
+  { correct: 'Le Mans',              user: 'Mans',                  expect: true,  note: 'foreign article: le stripped' },
+  { correct: 'Les Misérables',       user: 'Misérables',            expect: true,  note: 'foreign article: les stripped' },
+  { correct: 'El Dorado',            user: 'Dorado',                expect: true,  note: 'foreign article: el stripped' },
+  { correct: "L'Étranger",           user: 'Étranger',              expect: true,  note: "foreign article: l' elision stripped" },
+  { correct: 'Der Spiegel',          user: 'Spiegel',               expect: true,  note: 'foreign article: der stripped' },
+  { correct: 'la Marseillaise',      user: 'something else',        expect: false, note: 'foreign article: still rejects wrong answer' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

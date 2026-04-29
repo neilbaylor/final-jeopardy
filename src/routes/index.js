@@ -430,6 +430,13 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   const b = normalizeAnswer(correctAnswer);
   if (a === b) return true;
 
+  // Foreign leading article on the DB answer: "La Marseillaise" → also accept
+  // "Marseillaise". Retries the full pipeline against the stripped form.
+  {
+    const m = correctAnswer.match(/^(?:(?:la|le|les|el|los|las|il|der|die|das)\s+|l['’])/i);
+    if (m && isAnswerCorrect(userAnswer, correctAnswer.slice(m[0].length), questionText)) return true;
+  }
+
   // Year-style reading: "1984" ↔ "nineteen eighty four". Only triggers when at
   // least one side contains a 4-digit number in 1100..2099. The default cardinal
   // path ("two thousand one") still runs via normalizeAnswer above.
