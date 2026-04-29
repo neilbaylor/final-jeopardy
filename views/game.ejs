@@ -33,6 +33,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
     html { overflow: hidden; height: 100%; font-size: 16px; background: #07102e; }
+    :root { --sai-bottom: env(safe-area-inset-bottom, 0px); }
 
     /* Slide in from right over dashboard; dashboard parallaxes left */
     @view-transition { navigation: auto; }
@@ -821,9 +822,16 @@
   <script>
     if (/android/i.test(navigator.userAgent)) {
       document.body.classList.add('android');
-      if (window.matchMedia('(display-mode: standalone)').matches && window.visualViewport) {
-        const inset = Math.max(0, window.innerHeight - window.visualViewport.height);
-        document.documentElement.style.setProperty('--android-bottom-inset', inset + 'px');
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        let inset = window.visualViewport
+          ? Math.max(0, window.innerHeight - window.visualViewport.height)
+          : 0;
+        if (inset === 0) {
+          inset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sai-bottom')) || 0;
+        }
+        if (inset > 0) {
+          document.documentElement.style.setProperty('--android-bottom-inset', inset + 'px');
+        }
       }
     }
     if (sessionStorage.getItem('vt-from-dashboard') === '1' || document.documentElement.classList.contains('vt-from-game')) { document.body.classList.add('from-nav'); }
