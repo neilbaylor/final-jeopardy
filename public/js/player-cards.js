@@ -92,7 +92,7 @@ function getPlayerBadgeHtml(p, opts) {
   const isDisputed = !!p._isDisputed;
   const unansweredAsWrong = !hasAnswer && opts.unansweredIncorrect;
   if (hasAnswer && isDisputed) {
-    return `<div class="player-answered-badge disputed"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none" overflow="visible"><line x1="3" y1="1" x2="3" y2="3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="3" cy="4.6" r="0.95" fill="#fff"></circle></svg></div>`;
+    return `<div class="player-answered-badge disputed"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none" overflow="visible"><line x1="3" y1="0.8" x2="3" y2="2.4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="3" cy="4.5" r="0.9" fill="#fff"></circle></svg></div>`;
   }
   if (hasAnswer && isCorrect) {
     return `<div class="player-answered-badge"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#43a047" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
