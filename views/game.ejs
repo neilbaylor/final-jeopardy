@@ -891,6 +891,7 @@
 
     const disputeModalBackdrop = document.getElementById('dispute-modal-backdrop');
     disputeModalBackdrop.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    let pendingDisputeWrapper = null;
     document.getElementById('dispute-modal-cancel').addEventListener('click', () => {
       disputeModalBackdrop.classList.remove('open');
     });
@@ -927,6 +928,36 @@
           try { localStorage.setItem(`fjwf_games_${userId}`, JSON.stringify({ games, savedAt: Date.now() })); } catch {}
         }
       } catch (e) {}
+
+      if (pendingDisputeWrapper) {
+        const w = pendingDisputeWrapper;
+        pendingDisputeWrapper = null;
+        w.dataset.disputeLocked = '1';
+        const swipeRow = w.querySelector('.answer-response-row.swipeable');
+        if (swipeRow) {
+          swipeRow.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+          swipeRow.style.transform = '';
+        }
+        w.classList.remove('revealed');
+        const avatarWrap = w.querySelector('.player-avatar-wrap');
+        if (avatarWrap) {
+          const oldBadge = avatarWrap.querySelector('.player-answered-badge');
+          const newBadge = getPlayerBadgeHtml({ _answered: true, _isDisputed: true });
+          if (oldBadge) oldBadge.outerHTML = newBadge;
+          else {
+            const coin = avatarWrap.querySelector('.player-score-coin');
+            if (coin) coin.insertAdjacentHTML('beforebegin', newBadge);
+            else avatarWrap.insertAdjacentHTML('beforeend', newBadge);
+          }
+        }
+        const status = w.querySelector('.player-status');
+        if (status) {
+          status.className = 'player-status disputed';
+          status.textContent = 'Disputed';
+        }
+        const actionEl = w.querySelector('.ar-dispute-action');
+        if (actionEl) actionEl.remove();
+      }
 
       disputeModalBackdrop.classList.remove('open');
       setTimeout(() => {
@@ -1078,6 +1109,7 @@
       };
 
       row.addEventListener('touchstart', e => {
+        if (wrapper.dataset.disputeLocked === '1') return;
         if (e.touches.length !== 1) return;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
@@ -1144,6 +1176,8 @@
 
       action.addEventListener('click', e => {
         e.stopPropagation();
+        if (wrapper.dataset.disputeLocked === '1') return;
+        pendingDisputeWrapper = wrapper;
         const backdrop = document.getElementById('dispute-modal-backdrop');
         backdrop.dataset.answerId = action.dataset.answerId;
         backdrop.classList.add('open');
