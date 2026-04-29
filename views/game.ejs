@@ -830,14 +830,13 @@
         if (inset > 0) {
           document.documentElement.style.setProperty('--android-bottom-inset', inset + 'px');
         }
-        // After the first keyboard open/close cycle, Chrome re-measures dvh to exclude
-        // the gesture-nav strip. Once that happens the strip is already outside the layout,
-        // so the extra inset is no longer needed.
+        // Once Chrome re-measures dvh to exclude the gesture-nav strip (innerHeight
+        // shrinks vs. baseline), the strip is already outside the layout, so the
+        // extra inset is no longer needed.
         const _baseHeight = window.innerHeight;
         if (window.visualViewport) {
           window.visualViewport.addEventListener('resize', function _onVKResize() {
-            const keyboardClosed = window.visualViewport.height >= window.innerHeight - 10;
-            if (keyboardClosed && window.innerHeight < _baseHeight - 20) {
+            if (window.innerHeight < _baseHeight - 20) {
               document.documentElement.style.setProperty('--android-bottom-inset', '0px');
               window.visualViewport.removeEventListener('resize', _onVKResize);
             }
