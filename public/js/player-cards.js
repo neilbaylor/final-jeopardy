@@ -99,9 +99,13 @@ function buildPlayerCardHtml(p, opts) {
     : `<div class="player-avatar-placeholder">👤</div>`;
   const hasAnswer = p._answered;
   const isCorrect = p._isCorrect;
+  const isDisputed = !!p._isDisputed;
   const incorrectBadge = `<div class="player-answered-badge incorrect"><svg width="8" height="8" viewBox="0 0 8 8" fill="none" overflow="visible"><line x1="2" y1="2" x2="6" y2="6" stroke="#e53935" stroke-width="1.4" stroke-linecap="round"/><line x1="6" y1="2" x2="2" y2="6" stroke="#e53935" stroke-width="1.4" stroke-linecap="round"/></svg></div>`;
+  const disputedBadge = `<div class="player-answered-badge disputed"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><line x1="3" y1="1.4" x2="3" y2="3.6" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><circle cx="3" cy="4.7" r="0.55" fill="#fff"/></svg></div>`;
   let badge = '';
-  if (hasAnswer && isCorrect) {
+  if (hasAnswer && isDisputed) {
+    badge = disputedBadge;
+  } else if (hasAnswer && isCorrect) {
     badge = `<div class="player-answered-badge"><svg width="7.5" height="7.5" viewBox="0 0 6 6" fill="none"><polyline points="1,3 2.5,4.5 5,1.5" stroke="#43a047" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
   } else if (hasAnswer && isCorrect === false) {
     badge = incorrectBadge;
@@ -115,12 +119,14 @@ function buildPlayerCardHtml(p, opts) {
     : '';
   const avatarHtml = `<div class="player-avatar-wrap">${avatarInner}${badge}${coinBadge}</div>`;
   const unansweredAsWrong = !hasAnswer && opts && opts.unansweredIncorrect;
-  const statusClass = unansweredAsWrong ? 'answered-wrong' : (!hasAnswer ? 'waiting' : isCorrect ? 'answered' : 'answered-wrong');
-  const statusText = unansweredAsWrong
-    ? 'Expired'
-    : (opts && opts.askedAt && p._answeredAt)
-      ? relativeAnswerTime(opts.askedAt, opts && opts.short, p._answeredAt)
-      : relativeAnswerTime(p._answeredAt, opts && opts.short, opts && opts.relativeTo, p._answered);
+  const statusClass = (hasAnswer && isDisputed) ? 'disputed' : unansweredAsWrong ? 'answered-wrong' : (!hasAnswer ? 'waiting' : isCorrect ? 'answered' : 'answered-wrong');
+  const statusText = (hasAnswer && isDisputed)
+    ? 'Disputed'
+    : unansweredAsWrong
+      ? 'Expired'
+      : (opts && opts.askedAt && p._answeredAt)
+        ? relativeAnswerTime(opts.askedAt, opts && opts.short, p._answeredAt)
+        : relativeAnswerTime(p._answeredAt, opts && opts.short, opts && opts.relativeTo, p._answered);
   return `<div class="game-player">
     ${avatarHtml}
     <div class="game-player-info">
