@@ -832,20 +832,6 @@
         if (inset > 0) {
           document.documentElement.style.setProperty('--android-bottom-inset', inset + 'px');
         }
-
-        // After the soft keyboard's first open/close cycle, Android Chrome's
-        // dvh settles smaller (gesture-strip excluded). The 48px CSS fallback
-        // would then double-pad. When that's detected, zero the variable.
-        const baseInner = window.innerHeight;
-        const onSize = () => {
-          if (!window.visualViewport) return;
-          const kbClosed = Math.abs(window.visualViewport.height - window.innerHeight) < 10;
-          if (kbClosed && window.innerHeight < baseInner) {
-            document.documentElement.style.setProperty('--android-bottom-inset', '0px');
-          }
-        };
-        if (window.visualViewport) window.visualViewport.addEventListener('resize', onSize);
-        window.addEventListener('resize', onSize);
       }
     }
     if (sessionStorage.getItem('vt-from-dashboard') === '1' || document.documentElement.classList.contains('vt-from-game')) { document.body.classList.add('from-nav'); }
