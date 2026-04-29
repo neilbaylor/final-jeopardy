@@ -575,12 +575,14 @@
       transform: translateX(-50%) translateY(10px);
       transition: opacity 0.5s ease, transform 0.5s ease;
       pointer-events: none;
+      overflow: hidden;
     }
     #answer-responses.visible { opacity: 0.88; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     .answer-response-row { display: flex; align-items: center; padding: 9.5px 14px; gap: 13px; }
+    .answer-response-row:not(:first-child) { border-top: 1px solid #f0f0f0; }
     .answer-response-wrapper { position: relative; overflow: hidden; }
     .answer-response-wrapper .answer-response-row.swipeable { background: #fff; position: relative; z-index: 1; touch-action: pan-y; will-change: transform; -webkit-backface-visibility: hidden; }
-    .ar-dispute-action { position: absolute; right: 0; top: 0; bottom: 0; width: 78px; background: #e53935; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0; transition: opacity 0s 300ms; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .ar-dispute-action { position: absolute; right: 0; top: 0; bottom: 1px; width: 78px; background: #e53935; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0; transition: opacity 0s 300ms; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .answer-response-wrapper.revealed .ar-dispute-action { opacity: 1; transition: none; }
     #answer-responses .game-row-summary { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px 7px; font-size: 0.8rem; font-weight: 400; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.87; }
     #answer-responses .game-row-summary strong { font-weight: 600; }
