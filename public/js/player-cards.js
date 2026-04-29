@@ -115,7 +115,7 @@ function getPlayerStatus(p, opts) {
     : isCorrect ? 'answered' : 'answered-wrong';
   let statusText;
   if (hasAnswer && isDisputed) {
-    statusText = 'Disputed';
+    statusText = 'Dispute';
   } else if (unansweredAsWrong) {
     statusText = opts.expiredAsTime
       ? relativeAnswerTime(opts.relativeTo, true, null)
