@@ -236,6 +236,21 @@ function extractCompoundSurname(name) {
   return words.slice(1).join(' ');
 }
 
+// If `name` is "FirstName Word…" (3+ words, first is a known first name, all
+// subsequent words are alphabetic non-stop-words), returns everything after the
+// first name. e.g. "Jacqueline Kennedy Onassis" → "Kennedy Onassis".
+// Rejects "Jack the Ripper" (stop word), "Tom & Jerry" (connector), "Adam and Eve".
+function extractTailAfterFirstName(name) {
+  const words = name.trim().split(/\s+/);
+  if (words.length < 3) return null;
+  if (!COMMON_FIRST_NAMES.has(words[0].toLowerCase())) return null;
+  for (let i = 1; i < words.length; i++) {
+    if (NAME_STOP_WORDS.has(words[i].toLowerCase())) return null;
+    if (!/^[a-zA-Z][a-zA-Z'‘’-]*$/.test(words[i])) return null;
+  }
+  return words.slice(1).join(' ');
+}
+
 // Institution words that can be stripped from a name to get its core.
 // e.g. "University of Oregon" → "Oregon"; "Stanford University" → "Stanford";
 // "Department of Homeland Security" → "Homeland Security".
@@ -280,6 +295,13 @@ function matchesPart(userNorm, correctNorm, correctPartOrig) {
     const finalNorm = normalizeAnswer(cs.split(/\s+/).pop());
     if (userNorm === finalNorm) return true;
     if (natural.JaroWinklerDistance(userNorm, finalNorm) >= 0.88) return true;
+  }
+  // Tail-after-first-name: "Jacqueline Kennedy Onassis" → accept "Kennedy Onassis"
+  const tail = extractTailAfterFirstName(correctPartOrig);
+  if (tail !== null) {
+    const tailNorm = normalizeAnswer(tail);
+    if (userNorm === tailNorm) return true;
+    if (natural.JaroWinklerDistance(userNorm, tailNorm) >= 0.88) return true;
   }
   // Institution shorthand: "Stanford University" → accept "Stanford";
   // "University of Oregon" → accept "Oregon".
@@ -669,6 +691,25 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
     const finalNorm = normalizeAnswer(singleCs.split(/\s+/).pop());
     if (a === finalNorm) return true;
     if (natural.JaroWinklerDistance(a, finalNorm) >= 0.88) return true;
+  }
+
+  // Tail-after-first-name: "Jacqueline Kennedy Onassis" → accept "Kennedy Onassis"
+  const singleTail = extractTailAfterFirstName(correctAnswer);
+  if (singleTail !== null) {
+    const tailNorm = normalizeAnswer(singleTail);
+    if (a === tailNorm) return true;
+    if (natural.JaroWinklerDistance(a, tailNorm) >= 0.88) return true;
+  }
+
+  // "X of Y" → also accept "Y X" word order. e.g. "the code of Hammurabi" → "Hammurabi code"
+  {
+    const ofMatch = correctAnswer.match(/^(.+?)\s+of\s+(.+)$/i);
+    if (ofMatch) {
+      const reversed = `${ofMatch[2].trim()} ${ofMatch[1].trim()}`;
+      const reversedNorm = normalizeAnswer(reversed);
+      if (a === reversedNorm) return true;
+      if (natural.JaroWinklerDistance(a, reversedNorm) >= 0.88) return true;
+    }
   }
 
   // Title prefix: "President Ronald Reagan" → accept "Ronald Reagan" or "Reagan";

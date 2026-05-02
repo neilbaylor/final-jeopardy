@@ -744,6 +744,19 @@ const tests = [
   { correct: "L'Étranger",           user: 'Étranger',              expect: true,  note: "foreign article: l' elision stripped" },
   { correct: 'Der Spiegel',          user: 'Spiegel',               expect: true,  note: 'foreign article: der stripped' },
   { correct: 'la Marseillaise',      user: 'something else',        expect: false, note: 'foreign article: still rejects wrong answer' },
+
+  // ── Tail-after-first-name (3+ word names) ────────────────────────────────
+  { correct: 'Jacqueline Kennedy Onassis', user: 'Kennedy Onassis',  expect: true,  note: '3-word name: accept tail after first name' },
+  { correct: 'Jacqueline Kennedy Onassis', user: 'Onassis',          expect: true,  note: '3-word name: still accept last only' },
+  { correct: 'Jacqueline Kennedy Onassis', user: 'Jacqueline Kennedy Onassis', expect: true, note: '3-word name: full form' },
+  { correct: 'Jacqueline Kennedy Onassis', user: 'something else',   expect: false, note: '3-word name: rejects wrong' },
+  { correct: 'Edgar Allan Poe',            user: 'Allan Poe',        expect: true,  note: '3-word name: accept tail (Allan Poe)' },
+
+  // ── "X of Y" word-order reversal ─────────────────────────────────────────
+  { correct: 'the Code of Hammurabi',      user: 'Hammurabi code',   expect: true,  note: 'X of Y → Y X reversal' },
+  { correct: 'the Code of Hammurabi',      user: 'the code of Hammurabi', expect: true, note: 'X of Y: full form' },
+  { correct: 'Battle of Hastings',         user: 'Hastings battle',  expect: true,  note: 'X of Y reversal (no article)' },
+  { correct: 'the Code of Hammurabi',      user: 'something else',   expect: false, note: 'X of Y: rejects wrong' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
