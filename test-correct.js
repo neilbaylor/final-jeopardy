@@ -757,6 +757,14 @@ const tests = [
   { correct: 'the Code of Hammurabi',      user: 'the code of Hammurabi', expect: true, note: 'X of Y: full form' },
   { correct: 'Battle of Hastings',         user: 'Hastings battle',  expect: true,  note: 'X of Y reversal (no article)' },
   { correct: 'the Code of Hammurabi',      user: 'something else',   expect: false, note: 'X of Y: rejects wrong' },
+
+  // ── Leading parens: each word independently optional ─────────────────────
+  { correct: '(senator john) McCain',      user: 'John McCain',      expect: true,  note: 'leading parens: partial subset (first name only)' },
+  { correct: '(senator john) McCain',      user: 'Senator McCain',   expect: true,  note: 'leading parens: partial subset (title only)' },
+  { correct: '(senator john) McCain',      user: 'Senator John McCain', expect: true, note: 'leading parens: full form' },
+  { correct: '(senator john) McCain',      user: 'McCain',           expect: true,  note: 'leading parens: bare form' },
+  { correct: '(senator john) McCain',      user: 'something else',   expect: false, note: 'leading parens: rejects wrong' },
+  { correct: '(Randolph) Caldecott',       user: 'Randolph Caldecott', expect: true, note: 'leading parens: 1-word optional' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

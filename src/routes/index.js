@@ -639,6 +639,22 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
     const withoutOptional = normalizeAnswer(correctAnswer.replace(/\([^)]*\)/g, ''));
     if (a === withoutOptional) return true;
     if (natural.JaroWinklerDistance(a, withoutOptional) >= 0.88) return true;
+    // Leading parens "(...)": each word inside is independently optional and can
+    // precede the bare form. e.g. "(senator john) McCain" → accept "John McCain"
+    // or "Senator McCain" (the bare-only and all-words forms are already covered
+    // by withoutOptional and the default full normalize).
+    const leadParen = correctAnswer.match(/^\(([^)]+)\)\s+(.+)$/);
+    if (leadParen) {
+      const optWords = leadParen[1].trim().split(/\s+/).slice(0, 4); // cap at 4 → 16 subsets
+      const bare = leadParen[2].trim();
+      const N = optWords.length;
+      for (let mask = 1; mask < (1 << N) - 1; mask++) {
+        const prefix = optWords.filter((_, i) => mask & (1 << i)).join(' ');
+        const candNorm = normalizeAnswer(`${prefix} ${bare}`);
+        if (a === candNorm) return true;
+        if (natural.JaroWinklerDistance(a, candNorm) >= 0.88) return true;
+      }
+    }
     const trailingParen = correctAnswer.match(/^.+\s+\(([^)]+)\)\s*$/);
     if (trailingParen) {
       const alias = trailingParen[1].trim();
