@@ -1323,7 +1323,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
 
     // 5. Fetch answers and total players to check if everyone has answered
     const [answers] = await conn.execute(
-      `SELECT ga.id, ga.user_id, ga.game_question_id, ga.answer, ga.is_correct, ga.answered_at
+      `SELECT ga.id, ga.user_id, ga.game_question_id, ga.answer, ga.is_correct, ga.is_disputed, ga.answered_at
        FROM game_answers ga
        WHERE ga.game_question_id = ?`,
       [gq.game_question_id]
