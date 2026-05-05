@@ -594,7 +594,7 @@
     .ar-resolve-action.loading .ar-resolve-spinner { display: block; }
     #answer-responses .game-row-summary { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 6px 12px 7px; font-size: 0.8rem; font-weight: 400; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.87; }
     #answer-responses .game-row-summary strong { font-weight: 600; }
-    .ar-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; width: 115px; }
+    .ar-player { display: flex; align-items: center; gap: 7px; flex-shrink: 0; width: 115px; align-self: flex-start; }
     #answer-responses .player-answered-badge { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid #43a047; display: flex; align-items: center; justify-content: center; }
     #answer-responses .player-answered-badge.incorrect { background: #fff; border-color: #e53935; }
     #answer-responses .player-answered-badge.disputed { background: #fff; border-color: #e53935; }
@@ -631,7 +631,7 @@
     #answer-responses .player-status.answered       { color: #2e7d32; }
     #answer-responses .player-status.answered-wrong { color: #e53935; }
     #answer-responses .player-status.disputed       { color: #e53935; }
-    .ar-answer { font-size: 1rem; font-weight: 500; color: #333; opacity: 0.9; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; }
+    .ar-answer { font-size: 1rem; font-weight: 500; color: #333; opacity: 0.9; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
     /* 1–2 players: 20% larger */
     #answer-responses.count-1 .ar-player, #answer-responses.count-2 .ar-player { gap: 8px; }
     #answer-responses.count-1 .player-avatar-wrap, #answer-responses.count-2 .player-avatar-wrap { width: 41px; height: 41px; }
