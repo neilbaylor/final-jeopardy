@@ -564,6 +564,32 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
         return true;
       });
       if (allMatched) return true;
+
+      // Distinctive-word fallback: when every part shares a "scaffold" of words
+      // (e.g. "the gulf of tonkin & the gulf of thailand" → {gulf, of}), accept
+      // just the distinguishing words ("thailand and tonkin" / "tonkinn & thailand").
+      const partWordSets = normCorrect.map(n => new Set(n.split(/\s+/).filter(Boolean)));
+      if (partWordSets.length >= 2 && partWordSets.every(s => s.size > 0)) {
+        const common = [...partWordSets[0]].filter(w => partWordSets.every(s => s.has(w)));
+        if (common.length > 0) {
+          const commonSet = new Set(common);
+          const distinctiveOrig = correctParts.map((p, i) => {
+            const origWords = p.trim().split(/\s+/);
+            return origWords.filter(w => !commonSet.has(normalizeAnswer(w))).join(' ');
+          });
+          if (distinctiveOrig.every(d => d.trim().length > 0)) {
+            const distinctiveNorm = distinctiveOrig.map(normalizeAnswer);
+            const usedDist = new Set();
+            const allMatchedDist = normUser.every(u => {
+              const idx = distinctiveOrig.findIndex((dp, i) => !usedDist.has(i) && matchesPart(u, distinctiveNorm[i], dp));
+              if (idx === -1) return false;
+              usedDist.add(idx);
+              return true;
+            });
+            if (allMatchedDist) return true;
+          }
+        }
+      }
     }
   }
 

@@ -765,6 +765,46 @@ const tests = [
   { correct: '(senator john) McCain',      user: 'McCain',           expect: true,  note: 'leading parens: bare form' },
   { correct: '(senator john) McCain',      user: 'something else',   expect: false, note: 'leading parens: rejects wrong' },
   { correct: '(Randolph) Caldecott',       user: 'Randolph Caldecott', expect: true, note: 'leading parens: 1-word optional' },
+
+  // ── Distinctive-word fallback in multi-part answers ──────────────────────
+  // Two-part with "Gulf of" scaffold
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Thailand and Tonkin',  expect: true,  note: 'multi-part scaffold: distinctive only, reordered' },
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Tonkin and Thailand',  expect: true,  note: 'multi-part scaffold: distinctive only, original order' },
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Thailand & Tonkin',    expect: true,  note: 'multi-part scaffold: distinctive only, & connector' },
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Tonkinn & Thailand',   expect: true,  note: 'multi-part scaffold: typo on distinctive (JW)' },
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Thailand & Tinkin',    expect: true,  note: 'multi-part scaffold: typo other side' },
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'the Gulf of Thailand & the Gulf of Tonkin', expect: true, note: 'multi-part scaffold: full form still works' },
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Thailand',             expect: false, note: 'multi-part scaffold: only one part rejected' },
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Atlantic & Pacific',   expect: false, note: 'multi-part scaffold: wrong distinctives rejected' },
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Thailand & Vietnam',   expect: false, note: 'multi-part scaffold: one wrong distinctive' },
+
+  // Three-part with "ocean" scaffold
+  { correct: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', user: 'Pacific & Indian & Atlantic', expect: true,  note: '3-part scaffold: distinctive only, reordered' },
+  { correct: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', user: 'Atlantic, Pacific, Indian',   expect: true,  note: '3-part scaffold: distinctive only, comma' },
+  { correct: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', user: 'Atlantic and Pacific and Indian', expect: true, note: '3-part scaffold: distinctive only, repeated and' },
+  { correct: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', user: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', expect: true, note: '3-part scaffold: full form still works' },
+  { correct: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', user: 'Pacific Ocean & Indian Ocean & Atlantic Ocean',  expect: true, note: '3-part scaffold: full form reordered' },
+  { correct: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', user: 'Atlantik & Pasific & Indian',  expect: true,  note: '3-part scaffold: typos on distinctives' },
+  { correct: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', user: 'Pacific & Indian',             expect: false, note: '3-part scaffold: missing one part' },
+  { correct: 'Atlantic Ocean, Pacific Ocean and Indian Ocean', user: 'Pacific & Indian & Arctic',    expect: false, note: '3-part scaffold: wrong distinctive' },
+
+  // Edge: parts with no scaffold → fallback shouldn't fire
+  { correct: 'Tom & Jerry',                user: 'Tom',              expect: false, note: 'no scaffold: single part still rejected' },
+  { correct: 'Mercury & Venus & Mars',     user: 'Mercury',          expect: false, note: 'no scaffold: 1 of 3 rejected' },
+  { correct: 'Mercury & Venus & Mars',     user: 'Venus & Mercury & Mars', expect: true,  note: 'no scaffold: full form reordered still works' },
+
+  // Edge: parts where scaffold equals the entire part (no distinctive content) → should NOT match empty
+  { correct: 'Ocean & Ocean',              user: 'Ocean',            expect: false, note: 'scaffold = entire part: no distinctive content; 1 vs 2 parts' },
+
+  // Edge: longer scaffold (multi-word common prefix)
+  { correct: 'King James I & King James II', user: 'I and II',        expect: true,  note: 'multi-word scaffold (King James): distinctive only' },
+  { correct: 'King James I & King James II', user: 'II and I',        expect: true,  note: 'multi-word scaffold: reversed' },
+
+  // Edge: scaffold word also normalizes to a stop word — already stripped, shouldn't matter
+  { correct: 'the Battle of Yorktown & the Battle of Trenton', user: 'Trenton & Yorktown', expect: true, note: 'multi-part with article scaffold' },
+
+  // Edge: user gives wrong count
+  { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Tonkin Thailand Cambodia', expect: false, note: 'multi-part scaffold: 3 parts vs 2 rejected' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────
