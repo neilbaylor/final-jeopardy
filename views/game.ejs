@@ -1659,12 +1659,10 @@
               // Call answer endpoint, then games endpoint
               const apiDone = (async () => {
                 try {
-                  const kbDebug = window._kbDebug && window._kbDebug.length ? window._kbDebug : null;
-                  window._kbDebug = [];
                   const answerRes = await fetch(`/api/games/${gameId}/answers`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ playerId: userId, questionId: currentQuestionId, answer: submittedAnswer, kbDebug }),
+                    body: JSON.stringify({ playerId: userId, questionId: currentQuestionId, answer: submittedAnswer }),
                   });
                   try { localStorage.removeItem(`unanswered_${gameId}_${currentGameQuestionId}`); } catch {}
                   if (!answerRes.ok) {
@@ -1832,30 +1830,9 @@
       // TEMP debug log of every keyboard-shift signal — sent with the answer
       // submit so we can inspect on the server. Persists across multiple
       // open/close cycles within a single question; cleared on submit.
-      window._kbDebug = window._kbDebug || [];
-      const _kbDbg = (event, extra) => {
-        try {
-          window._kbDebug.push({
-            event,
-            t: Date.now(),
-            standalone: !!window.navigator.standalone,
-            vvH: window.visualViewport.height,
-            innerH: window.innerHeight,
-            offsetTop: window.visualViewport.offsetTop,
-            scrollY: window.scrollY,
-            baseVVHeight,
-            baseInnerHeight,
-            baseInputBottom,
-            kbOffset,
-            ...(extra || {}),
-          });
-        } catch {}
-      };
-
       const blockScroll = e => e.preventDefault();
       const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyShift = (source) => {
-        _kbDbg('applyShift', { source: source || 'unknown' });
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
           document.addEventListener('touchmove', blockScroll, { passive: false });
@@ -1892,7 +1869,6 @@
       };
       const applyVVShift = () => {
         const newOffset = window.visualViewport.offsetTop;
-        _kbDbg('applyVVShift', { newOffset });
         if (newOffset === kbOffset) return;
         kbOffset = newOffset;
         applyShift('vvShift');
@@ -1908,11 +1884,9 @@
         clearTimeout(fallbackTimerId);
         fallbackTimerId = setTimeout(() => {
           if (kbOffset > 0 || document.activeElement !== answerInput) {
-            _kbDbg('focusFallback:skip', { reason: kbOffset > 0 ? 'kbOffset>0' : 'notFocused' });
             return;
           }
           const newOffset = window.visualViewport.offsetTop;
-          _kbDbg('focusFallback', { newOffset });
           if (newOffset > 0) {
             kbOffset = newOffset;
             applyShift('focusFallback');
@@ -1928,7 +1902,6 @@
 
       window._vvStart = () => {
         kbOffset = 0;
-        _kbDbg('vvStart:enter');
         // Defer one frame so layout has a chance to settle (insets, chrome,
         // slide-in transform) before we capture baselines.
         requestAnimationFrame(() => {
@@ -1938,10 +1911,6 @@
           // resting viewport-bottom we'll compare against once iOS moves things.
           const rect = answerInputWrap.getBoundingClientRect();
           baseInputBottom = rect.bottom - rect.height * 1.4;
-          _kbDbg('vvStart:capture', {
-            inputRectBottom: rect.bottom,
-            inputRectHeight: rect.height,
-          });
           window.visualViewport.removeEventListener('resize', onVVResize);
           window.visualViewport.removeEventListener('scroll', onVVResize);
           window.visualViewport.addEventListener('resize', onVVResize);
