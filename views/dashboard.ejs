@@ -1650,7 +1650,7 @@
         .catch(() => location.replace('/'));
 
       const cachedGames = getCachedGames();
-      if (cachedGames) {
+      if (cachedGames && deepLinkGqId == null) {
         // If fresh data arrives before the cache delay fires, render it directly (no double flash).
         // If it arrives after, re-render normally as a background refresh.
         let cacheTimerFired = false;
@@ -1684,7 +1684,7 @@
           .catch(() => {});
       } else {
         const fromGame = document.documentElement.classList.contains('vt-from-game');
-        if (fromGame) {
+        if (deepLinkGqId != null || fromGame) {
           loadGames(true);
         } else {
           setTimeout(() => loadGames(), 500);
@@ -2176,6 +2176,11 @@
     let gameViewData = new Map();
     let gamePrevViewData = new Map();
     let gameTpqViewData = new Map();
+    const deepLinkGqId = (() => {
+      const v = new URLSearchParams(location.search).get('game_question_id');
+      return v && /^\d+$/.test(v) ? Number(v) : null;
+    })();
+    let deepLinkOpened = false;
     function renderGames(games) {
       currentGames = Array.isArray(games) ? games : [];
       const list = document.getElementById('games-list');
@@ -2558,6 +2563,52 @@
           });
         }
       });
+
+      if (deepLinkGqId != null && !deepLinkOpened) {
+        for (const game of currentGames) {
+          const gid = String(game.id);
+          if (game.current_question && game.current_question.game_question_id === deepLinkGqId && gameViewData.has(gid)) {
+            const { players, myAnswer, askedAt, category, question, correctAnswer } = gameViewData.get(gid);
+            document.getElementById('view-modal-category').textContent = toTitleCase(category || '');
+            document.getElementById('view-modal-question').textContent = question || '';
+            document.getElementById('view-modal-answer').textContent = toTitleCase(correctAnswer || '');
+            document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
+            document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(askedAt, players);
+            document.getElementById('view-modal').classList.add('current-question');
+            document.getElementById('view-modal-backdrop').classList.add('open');
+            deepLinkOpened = true;
+            break;
+          }
+          if (game.previous_question && game.previous_question.game_question_id === deepLinkGqId && gamePrevViewData.has(gid)) {
+            const wrapper = list.querySelector(`.game-row-wrapper[data-game-id="${gid}"]`);
+            if (wrapper) wrapper.dataset.revealed = 'true';
+            const { players, myAnswer, askedAt, relativeTo, category, question, correctAnswer } = gamePrevViewData.get(gid);
+            document.getElementById('view-modal-category').textContent = toTitleCase(category || '');
+            document.getElementById('view-modal-question').textContent = question || '';
+            document.getElementById('view-modal-answer').textContent = toTitleCase(correctAnswer || '');
+            document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer, relativeTo);
+            document.getElementById('view-modal-footer').innerHTML = formatQuestionDate(askedAt);
+            document.getElementById('view-modal').classList.remove('current-question');
+            document.getElementById('view-modal-backdrop').classList.add('open');
+            deepLinkOpened = true;
+            break;
+          }
+          if (game.two_previous_question && game.two_previous_question.game_question_id === deepLinkGqId && gameTpqViewData.has(gid)) {
+            const wrapper = list.querySelector(`.game-row-wrapper[data-game-id="${gid}"]`);
+            if (wrapper) wrapper.dataset.revealed = 'two';
+            const { players, myAnswer, askedAt, relativeTo, category, question, correctAnswer } = gameTpqViewData.get(gid);
+            document.getElementById('view-modal-category').textContent = toTitleCase(category || '');
+            document.getElementById('view-modal-question').textContent = question || '';
+            document.getElementById('view-modal-answer').textContent = toTitleCase(correctAnswer || '');
+            document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer, relativeTo);
+            document.getElementById('view-modal-footer').innerHTML = formatQuestionDate(askedAt);
+            document.getElementById('view-modal').classList.remove('current-question');
+            document.getElementById('view-modal-backdrop').classList.add('open');
+            deepLinkOpened = true;
+            break;
+          }
+        }
+      }
     }
 
     // View modal close handlers
