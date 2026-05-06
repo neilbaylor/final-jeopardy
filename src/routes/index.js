@@ -1332,6 +1332,13 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
 
     await conn.beginTransaction();
 
+    // Serialize concurrent answers for this question so the count check below
+    // can't race (two simultaneous answers each only seeing their own insert).
+    await conn.execute(
+      'SELECT id FROM game_questions WHERE id = ? FOR UPDATE',
+      [gq.game_question_id]
+    );
+
     // 4. Insert into game_answers (ignore duplicate if already answered)
     await conn.execute(
       `INSERT INTO game_answers (game_question_id, user_id, answer, is_correct)
@@ -1475,6 +1482,29 @@ router.delete('/api/users/:targetUserId', async (req, res) => {
 });
 
 // TEMP diagnostic endpoint — remove after investigation
+router.post('/api/_diag/unstick-game/:gameId', async (req, res) => {
+  if (req.query.t !== '0744337e1c22889b73cb7b27587fbe4105b188aed068500e') {
+    return res.status(404).end();
+  }
+  const gameId = Number(req.params.gameId);
+  try {
+    const [[next]] = await db.query(
+      `SELECT id FROM questions
+       WHERE id NOT IN (SELECT question_id FROM game_questions WHERE game_id = ?)
+       ORDER BY RAND() LIMIT 1`,
+      [gameId]
+    );
+    if (!next) return res.status(404).json({ error: 'No unused questions remaining' });
+    const [result] = await db.query(
+      'INSERT INTO game_questions (game_id, question_id, asked_at) VALUES (?, ?, NOW())',
+      [gameId, next.id]
+    );
+    res.json({ ok: true, game_question_id: result.insertId, question_id: next.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get('/api/_diag/player-games/:playerId', async (req, res) => {
   if (req.query.t !== '0744337e1c22889b73cb7b27587fbe4105b188aed068500e') {
     return res.status(404).end();
