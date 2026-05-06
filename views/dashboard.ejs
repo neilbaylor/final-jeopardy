@@ -1626,6 +1626,11 @@
       })).catch(() => {});
     }
 
+    const deepLinkGqId = (() => {
+      const v = new URLSearchParams(location.search).get('game_question_id');
+      return v && /^\d+$/.test(v) ? Number(v) : null;
+    })();
+
     if (!userId) {
       location.replace('/');
     } else {
@@ -2176,10 +2181,6 @@
     let gameViewData = new Map();
     let gamePrevViewData = new Map();
     let gameTpqViewData = new Map();
-    const deepLinkGqId = (() => {
-      const v = new URLSearchParams(location.search).get('game_question_id');
-      return v && /^\d+$/.test(v) ? Number(v) : null;
-    })();
     let deepLinkOpened = false;
     function renderGames(games) {
       currentGames = Array.isArray(games) ? games : [];
