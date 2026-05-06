@@ -1689,7 +1689,9 @@
           .catch(() => {});
       } else {
         const fromGame = document.documentElement.classList.contains('vt-from-game');
-        if (deepLinkGqId != null || fromGame) {
+        if (deepLinkGqId != null) {
+          loadGames();
+        } else if (fromGame) {
           loadGames(true);
         } else {
           setTimeout(() => loadGames(), 500);
