@@ -21,7 +21,16 @@
   <script>
     // Must run before first paint so the class is set before CSS is applied.
     window.addEventListener('pageswap', e => {
-      if (e.viewTransition) sessionStorage.setItem('vt-from-dashboard', '1');
+      if (!e.viewTransition) return;
+      try {
+        const destUrl = e.activation && e.activation.entry && e.activation.entry.url
+          ? new URL(e.activation.entry.url) : null;
+        if (destUrl && destUrl.pathname === '/dashboard') {
+          e.viewTransition.skipTransition();
+          return;
+        }
+      } catch {}
+      sessionStorage.setItem('vt-from-dashboard', '1');
     });
     window.addEventListener('pagereveal', e => {
       if (e.viewTransition) {
