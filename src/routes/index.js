@@ -1482,7 +1482,7 @@ router.get('/api/_diag/player-games/:playerId', async (req, res) => {
   const playerId = Number(req.params.playerId);
   try {
     const [games] = await db.query(
-      `SELECT g.id, g.created_at, g.is_active,
+      `SELECT g.id, g.created_at,
               (SELECT COUNT(*) FROM game_users WHERE game_id = g.id) AS player_count
        FROM games g
        JOIN game_users gu ON gu.game_id = g.id
@@ -1519,7 +1519,6 @@ router.get('/api/_diag/player-games/:playerId', async (req, res) => {
       out.push({
         game_id: g.id,
         created_at: g.created_at,
-        is_active: g.is_active,
         player_count: g.player_count,
         users: users.map(u => u.user_id),
         latest_questions: gqs,
