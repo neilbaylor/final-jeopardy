@@ -1184,23 +1184,31 @@ router.get('/api/stats', async (req, res) => {
   try {
     const [[row]] = await db.query(
       `SELECT
-         COUNT(ga.id)                              AS total_questions,
-         SUM(ga.is_correct = 1)                   AS correct_answers,
+         COUNT(*)                                  AS total_questions,
+         SUM(ga.is_correct = 1)                    AS correct_answers,
          SUM(gq.asked_at >= NOW() - INTERVAL 7 DAY) AS total_questions_week,
          SUM(ga.is_correct = 1 AND gq.asked_at >= NOW() - INTERVAL 7 DAY) AS correct_answers_week
        FROM game_users gu
        JOIN game_questions gq ON gq.game_id = gu.game_id
-       JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
-       WHERE gu.user_id = ?`,
+       LEFT JOIN game_answers ga ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
+       WHERE gu.user_id = ?
+         AND (
+           ga.id IS NOT NULL
+           OR EXISTS (SELECT 1 FROM game_questions gq2 WHERE gq2.game_id = gq.game_id AND gq2.id > gq.id)
+         )`,
       [Number(userId)]
     );
 
     const [answers] = await db.query(
-      `SELECT ga.is_correct, gq.game_id
+      `SELECT COALESCE(ga.is_correct, 0) AS is_correct, gq.game_id
        FROM game_users gu
        JOIN game_questions gq ON gq.game_id = gu.game_id
-       JOIN game_answers ga   ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
+       LEFT JOIN game_answers ga ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
        WHERE gu.user_id = ?
+         AND (
+           ga.id IS NOT NULL
+           OR EXISTS (SELECT 1 FROM game_questions gq2 WHERE gq2.game_id = gq.game_id AND gq2.id > gq.id)
+         )
        ORDER BY gq.asked_at, gq.id`,
       [Number(userId)]
     );
