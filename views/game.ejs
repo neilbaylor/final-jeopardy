@@ -1912,15 +1912,12 @@
           const rect = answerInputWrap.getBoundingClientRect();
           baseInputBottom = rect.bottom - rect.height * 1.4;
           window.visualViewport.removeEventListener('resize', onVVResize);
-          window.visualViewport.removeEventListener('scroll', onVVResize);
           window.visualViewport.addEventListener('resize', onVVResize);
-          window.visualViewport.addEventListener('scroll', onVVResize);
         });
       };
       window._vvStop = () => {
         setTimeout(() => {
           window.visualViewport.removeEventListener('resize', onVVResize);
-          window.visualViewport.removeEventListener('scroll', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
