@@ -2160,7 +2160,8 @@
         });
     }
 
-    function buildViewResponsesHtml(players, myAnswer, relativeTo) {
+    function buildViewResponsesHtml(players, myAnswer, relativeTo, askedAt) {
+      askedAt = askedAt || relativeTo;
       const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       const sorted = [...players].sort((a, b) => (a._isMe ? 1 : 0) - (b._isMe ? 1 : 0));
       return sorted.slice(0, 5).map(p => {
@@ -2195,7 +2196,7 @@
         </div>`;
         const canResolve = !p._isMe && p._answered && p._isDisputed && p._answerId;
         if (canResolve) {
-          const resolveBtn = `<button class="ar-resolve-action" data-answer-id="${esc(p._answerId)}" data-answered-at="${esc(p._answeredAt || '')}" aria-label="Resolve dispute"><svg class="ar-resolve-icon" width="28" height="28" viewBox="0 0 22 22" fill="none"><polyline points="5.5,11 9.5,15 16.5,7.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ar-resolve-spinner"></div></button>`;
+          const resolveBtn = `<button class="ar-resolve-action" data-answer-id="${esc(p._answerId)}" data-answered-at="${esc(p._answeredAt || '')}" data-asked-at="${esc(askedAt || '')}" aria-label="Resolve dispute"><svg class="ar-resolve-icon" width="28" height="28" viewBox="0 0 22 22" fill="none"><polyline points="5.5,11 9.5,15 16.5,7.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ar-resolve-spinner"></div></button>`;
           return `<div class="answer-response-wrapper has-resolve">${rowHtml}${resolveBtn}</div>`;
         }
         return rowHtml;
@@ -2387,7 +2388,7 @@
           document.getElementById('view-modal-category').textContent = toTitleCase(category || '');
           document.getElementById('view-modal-question').textContent = question || '';
           document.getElementById('view-modal-answer').textContent = toTitleCase(correctAnswer || '');
-          document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
+          document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer, undefined, askedAt);
           document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(askedAt, players);
           document.getElementById('view-modal').classList.add('current-question');
           document.getElementById('view-modal-backdrop').classList.add('open');
@@ -2597,7 +2598,7 @@
             document.getElementById('view-modal-category').textContent = toTitleCase(category || '');
             document.getElementById('view-modal-question').textContent = question || '';
             document.getElementById('view-modal-answer').textContent = toTitleCase(correctAnswer || '');
-            document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer);
+            document.getElementById('view-modal-content').innerHTML = buildViewResponsesHtml(players, myAnswer, undefined, askedAt);
             document.getElementById('view-modal-footer').innerHTML = nextQuestionSummary(askedAt, players);
             document.getElementById('view-modal').classList.add('current-question');
             document.getElementById('view-modal-backdrop').classList.add('open');
@@ -2683,7 +2684,11 @@
         const statusEl = wrapper.querySelector('.player-status');
         if (statusEl) {
           const answeredAt = btn.dataset.answeredAt || null;
-          const { statusClass, statusText } = getPlayerStatus({ _answered: true, _isCorrect: true, _answeredAt: answeredAt });
+          const askedAt = btn.dataset.askedAt || null;
+          const { statusClass, statusText } = getPlayerStatus(
+            { _answered: true, _isCorrect: true, _answeredAt: answeredAt },
+            askedAt ? { askedAt, relativeTo: askedAt } : {}
+          );
           statusEl.className = 'player-status ' + statusClass;
           statusEl.textContent = statusText;
         }
