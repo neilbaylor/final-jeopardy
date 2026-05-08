@@ -1428,6 +1428,7 @@ router.post('/api/games/:gameId/answers', async (req, res) => {
 
 router.post('/api/dispute-answer', async (req, res) => {
   const answerId = Number(req.body.answerId);
+  const disputerId = Number(req.body.userId) || null;
   if (!answerId) return res.status(400).json({ error: 'Missing required field: answerId' });
   try {
     const [result] = await db.query(
@@ -1436,6 +1437,38 @@ router.post('/api/dispute-answer', async (req, res) => {
     );
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Answer not found' });
     res.json({ ok: true });
+
+    if (disputerId) {
+      try {
+        const [[disputer]] = await db.query(
+          'SELECT display_name, avatar_url FROM users WHERE id = ?',
+          [disputerId]
+        );
+        const [[ansRow]] = await db.query(
+          `SELECT ga.game_question_id, gq.game_id
+           FROM game_answers ga
+           JOIN game_questions gq ON gq.id = ga.game_question_id
+           WHERE ga.id = ?`,
+          [answerId]
+        );
+        if (disputer && ansRow) {
+          const [others] = await db.query(
+            `SELECT ga.user_id FROM game_answers ga
+             WHERE ga.game_question_id = ? AND ga.user_id != ?`,
+            [ansRow.game_question_id, disputerId]
+          );
+          const disputerName = pushDisplayName(disputer.display_name || '');
+          const body = `${disputerName} has disputed an Incorrect answer, tap here to resolve.`;
+          const url = `/dashboard?game_question_id=${ansRow.game_question_id}`;
+          const icon = disputer.avatar_url || undefined;
+          for (const { user_id } of others) {
+            sendPush(user_id, { title: 'Dispute', body, url, icon });
+          }
+        }
+      } catch (e) {
+        console.error('Dispute push error:', e);
+      }
+    }
   } catch (err) {
     console.error('Dispute answer error:', err);
     res.status(500).json({ error: 'Failed to dispute answer' });

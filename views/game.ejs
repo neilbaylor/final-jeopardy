@@ -915,7 +915,7 @@
         const res = await fetch('/api/dispute-answer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answerId: Number(answerId) }),
+          body: JSON.stringify({ answerId: Number(answerId), userId: Number(userId) }),
         });
         ok = res.ok;
       } catch (e) {}
