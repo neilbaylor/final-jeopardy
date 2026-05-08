@@ -1458,7 +1458,7 @@ router.post('/api/dispute-answer', async (req, res) => {
             [ansRow.game_question_id, disputerId]
           );
           const disputerName = pushDisplayName(disputer.display_name || '');
-          const body = `${disputerName} has disputed an Incorrect answer, tap here to resolve.`;
+          const body = `${disputerName} has disputed an Incorrect answer. Tap to resolve it.`;
           const url = `/dashboard?game_question_id=${ansRow.game_question_id}`;
           const icon = disputer.avatar_url || undefined;
           for (const { user_id } of others) {
