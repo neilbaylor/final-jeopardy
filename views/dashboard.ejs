@@ -1064,6 +1064,13 @@
     }
     #view-modal-footer { background: #f5f5f5; border-top: 1px solid rgba(233,233,233,0.5); padding: 7px 10.5px 8px; font-size: 0.77rem; font-weight: 400; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 16px 16px; }
     #view-modal-footer strong { font-weight: 600; }
+    #view-modal .answer-response-wrapper { position: relative; overflow: hidden; }
+    #view-modal .answer-response-wrapper.has-resolve > .answer-response-row { padding-right: 66px; }
+    #view-modal .ar-resolve-action { position: absolute; right: 0; top: 0; bottom: 0; width: 58px; background: #43a047; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; padding: 0; z-index: 2; }
+    #view-modal .ar-resolve-action:disabled { cursor: default; }
+    #view-modal .ar-resolve-action .ar-resolve-spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    #view-modal .ar-resolve-action.loading .ar-resolve-icon { display: none; }
+    #view-modal .ar-resolve-action.loading .ar-resolve-spinner { display: block; }
 
     /* Summary bar */
     .game-row-summary {
@@ -2176,7 +2183,7 @@
         const coinBadge = score > 0
           ? `<div class="coin player-score-coin${coinShimmer}${score > 99 ? ' coin-3digit' : ''}">${Math.min(score, 999)}</div>`
           : '';
-        return `<div class="answer-response-row">
+        const rowHtml = `<div class="answer-response-row">
           <div class="ar-player">
             <div class="player-avatar-wrap">${avatarInner}${badge}${coinBadge}</div>
             <div class="game-player-info">
@@ -2186,6 +2193,12 @@
           </div>
           <div class="ar-answer">${answerText}</div>
         </div>`;
+        const canResolve = !p._isMe && p._answered && p._isDisputed && p._answerId;
+        if (canResolve) {
+          const resolveBtn = `<button class="ar-resolve-action" data-answer-id="${esc(p._answerId)}" data-answered-at="${esc(p._answeredAt || '')}" aria-label="Resolve dispute"><svg class="ar-resolve-icon" width="28" height="28" viewBox="0 0 22 22" fill="none"><polyline points="5.5,11 9.5,15 16.5,7.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ar-resolve-spinner"></div></button>`;
+          return `<div class="answer-response-wrapper has-resolve">${rowHtml}${resolveBtn}</div>`;
+        }
+        return rowHtml;
       }).join('');
     }
 
@@ -2229,12 +2242,12 @@
 
         const playerWithAnswer = p => {
           const ans = answerByUser.get(p.id);
-          return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answer: ans ? ans.answer : null, _isDisputed: ans ? !!ans.is_disputed : false };
+          return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answer: ans ? ans.answer : null, _isDisputed: ans ? !!ans.is_disputed : false, _answerId: ans ? ans.id : null };
         };
 
         // Build combined player list: others first, current user last
         const others = game.players || [];
-        const meEntry = currentUser ? { ...currentUser, _isMe: true, score: game.my_score || 0, _answered: iAnswered, _isCorrect: myAnswer ? !!myAnswer.is_correct : null, _answeredAt: myAnswer ? myAnswer.answered_at : null, _isDisputed: myAnswer ? !!myAnswer.is_disputed : false } : null;
+        const meEntry = currentUser ? { ...currentUser, _isMe: true, score: game.my_score || 0, _answered: iAnswered, _isCorrect: myAnswer ? !!myAnswer.is_correct : null, _answeredAt: myAnswer ? myAnswer.answered_at : null, _isDisputed: myAnswer ? !!myAnswer.is_disputed : false, _answerId: myAnswer ? myAnswer.id : null } : null;
         const combined = meEntry ? [...others.map(playerWithAnswer), meEntry] : others.map(playerWithAnswer);
 
         const overflow = combined.length > MAX_VISIBLE ? combined.length - MAX_VISIBLE : 0;
@@ -2252,7 +2265,7 @@
           const qAnswerByUser = new Map((answersList || []).filter(a => a.game_question_id === q.game_question_id).map(a => [a.user_id, a]));
           const qPlayers = combined.map(p => {
             const ans = qAnswerByUser.get(p.id);
-            return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answer: ans ? ans.answer : null, _isDisputed: ans ? !!ans.is_disputed : false };
+            return { ...p, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answer: ans ? ans.answer : null, _isDisputed: ans ? !!ans.is_disputed : false, _answerId: ans ? ans.id : null };
           });
           const qVisible = qPlayers.length > MAX_VISIBLE ? qPlayers.slice(0, MAX_VISIBLE) : qPlayers;
           const qOverflow = qPlayers.length > MAX_VISIBLE ? qPlayers.length - MAX_VISIBLE : 0;
@@ -2630,6 +2643,84 @@
       }
     });
     document.getElementById('view-modal-backdrop').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+    // Resolve-dispute handler inside view modal
+    document.getElementById('view-modal-content').addEventListener('click', async e => {
+      const btn = e.target.closest('.ar-resolve-action');
+      if (!btn || btn.classList.contains('loading')) return;
+      const answerId = Number(btn.dataset.answerId);
+      if (!answerId) return;
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      let ok = false;
+      try {
+        const res = await fetch('/api/resolve-dispute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answerId }),
+        });
+        ok = res.ok;
+      } catch {}
+
+      if (!ok) {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        return;
+      }
+
+      // Update modal DOM in-place
+      const wrapper = btn.closest('.answer-response-wrapper');
+      btn.remove();
+      if (wrapper) {
+        wrapper.classList.remove('has-resolve');
+        const avatarWrap = wrapper.querySelector('.player-avatar-wrap');
+        if (avatarWrap) {
+          const oldBadge = avatarWrap.querySelector('.player-answered-badge');
+          const newBadge = getPlayerBadgeHtml({ _answered: true, _isCorrect: true });
+          if (oldBadge) oldBadge.outerHTML = newBadge;
+        }
+        const statusEl = wrapper.querySelector('.player-status');
+        if (statusEl) {
+          const answeredAt = btn.dataset.answeredAt || null;
+          const { statusClass, statusText } = getPlayerStatus({ _answered: true, _isCorrect: true, _answeredAt: answeredAt });
+          statusEl.className = 'player-status ' + statusClass;
+          statusEl.textContent = statusText;
+        }
+        const avatarWrap2 = wrapper.querySelector('.player-avatar-wrap');
+        const coin = avatarWrap2 && avatarWrap2.querySelector('.player-score-coin');
+        if (coin) {
+          const next = Math.min((parseInt(coin.textContent, 10) || 0) + 1, 999);
+          coin.textContent = String(next);
+          coin.classList.toggle('coin-3digit', next > 99);
+          coin.classList.add('coin-shimmer');
+        } else if (avatarWrap2) {
+          avatarWrap2.insertAdjacentHTML('beforeend', '<div class="coin player-score-coin coin-shimmer">1</div>');
+        }
+      }
+
+      // Update in-memory game data and localStorage
+      const answerLists = ['answers', 'previous_answers', 'two_previous_answers'];
+      for (const game of currentGames) {
+        let found = false;
+        for (const key of answerLists) {
+          const list = game[key];
+          if (!list) continue;
+          const ans = list.find(a => a.id === answerId);
+          if (ans) {
+            ans.is_disputed = 0;
+            ans.is_correct = 1;
+            const player = (game.players || []).find(p => p.id === ans.user_id);
+            if (player) player.score = (player.score || 0) + 1;
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+      }
+      setCachedGames(currentGames);
+      renderGames(currentGames);
+    });
 
     // iOS-style flick gesture to dismiss modal
     (function() {
