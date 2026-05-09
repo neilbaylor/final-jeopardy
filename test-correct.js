@@ -270,7 +270,7 @@ const tests = [
   { correct: 'British Virgin Islands',        user: 'Virgin Islands',          expect: false, note: 'suffix — ratio 0.609 < 0.72, rejected' },
   { correct: 'The United States of America',  user: 'States of America',       expect: false, note: 'suffix — too short (<72% of full length)' },
   { correct: 'The United States of America',  user: 'United States of America', expect: true, note: 'suffix — omit "The", long enough' },
-  { correct: 'Lake Superior',                 user: 'Superior',                expect: false, note: 'suffix — single word, a.includes(" ") fails' },
+  { correct: 'Lake Superior',                 user: 'Superior',                expect: true,  note: 'geo prefix — "Lake" treated as optional prefix' },
   { correct: 'Mount Saint Helens',            user: 'Saint Helens',            expect: true,  note: 'geo prefix — "Mount" stripped, "Saint Helens" accepted' },
   { correct: 'Mount Saint Helens',            user: 'Helens',                  expect: false, note: 'suffix — single word rejected' },
   { correct: 'New York City',                 user: 'York City',               expect: false, note: 'suffix — ratio 0.692 < 0.72, rejected' },
@@ -805,6 +805,42 @@ const tests = [
 
   // Edge: user gives wrong count
   { correct: 'the Gulf of Tonkin & the Gulf of Thailand', user: 'Tonkin Thailand Cambodia', expect: false, note: 'multi-part scaffold: 3 parts vs 2 rejected' },
+
+  // ── Shared-title-prefix JW guard ──────────────────────────────────────────
+  // Two answers that share the same TITLE_PREFIX must not pass solely because
+  // of the prefix bonus on Jaro-Winkler. The post-prefix cores must also match.
+  { correct: 'Mount Zion',           user: 'Mount Sinai',          expect: false, note: 'shared "Mount" — different mountains' },
+  { correct: 'Mount Sinai',          user: 'Mount Zion',           expect: false, note: 'shared "Mount" — reversed' },
+  { correct: 'Mount Everest',        user: 'Mount Vesuvius',       expect: false, note: 'shared "Mount" — different mountains' },
+  { correct: 'Mount Kilimanjaro',    user: 'Mount Rushmore',       expect: false, note: 'shared "Mount" — totally different' },
+  { correct: 'Mount Olympus',        user: 'Mount McKinley',       expect: false, note: 'shared "Mount" — different mountains' },
+  { correct: 'Mount Fuji',           user: 'Mount Etna',           expect: false, note: 'shared "Mount" — short suffixes' },
+  { correct: 'Saint Mark',           user: 'Saint Mary',           expect: false, note: 'shared "Saint" — different people' },
+  { correct: 'Saint Peter',          user: 'Saint Paul',           expect: false, note: 'shared "Saint" — different apostles' },
+  { correct: 'Saint Louis',          user: 'Saint Lucia',          expect: false, note: 'shared "Saint" — city vs island' },
+  { correct: 'President Lincoln',    user: 'President Jackson',    expect: false, note: 'shared "President" — different presidents' },
+  { correct: 'President Roosevelt',  user: 'President Eisenhower', expect: false, note: 'shared "President" — different presidents' },
+  { correct: 'King Henry',           user: 'King Edward',          expect: false, note: 'shared "King" — different kings' },
+  { correct: 'Queen Mary',           user: 'Queen Anne',           expect: false, note: 'shared "Queen" — different queens' },
+  { correct: 'Pope John',            user: 'Pope Paul',            expect: false, note: 'shared "Pope" — different popes' },
+  { correct: 'Lake Erie',            user: 'Lake Eyre',            expect: false, note: 'no "Lake" prefix in TITLE_PREFIXES — JW may differ' },
+  { correct: 'Mt. Sinai',            user: 'Mt. Zion',             expect: false, note: 'Mt. expanded to Mount on both sides — different mountains' },
+  { correct: 'Mount Sinai',          user: 'Mt Zion',              expect: false, note: 'mixed Mt/Mount — different mountains' },
+  { correct: 'Doctor House',         user: 'Doctor Who',           expect: false, note: 'shared "Doctor" — different shows' },
+
+  // ── Shared-title-prefix JW guard: still accepts legitimate matches ───────
+  // Same title + same/typo'd core should still match.
+  { correct: 'Mount Everest',        user: 'Mount Everst',         expect: true,  note: 'shared "Mount" — typo in core, fuzzy passes' },
+  { correct: 'Mount Kilimanjaro',    user: 'Mount Kilamanjaro',    expect: true,  note: 'shared "Mount" — common typo' },
+  { correct: 'Saint Patrick',        user: 'Saint Patrik',         expect: true,  note: 'shared "Saint" — typo in core' },
+  { correct: 'President Roosevelt',  user: 'President Roosvelt',   expect: true,  note: 'shared "President" — typo in core' },
+
+  // ── Shared-title-prefix JW guard: only one side has the prefix ───────────
+  // When only one side has a title prefix, existing strip-title logic handles
+  // suffix-only matches; this guard shouldn't change behavior there.
+  { correct: 'Mount Everest',        user: 'Everest',              expect: true,  note: 'one-sided prefix — accept core only' },
+  { correct: 'President Lincoln',    user: 'Lincoln',              expect: true,  note: 'one-sided prefix — last name accepted' },
+  { correct: 'Saint Patrick',        user: 'Patrick',              expect: true,  note: 'one-sided prefix — name only' },
 ];
 
 // ─── Run & print table ────────────────────────────────────────────────────────

@@ -416,7 +416,7 @@ const TITLE_PREFIXES = [
   'doctor', 'dr', 'professor', 'prof', 'reverend', 'rev', 'father', 'brother', 'sister',
   'saint', 'st',
   'sir', 'lord', 'lady', 'dame',
-  'mount',
+  'mount', 'lake', 'cape',
   'mr', 'mrs', 'ms',
   'sgt', 'lt', 'col', 'capt', 'cmdr', 'maj',
   'gov', 'sen', 'pres',
@@ -429,6 +429,19 @@ function stripTitlePrefix(answer) {
   for (const t of TITLE_PREFIXES) {
     if (lower.startsWith(t + ' ')) {
       return answer.slice(t.length + 1).trim();
+    }
+  }
+  return null;
+}
+
+// Like stripTitlePrefix, but returns { prefix, suffix } so callers can compare
+// which title was matched. Useful for guarding fuzzy comparisons against
+// shared-prefix inflation (e.g. "mount sanai" vs "mount zion").
+function splitTitlePrefix(answer) {
+  const lower = answer.toLowerCase();
+  for (const t of TITLE_PREFIXES) {
+    if (lower.startsWith(t + ' ')) {
+      return { prefix: t, suffix: answer.slice(t.length + 1).trim() };
     }
   }
   return null;
@@ -483,7 +496,19 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   // Skip JW for multi-part answers — normalizeAnswer converts & → space, making
   // "Nat King Cole natalie cole" match "Nat King Cole" via shared prefix.
   // The multi-part section below requires ALL parts to be present.
-  if (!isNumericAnswer && !isMultiPartAnswer && natural.JaroWinklerDistance(a, b) >= 0.885) return true;
+  // When both answers begin with the same title prefix (e.g. "Mount", "Saint",
+  // "President"), JW the post-prefix cores instead — the prefix bonus
+  // otherwise inflates "mount sanai" vs "mount zion" past the threshold.
+  let jwA = a, jwB = b;
+  {
+    const uSplit = splitTitlePrefix(userAnswer);
+    const cSplit = splitTitlePrefix(correctAnswer);
+    if (uSplit && cSplit && uSplit.prefix === cSplit.prefix && uSplit.suffix && cSplit.suffix) {
+      jwA = normalizeAnswer(uSplit.suffix);
+      jwB = normalizeAnswer(cSplit.suffix);
+    }
+  }
+  if (!isNumericAnswer && !isMultiPartAnswer && natural.JaroWinklerDistance(jwA, jwB) >= 0.885) return true;
 
   // Abbreviation dot equivalence: "D.C." ↔ "DC", "G.I. Joe" ↔ "GI Joe", "C.I.A." ↔ "CIA".
   // Uses a lightweight strip (no Roman numeral conversion) so e.g. "DC" isn't treated as
@@ -791,27 +816,46 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   {
     const userWithoutTitle = stripTitlePrefix(userAnswer);
     if (userWithoutTitle !== null && userWithoutTitle !== userAnswer) {
-      if (isAnswerCorrect(userWithoutTitle, correctAnswer, questionText)) return true;
+      // If the correct answer carries the SAME title prefix, compare the
+      // cores directly. Recursing with the user core against the full correct
+      // would re-enter the title-strip path with a looser 0.88 JW threshold —
+      // and pass on short pairs like "Mark" vs "Mary" (0.883).
+      const uSplit = splitTitlePrefix(userAnswer);
+      const cSplit = splitTitlePrefix(correctAnswer);
+      if (uSplit && cSplit && uSplit.prefix === cSplit.prefix) {
+        if (isAnswerCorrect(uSplit.suffix, cSplit.suffix, questionText)) return true;
+      } else if (isAnswerCorrect(userWithoutTitle, correctAnswer, questionText)) {
+        return true;
+      }
     }
   }
 
   // Title + single-word name (e.g. "General MacArthur", "Sir Lancelot"):
   // accept any user answer whose last word matches the name. So "Tyler MacArthur"
-  // or "Joe Lancelot" are accepted. Scoped to single-word names after the title
+  // or "Joe Lancelot" are accepted. Skip when both sides share the same title
+  // prefix — those should be handled by the same-prefix core comparison above,
+  // and we don't want short-name JW (e.g. "Mark" vs "Mary" = 0.883 ≥ 0.88) to
+  // sneak through this loose path.
+  // Scoped to single-word names after the title
   // to avoid confusing historical figures with matching surnames.
   {
     const withoutTitle = stripTitlePrefix(correctAnswer);
     if (withoutTitle !== null) {
-      const dbWords = withoutTitle.trim().split(/\s+/);
-      if (dbWords.length === 1) {
-        const dbNameNorm = normalizeAnswer(dbWords[0]);
-        if (dbNameNorm) {
-          const userWords = userAnswer.trim().split(/\s+/);
-          if (userWords.length >= 2) {
-            const userLastNorm = normalizeAnswer(userWords[userWords.length - 1]);
-            if (userLastNorm === dbNameNorm) return true;
-            if (userLastNorm.length >= 4
-                && natural.JaroWinklerDistance(userLastNorm, dbNameNorm) >= 0.88) return true;
+      const uSplit = splitTitlePrefix(userAnswer);
+      const cSplit = splitTitlePrefix(correctAnswer);
+      const sharedTitle = uSplit && cSplit && uSplit.prefix === cSplit.prefix;
+      if (!sharedTitle) {
+        const dbWords = withoutTitle.trim().split(/\s+/);
+        if (dbWords.length === 1) {
+          const dbNameNorm = normalizeAnswer(dbWords[0]);
+          if (dbNameNorm) {
+            const userWords = userAnswer.trim().split(/\s+/);
+            if (userWords.length >= 2) {
+              const userLastNorm = normalizeAnswer(userWords[userWords.length - 1]);
+              if (userLastNorm === dbNameNorm) return true;
+              if (userLastNorm.length >= 4
+                  && natural.JaroWinklerDistance(userLastNorm, dbNameNorm) >= 0.88) return true;
+            }
           }
         }
       }
