@@ -835,6 +835,14 @@ const tests = [
   { correct: 'Saint Patrick',        user: 'Saint Patrik',         expect: true,  note: 'shared "Saint" — typo in core' },
   { correct: 'President Roosevelt',  user: 'President Roosvelt',   expect: true,  note: 'shared "President" — typo in core' },
 
+  // ── Additional political/religious title prefixes ────────────────────────
+  { correct: 'Chairman Mao Zedong',  user: 'Mao Zedong',           expect: true,  note: 'Chairman — accept full name without title' },
+  { correct: 'Chairman Mao',         user: 'Mao',                  expect: true,  note: 'Chairman + single name' },
+  { correct: 'Chairman Mao',         user: 'Stalin',               expect: false, note: 'Chairman — wrong name rejected' },
+  { correct: 'Premier Khrushchev',   user: 'Khrushchev',           expect: true,  note: 'Premier — last name' },
+  { correct: 'Ayatollah Khomeini',   user: 'Khomeini',             expect: true,  note: 'Ayatollah — name only' },
+  { correct: 'Chairman Mao',         user: 'Chairman Stalin',      expect: false, note: 'shared "Chairman" — different leaders' },
+
   // ── Shared-title-prefix JW guard: only one side has the prefix ───────────
   // When only one side has a title prefix, existing strip-title logic handles
   // suffix-only matches; this guard shouldn't change behavior there.

@@ -409,6 +409,7 @@ const TITLE_PREFIXES = [
   'prime minister', 'vice president', 'secretary of state', 'attorney general',
   'chief justice', 'commanding general', 'supreme commander',
   'president', 'senator', 'governor', 'commissioner', 'mayor', 'chancellor',
+  'chairman', 'chairwoman', 'premier', 'ayatollah',
   'king', 'queen', 'prince', 'princess', 'duke', 'duchess', 'emperor', 'empress',
   'czar', 'tsar', 'sultan', 'pharaoh', 'pope',
   'general', 'admiral', 'colonel', 'captain', 'major', 'sergeant', 'lieutenant',
