@@ -1873,7 +1873,21 @@
         kbOffset = newOffset;
         applyShift('vvShift');
       };
-      const onVVResize = () => { applyVVShift(); };
+      const onVVResize = () => { applyVVShift(); syncBodyHeight(); };
+
+      // iOS standalone: 100dvh on <body> updates a frame or two after the
+      // visualViewport.resize event, so the bottom-anchored input briefly
+      // remains anchored to the still-tall body and ends up partially hidden
+      // by the keyboard. Pin body height to visualViewport.height in JS so the
+      // anchor follows the keyboard synchronously.
+      const syncBodyHeight = () => {
+        if (!window.navigator.standalone) return;
+        if (baseVVHeight > 0 && window.visualViewport.height < baseVVHeight - 50) {
+          document.body.style.height = window.visualViewport.height + 'px';
+        } else {
+          document.body.style.height = '';
+        }
+      };
 
       // Focus fallback: iOS sometimes skips the visualViewport resize event
       // entirely. 500ms after focus, if no shift has been applied, try the
@@ -1923,6 +1937,7 @@
           window.visualViewport.removeEventListener('scroll', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
           window.removeEventListener('scroll', resetScroll);
+          document.body.style.height = '';
           kbOffset = 0;
           baseInputBottom = 0;
           baseInnerHeight = 0;
