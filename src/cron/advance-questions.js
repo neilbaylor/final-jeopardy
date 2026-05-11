@@ -72,6 +72,26 @@ async function advanceStaleQuestions() {
 
     // Advance stale games and collect notifications
     for (const { game_id } of staleGames) {
+      // If no player has answered any question in this game for 4+ days
+      // (or the game was created 4+ days ago and never answered), delete
+      // the game rather than advancing the question.
+      const [[activity]] = await conn.execute(
+        `SELECT g.created_at, MAX(ga.answered_at) AS last_answered
+         FROM games g
+         LEFT JOIN game_questions gq ON gq.game_id = g.id
+         LEFT JOIN game_answers ga ON ga.game_question_id = gq.id
+         WHERE g.id = ?
+         GROUP BY g.id`,
+        [game_id]
+      );
+      const referenceTime = activity?.last_answered || activity?.created_at;
+      if (referenceTime && (Date.now() - new Date(referenceTime).getTime()) > 4 * 24 * 60 * 60 * 1000) {
+        await conn.execute('DELETE FROM question_reminders WHERE game_id = ?', [game_id]);
+        await conn.execute('DELETE FROM games WHERE id = ?', [game_id]);
+        console.log(`Deleted abandoned game ${game_id} (no answers for 4+ days)`);
+        continue;
+      }
+
       const [[nextQuestion]] = await conn.execute(
         `SELECT id FROM questions
          WHERE id NOT IN (SELECT question_id FROM game_questions WHERE game_id = ?)
