@@ -92,7 +92,7 @@ const COMMON_FIRST_NAMES = new Set([
   // Male
   'aaron','abel','abraham','adam','adrian','alan','allan','allen','albert','alberto','alex','alexander','alexis','alfred','alvin',
   'andrew','andy','angelo','anthony','antonio','archer','arnold','arthur','austin','ayn',
-  'barry','ben','benjamin','bill','billy','blake','bob','bobby','brad','bradley','brandon','branden','brendan',
+  'barry','ben','benito','benjamin','bill','billy','blake','bob','bobby','brad','bradley','brandon','branden','brendan',
   'brett','brian','bruce','bryan','bryce',
   'calvin','carl','carlos','cassius','chad','charles','charlie','chris','cris','christian','christopher','chuck',
   'clark','clayton','clifford','clinton','cody','colin','conner','connor','corey','cory','craig',
@@ -108,7 +108,7 @@ const COMMON_FIRST_NAMES = new Set([
   'jose','joseph','josef','joshua','juan','julian','julius','justin',
   'karl','keith','ken','kenneth','kevin','kurt','kyle',
   'lance','larry','lawrence','leo','leon','leonard','liam','lloyd','logan','louis','luc','lucas','luke',
-  'malcolm','marcus','mario','mark','martin','mason','matt','matthew','max','michael','micheal','miguel','mike','miles',
+  'mahatma','malcolm','marcus','mario','mark','martin','mason','matt','matthew','max','michael','micheal','miguel','mike','miles',
   'mitchell','morris',
   'nathan','neil','nelson','neville','nicholas','nicolas','nick','noah','noel','norman',
   'oliver','omar','oscar','otto','owen',
@@ -448,6 +448,16 @@ function splitTitlePrefix(answer) {
   return null;
 }
 
+// JW catches most typos, but underweights single-character edits when the
+// missing character sits right after the only shared prefix character
+// (e.g. "cesar" vs "caesar" = 0.86). For name tokens of length ≥ 4 we accept
+// a Levenshtein distance of 1 as a fallback.
+function fuzzyNameEq(a, b) {
+  if (natural.JaroWinklerDistance(a, b) >= 0.88) return true;
+  if (Math.min(a.length, b.length) >= 4 && natural.LevenshteinDistance(a, b) <= 1) return true;
+  return false;
+}
+
 function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   userAnswer = stripJeopardyPreamble(userAnswer);
   // Expand "Mt." / "Mt" (before whitespace) to "Mount" on both sides so the two
@@ -731,7 +741,7 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   if (singleLn !== null) {
     const lnNorm = normalizeAnswer(singleLn);
     if (a === lnNorm) return true;
-    if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
+    if (fuzzyNameEq(a, lnNorm)) return true;
   }
 
   // Inverse: user supplied "FirstName [Middle] LastName" but correct answer is
@@ -742,11 +752,11 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   if (userLn !== null) {
     const userLnNorm = normalizeAnswer(userLn);
     if (userLnNorm === b) return true;
-    if (natural.JaroWinklerDistance(userLnNorm, b) >= 0.88) return true;
+    if (fuzzyNameEq(userLnNorm, b)) return true;
     if (singleLn !== null) {
       const lnNorm = normalizeAnswer(singleLn);
       if (userLnNorm === lnNorm) return true;
-      if (natural.JaroWinklerDistance(userLnNorm, lnNorm) >= 0.88) return true;
+      if (fuzzyNameEq(userLnNorm, lnNorm)) return true;
     }
   }
 
@@ -755,10 +765,10 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
   if (singleCs !== null) {
     const csNorm = normalizeAnswer(singleCs);
     if (a === csNorm) return true;
-    if (natural.JaroWinklerDistance(a, csNorm) >= 0.88) return true;
+    if (fuzzyNameEq(a, csNorm)) return true;
     const finalNorm = normalizeAnswer(singleCs.split(/\s+/).pop());
     if (a === finalNorm) return true;
-    if (natural.JaroWinklerDistance(a, finalNorm) >= 0.88) return true;
+    if (fuzzyNameEq(a, finalNorm)) return true;
   }
 
   // Tail-after-first-name: "Jacqueline Kennedy Onassis" → accept "Kennedy Onassis"
@@ -797,17 +807,17 @@ function isAnswerCorrect(userAnswer, correctAnswer, questionText) {
       if (ln !== null) {
         const lnNorm = normalizeAnswer(ln);
         if (a === lnNorm) return true;
-        if (natural.JaroWinklerDistance(a, lnNorm) >= 0.88) return true;
+        if (fuzzyNameEq(a, lnNorm)) return true;
       }
       // Compound surname (e.g. "da Vinci" or "Vinci" for "President Leonardo da Vinci")
       const cs = extractCompoundSurname(withoutTitle);
       if (cs !== null) {
         const csNorm = normalizeAnswer(cs);
         if (a === csNorm) return true;
-        if (natural.JaroWinklerDistance(a, csNorm) >= 0.88) return true;
+        if (fuzzyNameEq(a, csNorm)) return true;
         const finalNorm = normalizeAnswer(cs.split(/\s+/).pop());
         if (a === finalNorm) return true;
-        if (natural.JaroWinklerDistance(a, finalNorm) >= 0.88) return true;
+        if (fuzzyNameEq(a, finalNorm)) return true;
       }
     }
   }

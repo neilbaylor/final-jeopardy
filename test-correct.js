@@ -835,6 +835,17 @@ const tests = [
   { correct: 'Saint Patrick',        user: 'Saint Patrik',         expect: true,  note: 'shared "Saint" — typo in core' },
   { correct: 'President Roosevelt',  user: 'President Roosvelt',   expect: true,  note: 'shared "President" — typo in core' },
 
+  // ── Single-character typos on last names (JW underweights, Levenshtein-1)
+  { correct: 'Julius Caesar',        user: 'Caesar',               expect: true,  note: 'Julius Caesar — last name only' },
+  { correct: 'Julius Caesar',        user: 'Cesar',                expect: true,  note: 'Julius Caesar — common typo (1-char deletion)' },
+  { correct: 'Julius Caesar',        user: 'Ceasar',               expect: true,  note: 'Julius Caesar — transposition typo' },
+  { correct: 'Julius Caesar',        user: 'Caesr',                expect: true,  note: 'Julius Caesar — 1-char deletion at end' },
+  { correct: 'Julius Caesar',        user: 'Sausage',              expect: false, note: 'Julius Caesar — totally different word rejected' },
+  { correct: 'Julius Caesar',        user: 'Brutus',               expect: false, note: 'Julius Caesar — different name rejected' },
+  { correct: 'Benito Mussolini',     user: 'Musolini',             expect: true,  note: 'Mussolini — 1-char deletion (double-s)' },
+  { correct: 'Mahatma Gandhi',       user: 'Ghandi',               expect: true,  note: 'Gandhi — common transposition typo' },
+  { correct: 'Vincent van Gogh',     user: 'Van Goh',              expect: true,  note: 'van Gogh — 1-char deletion in compound surname' },
+
   // ── Additional political/religious title prefixes ────────────────────────
   { correct: 'Chairman Mao Zedong',  user: 'Mao Zedong',           expect: true,  note: 'Chairman — accept full name without title' },
   { correct: 'Chairman Mao',         user: 'Mao',                  expect: true,  note: 'Chairman + single name' },
