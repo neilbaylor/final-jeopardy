@@ -1917,7 +1917,24 @@
         kbOffset = newOffset;
         applyShift('vvShift');
       };
-      const onVVResize = () => { window._kbDiagPush('vvResize'); applyVVShift(); };
+      const onVVResize = () => {
+        window._kbDiagPush('vvResize');
+        applyVVShift();
+        // iOS standalone sometimes shrinks visualViewport for the keyboard
+        // but doesn't auto-scroll the page — offsetTop stays 0 and the
+        // bottom-anchored input ends up below the keyboard. Drive the
+        // missing scroll ourselves so the next vvResize gets a positive
+        // offsetTop and applyVVShift runs normally.
+        if (window.navigator.standalone
+            && document.activeElement === answerInput
+            && window.visualViewport.offsetTop === 0
+            && baseVVHeight > 0
+            && window.visualViewport.height < baseVVHeight - 50) {
+          const need = baseVVHeight - window.visualViewport.height;
+          window._kbDiagPush('manualScroll:' + need);
+          window.scrollTo(0, need);
+        }
+      };
       answerInput.addEventListener('focus', () => window._kbDiagPush('inputFocus'));
       answerInput.addEventListener('blur', () => window._kbDiagPush('inputBlur'));
       window.addEventListener('scroll', () => window._kbDiagPush('windowScroll'), { passive: true });
