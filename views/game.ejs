@@ -391,7 +391,8 @@
       pointer-events: none;
       transition: transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
     }
-    #answer-input-wrap.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+    #answer-input-wrap.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #answer-input-wrap.visible.interactive { pointer-events: auto; }
     #answer-input-wrap.sliding-out {
       transform: translateX(-50%) translateY(calc(100% + env(safe-area-inset-bottom, 0px) + 24px));
       opacity: 0;
@@ -1623,7 +1624,18 @@
           goodLuckEl.classList.remove('visible');
           answerInputWrap.style.display = '';
           answerInputWrap.offsetHeight; // reflow so transition fires
+          answerInputWrap.classList.remove('interactive');
           answerInputWrap.classList.add('visible');
+          // Block taps (and therefore iOS keyboard-avoidance scroll on focus)
+          // until the slide-in transform finishes. iOS computes its scroll
+          // from the input rect at focus time — focusing mid-slide leaves the
+          // input partly hidden below the keyboard.
+          answerInputWrap.addEventListener('transitionend', function onSlideIn(e) {
+            if (e.target !== answerInputWrap || e.propertyName !== 'transform') return;
+            answerInputWrap.removeEventListener('transitionend', onSlideIn);
+            answerInputWrap.classList.add('interactive');
+            if (window._kbDiagPush) window._kbDiagPush('slideInEnd');
+          });
 
           {
             progressFill.style.transform = '';
@@ -1662,7 +1674,12 @@
                   const answerRes = await fetch(`/api/games/${gameId}/answers`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ playerId: userId, questionId: currentQuestionId, answer: submittedAnswer }),
+                    body: JSON.stringify({
+                      playerId: userId,
+                      questionId: currentQuestionId,
+                      answer: submittedAnswer,
+                      kbDiag: window._kbDiag || [],
+                    }),
                   });
                   try { localStorage.removeItem(`unanswered_${gameId}_${currentGameQuestionId}`); } catch {}
                   if (!answerRes.ok) {
@@ -1827,6 +1844,33 @@
       let baseInputBottom = 0;
       let kbOffset = 0;
 
+      // TEMP diagnostic: capture viewport/input snapshots at key moments;
+      // submitted with the answer so we can see what state things are in
+      // when the input lands below the keyboard. Resets each question.
+      window._kbDiag = [];
+      const _kbDiagStart = Date.now();
+      window._kbDiagPush = (label) => {
+        try {
+          const r = answerInputWrap.getBoundingClientRect();
+          const ir = answerInput.getBoundingClientRect();
+          const vv = window.visualViewport;
+          window._kbDiag.push({
+            t: Date.now() - _kbDiagStart,
+            label,
+            ot: Math.round(vv.offsetTop),
+            vh: Math.round(vv.height),
+            ih: window.innerHeight,
+            sy: Math.round(window.scrollY),
+            wrapB: Math.round(r.bottom),
+            inpB: Math.round(ir.bottom),
+            kbo: kbOffset,
+            focused: document.activeElement === answerInput,
+            standalone: !!window.navigator.standalone,
+          });
+          if (window._kbDiag.length > 60) window._kbDiag.shift();
+        } catch {}
+      };
+
       // TEMP debug log of every keyboard-shift signal — sent with the answer
       // submit so we can inspect on the server. Persists across multiple
       // open/close cycles within a single question; cleared on submit.
@@ -1873,7 +1917,10 @@
         kbOffset = newOffset;
         applyShift('vvShift');
       };
-      const onVVResize = () => { applyVVShift(); };
+      const onVVResize = () => { window._kbDiagPush('vvResize'); applyVVShift(); };
+      answerInput.addEventListener('focus', () => window._kbDiagPush('inputFocus'));
+      answerInput.addEventListener('blur', () => window._kbDiagPush('inputBlur'));
+      window.addEventListener('scroll', () => window._kbDiagPush('windowScroll'), { passive: true });
 
       // Focus fallback: iOS sometimes skips the visualViewport resize event
       // entirely. 500ms after focus, if no shift has been applied, try the
@@ -1902,6 +1949,7 @@
 
       window._vvStart = () => {
         kbOffset = 0;
+        window._kbDiagPush('vvStart');
         // Defer one frame so layout has a chance to settle (insets, chrome,
         // slide-in transform) before we capture baselines.
         requestAnimationFrame(() => {
