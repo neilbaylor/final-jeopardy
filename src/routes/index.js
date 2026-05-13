@@ -1255,16 +1255,11 @@ router.get('/api/stats', async (req, res) => {
     );
 
     const [answers] = await db.query(
-      `SELECT COALESCE(ga.is_correct, 0) AS is_correct, gq.game_id
-       FROM game_users gu
-       JOIN game_questions gq ON gq.game_id = gu.game_id
-       LEFT JOIN game_answers ga ON ga.game_question_id = gq.id AND ga.user_id = gu.user_id
-       WHERE gu.user_id = ?
-         AND (
-           ga.id IS NOT NULL
-           OR EXISTS (SELECT 1 FROM game_questions gq2 WHERE gq2.game_id = gq.game_id AND gq2.id > gq.id)
-         )
-       ORDER BY gq.asked_at, gq.id`,
+      `SELECT ga.is_correct, gq.game_id
+       FROM game_answers ga
+       JOIN game_questions gq ON gq.id = ga.game_question_id
+       WHERE ga.user_id = ?
+       ORDER BY ga.answered_at, ga.id`,
       [Number(userId)]
     );
 
