@@ -1262,7 +1262,7 @@
     function buildAnswerResponsesHtml(players, nextReady) {
       const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       const sorted = [...players].sort((a, b) => (b._isMe ? 1 : 0) - (a._isMe ? 1 : 0));
-      return sorted.slice(0, 5).map(p => {
+      return sorted.slice(0, 4).map(p => {
         const rawName = (p.display_name || '').trim();
         const parts = rawName.split(' ');
         const fn = parts[0] || '';
@@ -1753,7 +1753,7 @@
                       const latest = latestPlayers && latestPlayers.find(lp => String(lp.id) === String(p.id));
                       return { ...p, score: latest ? latest.score : p.score, _answered: !!ans, _isCorrect: ans ? !!ans.is_correct : null, _answeredAt: ans ? ans.answered_at : null, _answerText: ans ? ans.answer : null, _answerId: ans ? ans.id : null, _isDisputed: ans ? !!ans.is_disputed : false };
                     });
-                    const arPlayers = [meEntry, ...enrichedOthers].slice(0, 3);
+                    const arPlayers = [meEntry, ...enrichedOthers].slice(0, 4);
                     answerResponsesEl.innerHTML = buildAnswerResponsesHtml(arPlayers, shouldShowNextBtn);
                     answerResponsesEl.classList.remove('count-1', 'count-2');
                     if (arPlayers.length === 1) answerResponsesEl.classList.add('count-1');
