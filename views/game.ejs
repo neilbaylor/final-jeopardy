@@ -1876,17 +1876,12 @@
       // submit so we can inspect on the server. Persists across multiple
       // open/close cycles within a single question; cleared on submit.
       const blockScroll = e => e.preventDefault();
-      const resetScroll = () => window.scrollTo(0, document.body.scrollHeight);
       const applyShift = (source) => {
         const shift = kbOffset > 0 ? `translateY(${kbOffset}px)` : '';
         if (kbOffset > 0) {
           document.addEventListener('touchmove', blockScroll, { passive: false });
-          if (window.navigator.standalone) {
-            setTimeout(() => window.addEventListener('scroll', resetScroll, { passive: true }), 600);
-          }
         } else {
           document.removeEventListener('touchmove', blockScroll);
-          window.removeEventListener('scroll', resetScroll);
         }
         [progressBar, headerCategoryEl, questionEl].forEach(el => {
           if (answerInput.disabled) {
@@ -1989,7 +1984,6 @@
           window.visualViewport.removeEventListener('resize', onVVResize);
           window.visualViewport.removeEventListener('scroll', onVVResize);
           document.removeEventListener('touchmove', blockScroll);
-          window.removeEventListener('scroll', resetScroll);
           kbOffset = 0;
           baseInputBottom = 0;
           baseInnerHeight = 0;
