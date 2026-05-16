@@ -1918,18 +1918,13 @@
         applyVVShift();
         if (!window.navigator.standalone || document.activeElement !== answerInput) return;
         const vv = window.visualViewport;
-        if (vv.offsetTop === 0 && baseVVHeight > 0 && vv.height < baseVVHeight - 50) {
+        // Only scroll when the keyboard is mostly/fully up (not a partial first-step
+        // shrink). Scrolling on the partial step causes iOS to mirror our scroll into
+        // offsetTop on the next resize, leaving the input behind the keyboard.
+        if (vv.offsetTop === 0 && baseVVHeight > 0 && vv.height < baseVVHeight - 300) {
           const need = baseVVHeight - vv.height;
           window._kbDiagPush('manualScroll:' + need);
           window.scrollTo(0, need);
-          return;
-        }
-        const wrapBottom = answerInputWrap.getBoundingClientRect().bottom;
-        const visualBottom = vv.offsetTop + vv.height;
-        if (wrapBottom > visualBottom + 2) {
-          const extra = Math.ceil(wrapBottom - visualBottom);
-          window._kbDiagPush('extraScroll:' + extra);
-          window.scrollTo(0, window.scrollY + extra);
         }
       };
       answerInput.addEventListener('focus', () => window._kbDiagPush('inputFocus'));
