@@ -278,7 +278,12 @@ function extractInstitutionCore(name) {
 // and the compound surname (or bare surname) for "FirstName [particle] Surname" names.
 function matchesPart(userNorm, correctNorm, correctPartOrig) {
   if (userNorm === correctNorm) return true;
-  if (natural.JaroWinklerDistance(userNorm, correctNorm) >= 0.88) return true;
+  // Skip JW for pure-number parts — "1864" → "one thousand eight hundred sixty four"
+  // shares a 27-char prefix with "1881" → "one thousand eight hundred eighty one",
+  // inflating JW past 0.88.
+  const isNumeric = /^\s*[\d,\s]+\s*$/.test(correctPartOrig);
+  if (!isNumeric && natural.JaroWinklerDistance(userNorm, correctNorm) >= 0.88) return true;
+  if (isNumeric) return false;
   const ln = extractLastName(correctPartOrig);
   if (ln !== null) {
     const lnNorm = normalizeAnswer(ln);

@@ -584,6 +584,13 @@ const tests = [
   { correct: '42',     user: '43',     expect: false, note: 'numeric: adjacent small number rejected' },
   { correct: '100',    user: '1000',   expect: false, note: 'numeric: different magnitude rejected' },
 
+  // ─── "X or Y" numeric alternatives ──────────────────────────────────────────
+  { correct: '1881 or 1841', user: '1881', expect: true,  note: 'numeric or: first alternative' },
+  { correct: '1881 or 1841', user: '1841', expect: true,  note: 'numeric or: second alternative' },
+  { correct: '1881 or 1841', user: '1864', expect: false, note: 'numeric or: near-year rejected (shared "one thousand eight hundred" prefix)' },
+  { correct: '1881 or 1841', user: '1900', expect: false, note: 'numeric or: different year rejected' },
+  { correct: '1066 or 1077', user: '1067', expect: false, note: 'numeric or: off-by-one near alternative rejected' },
+
   // ── Institution shorthand (university/college/school/academy/institute) ──────
   { correct: 'University of Oregon',        user: 'Oregon',                expect: true,  note: 'institution: University of X → X' },
   { correct: 'Oregon University',           user: 'Oregon',                expect: true,  note: 'institution: X University → X' },
